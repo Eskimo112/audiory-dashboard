@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types';
-import ComputerDesktopIcon from '@heroicons/react/24/solid/ComputerDesktopIcon';
-import DeviceTabletIcon from '@heroicons/react/24/solid/DeviceTabletIcon';
-import PhoneIcon from '@heroicons/react/24/solid/PhoneIcon';
+import PropTypes from "prop-types";
+import ComputerDesktopIcon from "@heroicons/react/24/solid/ComputerDesktopIcon";
+import DeviceTabletIcon from "@heroicons/react/24/solid/DeviceTabletIcon";
+import PhoneIcon from "@heroicons/react/24/solid/PhoneIcon";
 import {
   Box,
   Card,
@@ -10,91 +10,68 @@ import {
   Stack,
   SvgIcon,
   Typography,
-  useTheme
-} from '@mui/material';
-import { Chart } from 'src/components/chart';
+  useTheme,
+} from "@mui/material";
+import { Chart } from "src/components/chart";
+
+import { formatPrice } from "../../utils/format-price";
+import { brand } from "../../theme/colors";
 
 const useChartOptions = (labels) => {
   const theme = useTheme();
-
+  const colors = [brand.shopee, brand.tiktok, brand.lazada];
   return {
     chart: {
-      background: 'transparent'
+      background: "transparent",
     },
-    colors: [
-      theme.palette.primary.main,
-      theme.palette.success.main,
-      theme.palette.warning.main
-    ],
+    colors: colors,
     dataLabels: {
-      enabled: false
+      enabled: false,
     },
     labels,
     legend: {
-      show: false
+      show: false,
     },
     plotOptions: {
       pie: {
-        expandOnClick: false
-      }
+        expandOnClick: false,
+      },
     },
     states: {
       active: {
         filter: {
-          type: 'none'
-        }
+          type: "none",
+        },
       },
       hover: {
         filter: {
-          type: 'none'
-        }
-      }
+          type: "none",
+        },
+      },
     },
     stroke: {
-      width: 0
+      width: 0,
     },
     theme: {
-      mode: theme.palette.mode
+      mode: theme.palette.mode,
     },
     tooltip: {
-      fillSeriesColor: false
-    }
+      fillSeriesColor: false,
+    },
   };
-};
-
-const iconMap = {
-  Desktop: (
-    <SvgIcon>
-      <ComputerDesktopIcon />
-    </SvgIcon>
-  ),
-  Tablet: (
-    <SvgIcon>
-      <DeviceTabletIcon />
-    </SvgIcon>
-  ),
-  Phone: (
-    <SvgIcon>
-      <PhoneIcon />
-    </SvgIcon>
-  )
 };
 
 export const OverviewTraffic = (props) => {
   const { chartSeries, labels, sx } = props;
   const chartOptions = useChartOptions(labels);
+  const theme = useTheme();
+  const colors = [brand.shopee, brand.tiktok, brand.lazada];
 
   return (
     <Card sx={sx}>
-      <CardHeader title="Traffic Source" />
+      <CardHeader title="Nguồn doanh thu" />
       <CardContent>
-        <Chart
-          height={300}
-          options={chartOptions}
-          series={chartSeries}
-          type="donut"
-          width="100%"
-        />
+        <Chart height={300} options={chartOptions} series={chartSeries} type="donut" width="100%" />
         <Stack
           alignItems="center"
           direction="row"
@@ -109,23 +86,16 @@ export const OverviewTraffic = (props) => {
               <Box
                 key={label}
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center'
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
                 }}
               >
-                {iconMap[label]}
-                <Typography
-                  sx={{ my: 1 }}
-                  variant="h6"
-                >
+                <Typography sx={{ my: 1, color: colors[index] }} variant="h6">
                   {label}
                 </Typography>
-                <Typography
-                  color="text.secondary"
-                  variant="subtitle2"
-                >
-                  {item}%
+                <Typography color="text.secondary" variant="subtitle2">
+                  {formatPrice(item)}
                 </Typography>
               </Box>
             );
@@ -139,5 +109,5 @@ export const OverviewTraffic = (props) => {
 OverviewTraffic.propTypes = {
   chartSeries: PropTypes.array.isRequired,
   labels: PropTypes.array.isRequired,
-  sx: PropTypes.object
+  sx: PropTypes.object,
 };

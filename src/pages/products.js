@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { useSelection } from "src/hooks/use-selection";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import { CustomersTable } from "src/sections/customer/customers-table";
+import { ProductsTable } from "src/sections/product/products-table";
 import { applyPagination } from "src/utils/apply-pagination";
 import { useQuery } from "react-query";
 import axios from "axios";
@@ -23,22 +23,22 @@ import MagnifyingGlassIcon from "@heroicons/react/24/solid/MagnifyingGlassIcon";
 
 const now = new Date();
 
-const useCustomers = (data, page, rowsPerPage) => {
+const useProducts = (data, page, rowsPerPage) => {
   return useMemo(() => {
     return applyPagination(data, page, rowsPerPage);
   }, [page, rowsPerPage, data.length]);
 };
 
-const useCustomerIds = (customers) => {
+const useProductIds = (products) => {
   return useMemo(() => {
-    return customers.map((customer) => customer.id);
-  }, [customers]);
+    return products.map((product) => product.id);
+  }, [products]);
 };
 
 const Page = () => {
-  const { data = [] } = useQuery(["customers"], async () => {
+  const { data = [] } = useQuery(["products"], async () => {
     const res = await axios.get(
-      "https://pricible.azurewebsites.net/api/Account?" +
+      "https://pricible.azurewebsites.net/api/Product?" +
         new URLSearchParams({
           pageSize: 10000000,
         })
@@ -49,15 +49,18 @@ const Page = () => {
   const [searchValue, setSearchValue] = useState("");
   const debounceSearchValue = useDebounce(searchValue, 500);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const customers = useCustomers(
+  const products = useProducts(
     data.filter(
-      (item) => item.name.includes(debounceSearchValue) || item.email.includes(debounceSearchValue)
+      (item) =>
+        item.name.includes(debounceSearchValue) ||
+        item.link.includes(debounceSearchValue) ||
+        item.provider.includes(debounceSearchValue)
     ),
     page,
     rowsPerPage
   );
-  const customersIds = useCustomerIds(customers);
-  const customersSelection = useSelection(customersIds);
+  const productsIds = useProductIds(products);
+  const productsSelection = useSelection(productsIds);
 
   const handlePageChange = useCallback((event, value) => {
     setPage(value);
@@ -69,7 +72,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>Customers | Devias Kit</title>
+        <title>Product | Pricible</title>
       </Head>
       <Box
         component="main"
@@ -82,29 +85,8 @@ const Page = () => {
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
-                <Typography variant="h4">Người dùng</Typography>
-                <Stack alignItems="center" direction="row" spacing={1}>
-                  {/* <Button
-                    color="inherit"
-                    startIcon={
-                      <SvgIcon fontSize="small">
-                        <ArrowUpOnSquareIcon />
-                      </SvgIcon>
-                    }
-                  >
-                    Import
-                  </Button>
-                  <Button
-                    color="inherit"
-                    startIcon={
-                      <SvgIcon fontSize="small">
-                        <ArrowDownOnSquareIcon />
-                      </SvgIcon>
-                    }
-                  >
-                    Export
-                  </Button> */}
-                </Stack>
+                <Typography variant="h4">Sản phẩm</Typography>
+                <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
               <div>
                 <Button
@@ -123,7 +105,7 @@ const Page = () => {
               <OutlinedInput
                 defaultValue=""
                 fullWidth
-                placeholder="Tìm kiếm người dùng"
+                placeholder="Tìm kiếm sản phẩm"
                 onChange={(e) => setSearchValue(e.target.value)}
                 startAdornment={
                   <InputAdornment position="start">
@@ -136,18 +118,18 @@ const Page = () => {
               />
             </Card>
 
-            <CustomersTable
+            <ProductsTable
               count={data.length}
-              items={customers}
-              onDeselectAll={customersSelection.handleDeselectAll}
-              onDeselectOne={customersSelection.handleDeselectOne}
+              items={products}
+              onDeselectAll={productsSelection.handleDeselectAll}
+              onDeselectOne={productsSelection.handleDeselectOne}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
-              onSelectAll={customersSelection.handleSelectAll}
-              onSelectOne={customersSelection.handleSelectOne}
+              onSelectAll={productsSelection.handleSelectAll}
+              onSelectOne={productsSelection.handleSelectOne}
               page={page}
               rowsPerPage={rowsPerPage}
-              selected={customersSelection.selected}
+              selected={productsSelection.selected}
             />
           </Stack>
         </Container>

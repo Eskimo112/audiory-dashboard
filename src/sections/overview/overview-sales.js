@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
-import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
-import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
+import PropTypes from "prop-types";
+import ArrowPathIcon from "@heroicons/react/24/solid/ArrowPathIcon";
+import ArrowRightIcon from "@heroicons/react/24/solid/ArrowRightIcon";
 import {
   Button,
   Card,
@@ -8,99 +8,100 @@ import {
   CardContent,
   CardHeader,
   Divider,
-  SvgIcon
-} from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
-import { Chart } from 'src/components/chart';
+  SvgIcon,
+} from "@mui/material";
+import { alpha, useTheme } from "@mui/material/styles";
+import { Chart } from "src/components/chart";
+import { formatPrice } from "../../utils/format-price";
 
 const useChartOptions = () => {
   const theme = useTheme();
 
   return {
     chart: {
-      background: 'transparent',
+      background: "transparent",
       stacked: false,
       toolbar: {
-        show: false
-      }
+        show: false,
+      },
     },
     colors: [theme.palette.primary.main, alpha(theme.palette.primary.main, 0.25)],
     dataLabels: {
-      enabled: false
+      enabled: false,
     },
     fill: {
       opacity: 1,
-      type: 'solid'
+      type: "solid",
     },
     grid: {
       borderColor: theme.palette.divider,
       strokeDashArray: 2,
       xaxis: {
         lines: {
-          show: false
-        }
+          show: false,
+        },
       },
       yaxis: {
         lines: {
-          show: true
-        }
-      }
+          show: true,
+        },
+      },
     },
     legend: {
-      show: false
+      show: false,
     },
     plotOptions: {
       bar: {
-        columnWidth: '40px'
-      }
+        columnWidth: "40px",
+      },
     },
     stroke: {
-      colors: ['transparent'],
+      colors: ["transparent"],
       show: true,
-      width: 2
+      width: 2,
     },
     theme: {
-      mode: theme.palette.mode
+      mode: theme.palette.mode,
     },
     xaxis: {
       axisBorder: {
         color: theme.palette.divider,
-        show: true
+        show: true,
       },
       axisTicks: {
         color: theme.palette.divider,
-        show: true
+        show: true,
       },
       categories: [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
+        "01/07",
+        "02/07",
+        "03/07",
+        "04/07",
+        "05/07",
+        "06/07",
+        "07/07",
+        "08/07",
+        "09/07",
+        "10/07",
+        "11/07",
+        "12/07",
       ],
       labels: {
         offsetY: 5,
         style: {
-          colors: theme.palette.text.secondary
-        }
-      }
+          colors: theme.palette.text.secondary,
+        },
+      },
     },
     yaxis: {
       labels: {
-        formatter: (value) => (value > 0 ? `${value}K` : `${value}`),
+        formatter: (value) => (value > 0 ? `${formatPrice(value)}` : `${formatPrice(value)}`),
         offsetX: -10,
         style: {
-          colors: theme.palette.text.secondary
-        }
-      }
-    }
+          colors: theme.palette.text.secondary,
+        },
+      },
+    },
   };
 };
 
@@ -111,31 +112,25 @@ export const OverviewSales = (props) => {
   return (
     <Card sx={sx}>
       <CardHeader
-        action={(
+        action={
           <Button
             color="inherit"
             size="small"
-            startIcon={(
+            startIcon={
               <SvgIcon fontSize="small">
                 <ArrowPathIcon />
               </SvgIcon>
-            )}
+            }
           >
-            Sync
+            Làm mới
           </Button>
-        )}
-        title="Sales"
+        }
+        title="Doanh thu"
       />
       <CardContent>
-        <Chart
-          height={350}
-          options={chartOptions}
-          series={chartSeries}
-          type="bar"
-          width="100%"
-        />
+        <Chart height={350} options={chartOptions} series={chartSeries} type="bar" width="100%" />
       </CardContent>
-      <Divider />
+      {/* <Divider />
       <CardActions sx={{ justifyContent: 'flex-end' }}>
         <Button
           color="inherit"
@@ -148,12 +143,12 @@ export const OverviewSales = (props) => {
         >
           Overview
         </Button>
-      </CardActions>
+      </CardActions> */}
     </Card>
   );
 };
 
 OverviewSales.protoTypes = {
   chartSeries: PropTypes.array.isRequired,
-  sx: PropTypes.object
+  sx: PropTypes.object,
 };

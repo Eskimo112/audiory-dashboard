@@ -15,10 +15,9 @@ import {
   Typography,
 } from "@mui/material";
 import { Scrollbar } from "src/components/scrollbar";
-import { getInitials } from "src/utils/get-initials";
-import { useQuery } from "react-query";
+import { formatPrice } from "../../utils/format-price";
 
-export const CustomersTable = (props) => {
+export const ProductsTable = (props) => {
   const {
     count = 0,
     items = [],
@@ -36,7 +35,6 @@ export const CustomersTable = (props) => {
   const selectedSome = selected.length > 0 && selected.length < items.length;
   const selectedAll = items.length > 0 && selected.length === items.length;
 
-  console.log(items);
   return (
     <Card>
       <Scrollbar>
@@ -58,43 +56,34 @@ export const CustomersTable = (props) => {
                   />
                 </TableCell>
                 <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                {/* <TableCell>Location</TableCell> */}
-                {/* <TableCell>Phone</TableCell> */}
-                {/* <TableCell>Signed Up</TableCell> */}
+                <TableCell>Price</TableCell>
+                <TableCell>Provider</TableCell>
+                <TableCell sx={{ maxWidth: "400px" }}>Affiliate link</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {items.map((customer) => {
-                const isSelected = selected.includes(customer.id);
-                // const createdAt = format(customer.createdAt, "dd/MM/yyyy");
+              {items.map((product) => {
+                const isSelected = selected.includes(product.id);
+                // const createdAt = format(product.createdAt, "dd/MM/yyyy");
 
                 return (
-                  <TableRow hover key={customer.id} selected={isSelected}>
+                  <TableRow hover key={product.id} selected={isSelected}>
                     <TableCell padding="checkbox">
                       <Checkbox
                         checked={isSelected}
                         onChange={(event) => {
                           if (event.target.checked) {
-                            onSelectOne?.(customer.id);
+                            onSelectOne?.(product.id);
                           } else {
-                            onDeselectOne?.(customer.id);
+                            onDeselectOne?.(product.id);
                           }
                         }}
                       />
                     </TableCell>
-                    <TableCell>
-                      <Stack alignItems="center" direction="row" spacing={2}>
-                        {/* <Avatar src={customer.avatar}>{getInitials(customer.name)}</Avatar> */}
-                        <Typography variant="subtitle2">{customer.name}</Typography>
-                      </Stack>
-                    </TableCell>
-                    <TableCell>{customer.email}</TableCell>
-                    {/* <TableCell>
-                      {customer.address.city}, {customer.address.state}, {customer.address.country}
-                    </TableCell>
-                    <TableCell>{customer.phone}</TableCell>
-                    <TableCell>{createdAt}</TableCell> */}
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell>{formatPrice(product.discountedPrice)}</TableCell>
+                    <TableCell>{product.provider}</TableCell>
+                    <TableCell>{product.link}</TableCell>
                   </TableRow>
                 );
               })}
@@ -115,7 +104,7 @@ export const CustomersTable = (props) => {
   );
 };
 
-CustomersTable.propTypes = {
+ProductsTable.propTypes = {
   count: PropTypes.number,
   items: PropTypes.array,
   onDeselectAll: PropTypes.func,
