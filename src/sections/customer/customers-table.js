@@ -15,8 +15,6 @@ import {
   Typography,
 } from "@mui/material";
 import { Scrollbar } from "src/components/scrollbar";
-import { getInitials } from "src/utils/get-initials";
-import { useQuery } from "react-query";
 
 export const CustomersTable = (props) => {
   const {
@@ -36,7 +34,6 @@ export const CustomersTable = (props) => {
   const selectedSome = selected.length > 0 && selected.length < items.length;
   const selectedAll = items.length > 0 && selected.length === items.length;
 
-  console.log(items);
   return (
     <Card>
       <Scrollbar>

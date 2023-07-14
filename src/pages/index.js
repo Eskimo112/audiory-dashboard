@@ -60,7 +60,7 @@ const Page = () => (
           </Grid>
           <Grid xs={12} md={6} lg={4}>
             <OverviewTraffic
-              chartSeries={[63000, 15000, 2000]}
+              chartSeries={[73000, 65000, 5000]}
               labels={["Shopee", "Tiktok", "Lazada"]}
               sx={{ height: "100%" }}
             />
