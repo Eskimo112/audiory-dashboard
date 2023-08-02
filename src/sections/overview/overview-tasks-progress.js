@@ -11,13 +11,14 @@ import {
   Typography,
 } from "@mui/material";
 import { useQuery } from "react-query";
+import axios from "axios";
 
 export const OverviewTasksProgress = (props) => {
   const { value, sx } = props;
 
-  const { data: view = 0 } = useQuery(["view"], async () => {
-    await setTimeout(() => {}, 2000);
-    return 213;
+  const { data: view = 0, isLoading } = useQuery(["view"], async () => {
+    const res = await axios.get("https://pricible.azurewebsites.net/api/Visit");
+    return res.data;
   });
 
   return (
@@ -28,7 +29,7 @@ export const OverviewTasksProgress = (props) => {
             <Typography color="text.secondary" gutterBottom variant="overline">
               Lượt xem trang
             </Typography>
-            <Typography variant="h4">{view}</Typography>
+            <Typography variant="h4">{isLoading ? "..." : view}</Typography>
           </Stack>
           <Avatar
             sx={{

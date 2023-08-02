@@ -1,9 +1,16 @@
 import PropTypes from "prop-types";
 import CurrencyDollarIcon from "@heroicons/react/24/solid/CurrencyDollarIcon";
 import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from "@mui/material";
+import { useQuery } from "react-query";
+import axios from "axios";
+import { formatPrice } from "../../utils/format-price";
 
 export const OverviewTotalProfit = (props) => {
-  const { value, sx } = props;
+  const { sx } = props;
+  const { data: total = 0, isLoading } = useQuery(["profit"], async () => {
+    const res = await axios.get("https://pricible.azurewebsites.net/api/Order/getTotalProfit");
+    return res.data;
+  });
 
   return (
     <Card sx={sx}>
@@ -13,7 +20,9 @@ export const OverviewTotalProfit = (props) => {
             <Typography color="text.secondary" variant="overline">
               Tổng doanh thu
             </Typography>
-            <Typography variant="h4">{value}</Typography>
+            <Typography variant="h4">
+              {isLoading ? "..." : formatPrice(Math.round(total))}
+            </Typography>
           </Stack>
           <Avatar
             sx={{

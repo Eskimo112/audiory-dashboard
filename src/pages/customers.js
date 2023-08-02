@@ -69,7 +69,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>Customers | Devias Kit</title>
+        <title>Customers | Pricible</title>
       </Head>
       <Box
         component="main"
@@ -83,28 +83,7 @@ const Page = () => {
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
                 <Typography variant="h4">Người dùng</Typography>
-                <Stack alignItems="center" direction="row" spacing={1}>
-                  {/* <Button
-                    color="inherit"
-                    startIcon={
-                      <SvgIcon fontSize="small">
-                        <ArrowUpOnSquareIcon />
-                      </SvgIcon>
-                    }
-                  >
-                    Import
-                  </Button>
-                  <Button
-                    color="inherit"
-                    startIcon={
-                      <SvgIcon fontSize="small">
-                        <ArrowDownOnSquareIcon />
-                      </SvgIcon>
-                    }
-                  >
-                    Export
-                  </Button> */}
-                </Stack>
+                <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
               <div>
                 <Button

@@ -8,7 +8,7 @@ import axios from "axios";
 
 export const OverviewTotalCustomers = (props) => {
   const { difference, positive = false, sx, value } = props;
-  const { data: users = [] } = useQuery(["account"], async () => {
+  const { data: users = [], isLoading } = useQuery(["account"], async () => {
     const res = await axios.get("https://pricible.azurewebsites.net/api/Account", {
       params: {
         pageSize: 100000,
@@ -24,7 +24,7 @@ export const OverviewTotalCustomers = (props) => {
             <Typography color="text.secondary" variant="overline">
               Người dùng
             </Typography>
-            <Typography variant="h4">{users.length}</Typography>
+            <Typography variant="h4">{isLoading ? "..." : users.length}</Typography>
           </Stack>
           <Avatar
             sx={{

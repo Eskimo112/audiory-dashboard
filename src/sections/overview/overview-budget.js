@@ -6,7 +6,7 @@ import axios from "axios";
 
 export const OverviewBudget = (props) => {
   const { difference, positive = false, sx, value } = props;
-  const { data: order = [] } = useQuery(["order"], async () => {
+  const { data: order = [], isLoading } = useQuery(["order"], async () => {
     const res = await axios.get("https://pricible.azurewebsites.net/api/Order", {
       params: {
         pageSize: 100000,
@@ -22,7 +22,7 @@ export const OverviewBudget = (props) => {
             <Typography color="text.secondary" variant="overline">
               Đơn hàng
             </Typography>
-            <Typography variant="h4">{order.length}</Typography>
+            <Typography variant="h4">{isLoading ? "..." : order.length}</Typography>
           </Stack>
           <Avatar
             sx={{
@@ -37,32 +37,7 @@ export const OverviewBudget = (props) => {
           </Avatar>
         </Stack>
         {difference && (
-          <Stack alignItems="center" direction="row" spacing={2} sx={{ mt: 2 }}>
-            {/* <Stack
-              alignItems="center"
-              direction="row"
-              spacing={0.5}
-            >
-              <SvgIcon
-                color={positive ? 'success' : 'error'}
-                fontSize="small"
-              >
-                {positive ? <ArrowUpIcon /> : <ArrowDownIcon />}
-              </SvgIcon>
-              <Typography
-                color={positive ? 'success.main' : 'error.main'}
-                variant="body2"
-              >
-                {difference}%
-              </Typography>
-            </Stack>
-            <Typography
-              color="text.secondary"
-              variant="caption"
-            >
-              Since last month
-            </Typography> */}
-          </Stack>
+          <Stack alignItems="center" direction="row" spacing={2} sx={{ mt: 2 }}></Stack>
         )}
       </CardContent>
     </Card>
