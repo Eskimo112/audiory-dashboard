@@ -15,7 +15,6 @@ export function usePopover() {
   const handleToggle = useCallback(() => {
     setOpen((prevState) => !prevState);
   }, []);
-  console.log("asdasd");
   return {
     anchorRef,
     handleClose,

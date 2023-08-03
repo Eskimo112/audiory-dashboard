@@ -36,7 +36,8 @@ export const OrderTable = (props) => {
               <TableRow>
                 <TableCell>Code</TableCell>
                 <TableCell>Provider</TableCell>
-                <TableCell>Category</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Order Value</TableCell>
                 <TableCell>Commission</TableCell>
                 <TableCell>Date</TableCell>
               </TableRow>
@@ -51,7 +52,8 @@ export const OrderTable = (props) => {
                       </Stack>
                     </TableCell>
                     <TableCell>{order.provider}</TableCell>
-                    <TableCell>{order.category}</TableCell>
+                    <TableCell>{order.tenItem}</TableCell>
+                    <TableCell>{formatPrice(order.giaTriMua)}</TableCell>
                     <TableCell>{formatPrice(order.loiNhuan)}</TableCell>
                     <TableCell>{order.ngayMua}</TableCell>
                   </TableRow>
