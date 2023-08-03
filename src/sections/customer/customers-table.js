@@ -56,9 +56,8 @@ export const CustomersTable = (props) => {
                 </TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Email</TableCell>
-                {/* <TableCell>Location</TableCell> */}
-                {/* <TableCell>Phone</TableCell> */}
-                {/* <TableCell>Signed Up</TableCell> */}
+                <TableCell>Year of birth</TableCell>
+                <TableCell>Location</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -87,6 +86,8 @@ export const CustomersTable = (props) => {
                       </Stack>
                     </TableCell>
                     <TableCell>{customer.email}</TableCell>
+                    <TableCell>{customer.yoB}</TableCell>
+                    <TableCell>{customer.location}</TableCell>
                     {/* <TableCell>
                       {customer.address.city}, {customer.address.state}, {customer.address.country}
                     </TableCell>
