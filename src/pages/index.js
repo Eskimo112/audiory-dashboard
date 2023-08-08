@@ -46,18 +46,7 @@ const Page = () => (
             <OverviewTotalProfit sx={{ height: "100%" }} value={formatPrice(145000)} />
           </Grid>
           <Grid xs={12} lg={8}>
-            <OverviewSales
-              chartSeries={[
-                {
-                  name: "Doanh thu",
-                  data: [
-                    278000, 16000, 5000, 8000, 3000, 150000, 14000, 267000, 17000, 19000, 18000,
-                    20000,
-                  ],
-                },
-              ]}
-              sx={{ height: "100%" }}
-            />
+            <OverviewSales sx={{ height: "100%" }} />
           </Grid>
           <Grid xs={12} md={6} lg={4}>
             <OverviewTraffic

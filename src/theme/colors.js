@@ -25,9 +25,9 @@ export const neutral = {
 };
 
 export const brand = {
-  shopee: "#ffb380",
-  lazada: "#8080c1",
-  tiktok: "#808080",
+  shopee: "#ff6600",
+  lazada: "#2424ff",
+  tiktok: "#212121",
 };
 
 export const indigo = withAlphas({

@@ -13,8 +13,10 @@ import {
 import { alpha, useTheme } from "@mui/material/styles";
 import { Chart } from "src/components/chart";
 import { formatPrice } from "../../utils/format-price";
+import { useQuery } from "react-query";
+import axios from "axios";
 
-const useChartOptions = () => {
+const useChartOptions = (weeklyData) => {
   const theme = useTheme();
 
   return {
@@ -25,10 +27,11 @@ const useChartOptions = () => {
         show: false,
       },
     },
-    colors: [theme.palette.primary.main, alpha(theme.palette.primary.main, 0.25)],
+    colors: ["#DB5461", "#33CA7F", "#686963"],
     dataLabels: {
       enabled: false,
     },
+
     fill: {
       opacity: 1,
       type: "solid",
@@ -48,15 +51,11 @@ const useChartOptions = () => {
       },
     },
     legend: {
-      show: false,
+      show: true,
     },
-    plotOptions: {
-      bar: {
-        columnWidth: "40px",
-      },
-    },
+    plotOptions: {},
     stroke: {
-      colors: ["transparent"],
+      // colors: ["transparent"],
       show: true,
       width: 2,
     },
@@ -72,20 +71,7 @@ const useChartOptions = () => {
         color: theme.palette.divider,
         show: true,
       },
-      categories: [
-        "01/07",
-        "02/07",
-        "03/07",
-        "04/07",
-        "05/07",
-        "06/07",
-        "07/07",
-        "08/07",
-        "09/07",
-        "10/07",
-        "11/07",
-        "12/07",
-      ],
+      categories: weeklyData.map((item) => "week " + item.week),
       labels: {
         offsetY: 5,
         style: {
@@ -95,7 +81,7 @@ const useChartOptions = () => {
     },
     yaxis: {
       labels: {
-        formatter: (value) => (value > 0 ? `${formatPrice(value)}` : `${formatPrice(value)}`),
+        // formatter: (value) => (value > 0 ? `${formatPrice(value)}` : `${formatPrice(value)}`),
         offsetX: -10,
         style: {
           colors: theme.palette.text.secondary,
@@ -104,10 +90,44 @@ const useChartOptions = () => {
     },
   };
 };
-
+// {
+//   "id": 0,
+//   "week": 0,
+//   "visits": 0,
+//   "userCreated": 0,
+//   "orders": 0
+// }
 export const OverviewSales = (props) => {
-  const { chartSeries, sx } = props;
-  const chartOptions = useChartOptions();
+  const { sx } = props;
+
+  const { data: weeklyData = [] } = useQuery(["weekly_data"], async () => {
+    const res = await axios.get("https://pricible.azurewebsites.net/api/WeekMetric");
+    return res.data;
+  });
+
+  console.log(weeklyData);
+
+  const chartOptions = useChartOptions(weeklyData);
+
+  let formattedSeries = [
+    {
+      data: [],
+      name: "visit",
+    },
+    {
+      data: [],
+      name: "new user",
+    },
+    {
+      data: [],
+      name: "orders",
+    },
+  ];
+  weeklyData.forEach((week) => {
+    formattedSeries[0].data.push(week.visits);
+    formattedSeries[1].data.push(week.userCreated);
+    formattedSeries[2].data.push(week.orders);
+  });
 
   return (
     <Card sx={sx}>
@@ -125,10 +145,16 @@ export const OverviewSales = (props) => {
             Làm mới
           </Button>
         }
-        title="Doanh thu"
+        title="Số liệu theo tuần"
       />
       <CardContent>
-        <Chart height={350} options={chartOptions} series={chartSeries} type="bar" width="100%" />
+        <Chart
+          height={350}
+          type="line"
+          options={chartOptions}
+          series={formattedSeries}
+          width="100%"
+        />
       </CardContent>
       {/* <Divider />
       <CardActions sx={{ justifyContent: 'flex-end' }}>

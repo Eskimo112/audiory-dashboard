@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 import Head from "next/head";
 import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
+import NextLink from "next/link";
+
 import {
   Box,
   Button,
@@ -85,11 +87,12 @@ const Page = () => {
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
-                <Typography variant="h4">Sản phẩm</Typography>
+                <Typography variant="h4">Tạo Sản phẩm</Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
               <div>
                 <Button
+                  onClick={() => {}}
                   startIcon={
                     <SvgIcon fontSize="small">
                       <PlusIcon />
