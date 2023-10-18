@@ -1,17 +1,12 @@
-import ChartBarIcon from "@heroicons/react/24/solid/ChartBarIcon";
-import CogIcon from "@heroicons/react/24/solid/CogIcon";
-import LockClosedIcon from "@heroicons/react/24/solid/LockClosedIcon";
-import ShoppingBagIcon from "@heroicons/react/24/solid/ShoppingBagIcon";
-import UserIcon from "@heroicons/react/24/solid/UserIcon";
-import UserPlusIcon from "@heroicons/react/24/solid/UserPlusIcon";
-import UsersIcon from "@heroicons/react/24/solid/UsersIcon";
-import XCircleIcon from "@heroicons/react/24/solid/XCircleIcon";
-import { SvgIcon } from "@mui/material";
+import ChartBarIcon from '@heroicons/react/24/solid/ChartBarIcon';
+import ShoppingBagIcon from '@heroicons/react/24/solid/ShoppingBagIcon';
+import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
+import { SvgIcon } from '@mui/material';
 
 export const items = [
   {
-    title: "Tổng quan",
-    path: "/",
+    title: 'Tổng quan',
+    path: '/',
     icon: (
       <SvgIcon fontSize="small">
         <ChartBarIcon />
@@ -19,8 +14,8 @@ export const items = [
     ),
   },
   {
-    title: "Người dùng",
-    path: "/customers",
+    title: 'Người dùng',
+    path: '/users',
     icon: (
       <SvgIcon fontSize="small">
         <UsersIcon />
@@ -28,8 +23,8 @@ export const items = [
     ),
   },
   {
-    title: "Sản phẩm",
-    path: "/products",
+    title: 'Sản phẩm',
+    path: '/products',
     icon: (
       <SvgIcon fontSize="small">
         <ShoppingBagIcon />

@@ -1,26 +1,23 @@
-import { Box, BoxProps, Typography, useTheme } from "@mui/material";
-import { ImSearch } from "react-icons/im";
+import NextLink from 'next/link';
 
-export default function AppIcon({ size = 28, ...props }) {
-  const theme = useTheme();
+import { Typography } from '@mui/material';
+
+export default function AppIcon({ size = 32 }) {
   return (
-    <Box display="flex" alignItems="baseline" {...props}>
-      <ImSearch
-        size={size}
-        style={{
-          marginRight: "-4px",
-          transform: "rotate(70deg)",
-          color: theme.palette.primary.main,
-        }}
-      />
-      {/* <Typography
-        fontWeight={700}
-        fontSize={`${size - 14}px`}
-        color={props.color ?? theme.palette.text.primary}
-        sx={{ textDecoration: "none", textTransform: "none" }}
-      >
-        ricible
-      </Typography> */}
-    </Box>
+    <Typography
+      href="/"
+      component={NextLink}
+      variant="h1"
+      sx={{
+        background: '-webkit-linear-gradient(#439A97, #33FFF8)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        textDecoration: 'none',
+        fontWeight: 700,
+        fontSize: size,
+        // color: theme.palette.primary.main,
+      }}>
+      Audiory
+    </Typography>
   );
 }

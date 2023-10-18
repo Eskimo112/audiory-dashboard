@@ -1,10 +1,17 @@
-import { createContext, useContext, useEffect, useReducer, useRef } from "react";
-import PropTypes from "prop-types";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+} from 'react';
+
+import PropTypes from 'prop-types';
 
 const HANDLERS = {
-  INITIALIZE: "INITIALIZE",
-  SIGN_IN: "SIGN_IN",
-  SIGN_OUT: "SIGN_OUT",
+  INITIALIZE: 'INITIALIZE',
+  SIGN_IN: 'SIGN_IN',
+  SIGN_OUT: 'SIGN_OUT',
 };
 
 const initialState = {
@@ -72,17 +79,18 @@ export const AuthProvider = (props) => {
     let isAuthenticated = false;
 
     try {
-      isAuthenticated = window.sessionStorage.getItem("authenticated") === "true";
+      isAuthenticated =
+        window.sessionStorage.getItem('authenticated') === 'true';
     } catch (err) {
       console.error(err);
     }
 
     if (isAuthenticated) {
       const user = {
-        id: "5e86809283e28b96d2d38537",
-        avatar: "/assets/avatars/avatar-anika-visser.png",
-        name: "Phạm Nguyên",
-        email: "nguyengl176@gmail.com",
+        id: '5e86809283e28b96d2d38537',
+        avatar: '/assets/avatars/avatar-anika-visser.png',
+        name: 'Phạm Nguyên',
+        email: 'nguyengl176@gmail.com',
       };
 
       dispatch({
@@ -101,21 +109,21 @@ export const AuthProvider = (props) => {
       initialize();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   const skip = () => {
     try {
-      window.sessionStorage.setItem("authenticated", "true");
+      window.sessionStorage.setItem('authenticated', 'true');
     } catch (err) {
       console.error(err);
     }
 
     const user = {
-      id: "5e86809283e28b96d2d38537",
-      avatar: "/assets/avatars/avatar-anika-visser.png",
-      name: "Phạm Nguyên",
-      email: "nguyengl176@gmail.com",
+      id: '5e86809283e28b96d2d38537',
+      avatar: '/assets/avatars/avatar-anika-visser.png',
+      name: 'Phạm Nguyên',
+      email: 'nguyengl176@gmail.com',
     };
 
     dispatch({
@@ -125,21 +133,21 @@ export const AuthProvider = (props) => {
   };
 
   const signIn = async (email, password) => {
-    if (email !== "nguyengl176@gmail.com" || password !== "nguyen123") {
-      throw new Error("Please check your email and password");
+    if (email !== 'nguyengl176@gmail.com' || password !== 'nguyen123') {
+      throw new Error('Please check your email and password');
     }
 
     try {
-      window.sessionStorage.setItem("authenticated", "true");
+      window.sessionStorage.setItem('authenticated', 'true');
     } catch (err) {
       console.error(err);
     }
 
     const user = {
-      id: "5e86809283e28b96d2d38537",
-      avatar: "/assets/avatars/avatar-anika-visser.png",
-      name: "Phạm Nguyên",
-      email: "nguyengl176@gmail.com",
+      id: '5e86809283e28b96d2d38537',
+      avatar: '/assets/avatars/avatar-anika-visser.png',
+      name: 'Phạm Nguyên',
+      email: 'nguyengl176@gmail.com',
     };
 
     dispatch({
@@ -149,7 +157,7 @@ export const AuthProvider = (props) => {
   };
 
   const signUp = async (email, name, password) => {
-    throw new Error("Sign up is not implemented");
+    throw new Error('Sign up is not implemented');
   };
 
   const signOut = () => {
@@ -166,8 +174,7 @@ export const AuthProvider = (props) => {
         signIn,
         signUp,
         signOut,
-      }}
-    >
+      }}>
       {children}
     </AuthContext.Provider>
   );

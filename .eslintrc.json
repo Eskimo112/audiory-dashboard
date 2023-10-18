@@ -1,8 +1,55 @@
 {
-  "extends": "next/core-web-vitals",
-  "rules": {
-    "@next/next/no-img-element": "off",
-    "jsx-a11y/alt-text": "off",
-    "react/display-name": "off"
-  }
+    "root":true,
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "extends": [
+      "standard",
+      "next/core-web-vitals",
+      "plugin:react/recommended",
+      "plugin:react-hooks/recommended",
+      "prettier"
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react",
+        "simple-import-sort",
+        "import"     
+    ],
+    "rules": {
+      "react/prop-types": "off",
+      "react/react-in-jsx-scope": "off",
+      "react/display-name": "off",
+      "import/named": 2,
+      "import/default": 2,
+      // (This helps configure simple-import-sort) Make sure all imports are at the top of the file
+      "import/first": 2,
+      // (This helps configure simple-import-sort) Make sure there's a newline after the imports
+      "import/newline-after-import": 2,
+      // (This helps configure simple-import-sort) Merge imports of the same file
+      "import/no-duplicates": 2,
+      // This sorts re-exports (`export * from 'foo';`), but not other types of exports.
+      "simple-import-sort/exports": 2,
+      "simple-import-sort/imports": [
+        2,
+        {
+          // The default grouping, but with type imports first as a separate group.
+          // See: https://github.com/lydell/eslint-plugin-simple-import-sort/blob/d9a116f71302c5dcfc1581fc7ded8d77392f1924/examples/.eslintrc.js#L122-L133
+          "groups": [
+            ["^.*\\u0000$"],
+            ["^react$"],
+            ["^next?([/]|$)"],
+            ["^\\u0000"],
+            ["^@?\\w"],
+            ["^@static|@components|@/?\\w"],
+            ["^"],
+            ["^\\."]
+          ]
+        }
+      ]
+    }
 }

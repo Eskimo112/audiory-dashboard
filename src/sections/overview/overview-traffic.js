@@ -1,30 +1,23 @@
-import PropTypes from "prop-types";
-import ComputerDesktopIcon from "@heroicons/react/24/solid/ComputerDesktopIcon";
-import DeviceTabletIcon from "@heroicons/react/24/solid/DeviceTabletIcon";
-import PhoneIcon from "@heroicons/react/24/solid/PhoneIcon";
 import {
   Box,
   Card,
   CardContent,
   CardHeader,
   Stack,
-  SvgIcon,
   Typography,
   useTheme,
-} from "@mui/material";
-import { Chart } from "src/components/chart";
+} from '@mui/material';
+import PropTypes from 'prop-types';
+import { Chart } from 'src/components/chart';
 
-import { formatPrice } from "../../utils/format-price";
-import { brand } from "../../theme/colors";
+import { formatPrice } from '../../utils/format-price';
 
 const useChartOptions = (labels) => {
   const theme = useTheme();
-  const colors = [brand.shopee, brand.tiktok, brand.lazada];
   return {
     chart: {
-      background: "transparent",
+      background: 'transparent',
     },
-    colors: colors,
     dataLabels: {
       enabled: false,
     },
@@ -40,12 +33,12 @@ const useChartOptions = (labels) => {
     states: {
       active: {
         filter: {
-          type: "none",
+          type: 'none',
         },
       },
       hover: {
         filter: {
-          type: "none",
+          type: 'none',
         },
       },
     },
@@ -64,21 +57,24 @@ const useChartOptions = (labels) => {
 export const OverviewTraffic = (props) => {
   const { chartSeries, labels, sx } = props;
   const chartOptions = useChartOptions(labels);
-  const theme = useTheme();
-  const colors = [brand.shopee, brand.tiktok, brand.lazada];
 
   return (
     <Card sx={sx}>
       <CardHeader title="Nguồn doanh thu" />
       <CardContent>
-        <Chart height={300} options={chartOptions} series={chartSeries} type="donut" width="100%" />
+        <Chart
+          height={300}
+          options={chartOptions}
+          series={chartSeries}
+          type="donut"
+          width="100%"
+        />
         <Stack
           alignItems="center"
           direction="row"
           justifyContent="center"
           spacing={2}
-          sx={{ mt: 2 }}
-        >
+          sx={{ mt: 2 }}>
           {chartSeries.map((item, index) => {
             const label = labels[index];
 
@@ -86,12 +82,11 @@ export const OverviewTraffic = (props) => {
               <Box
                 key={label}
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <Typography sx={{ my: 1, color: colors[index] }} variant="h6">
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}>
+                <Typography sx={{ my: 1, color: 'red' }} variant="h6">
                   {label}
                 </Typography>
                 <Typography color="text.secondary" variant="subtitle2">

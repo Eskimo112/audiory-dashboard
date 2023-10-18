@@ -1,4 +1,5 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState } from 'react';
+
 import {
   Box,
   Button,
@@ -9,35 +10,35 @@ import {
   Divider,
   TextField,
   Unstable_Grid2 as Grid,
-} from "@mui/material";
+} from '@mui/material';
 
 const states = [
   {
-    value: "alabama",
-    label: "Alabama",
+    value: 'alabama',
+    label: 'Alabama',
   },
   {
-    value: "new-york",
-    label: "New York",
+    value: 'new-york',
+    label: 'New York',
   },
   {
-    value: "san-francisco",
-    label: "San Francisco",
+    value: 'san-francisco',
+    label: 'San Francisco',
   },
   {
-    value: "los-angeles",
-    label: "Los Angeles",
+    value: 'los-angeles',
+    label: 'Los Angeles',
   },
 ];
 
 export const AccountProfileDetails = () => {
   const [values, setValues] = useState({
-    firstName: "Nguyên",
-    lastName: "Phạm",
-    email: "nguyengl176@gmail.com",
-    phone: "",
-    state: "los-angeles",
-    country: "USA",
+    firstName: 'Nguyên',
+    lastName: 'Phạm',
+    email: 'nguyengl176@gmail.com',
+    phone: '',
+    state: 'los-angeles',
+    country: 'USA',
   });
 
   const handleChange = useCallback((event) => {
@@ -118,8 +119,7 @@ export const AccountProfileDetails = () => {
                   required
                   select
                   SelectProps={{ native: true }}
-                  value={values.state}
-                >
+                  value={values.state}>
                   {states.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -131,7 +131,7 @@ export const AccountProfileDetails = () => {
           </Box>
         </CardContent>
         <Divider />
-        <CardActions sx={{ justifyContent: "flex-end" }}>
+        <CardActions sx={{ justifyContent: 'flex-end' }}>
           <Button variant="contained">Save details</Button>
         </CardActions>
       </Card>

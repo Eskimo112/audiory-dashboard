@@ -1,0 +1,8 @@
+# NOTE: In general this should be kept in sync with .eslintignore
+**/*.md
+**/node_modules
+public
+jsconfig.json
+dist
+.prettierignore
+.next

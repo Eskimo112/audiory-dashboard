@@ -1,8 +1,10 @@
-import { useCallback, useMemo, useState } from "react";
-import Head from "next/head";
-import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
-import NextLink from "next/link";
+import { useCallback, useMemo, useState } from 'react';
 
+import Head from 'next/head';
+import NextLink from 'next/link';
+
+import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
+import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
   Box,
   Button,
@@ -13,15 +15,15 @@ import {
   Stack,
   SvgIcon,
   Typography,
-} from "@mui/material";
-import { useSelection } from "src/hooks/use-selection";
-import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import { ProductsTable } from "src/sections/product/products-table";
-import { applyPagination } from "src/utils/apply-pagination";
-import { useQuery } from "react-query";
-import axios from "axios";
-import useDebounce from "../hooks/use-debounce";
-import MagnifyingGlassIcon from "@heroicons/react/24/solid/MagnifyingGlassIcon";
+} from '@mui/material';
+import axios from 'axios';
+import { useQuery } from 'react-query';
+import { useSelection } from 'src/hooks/use-selection';
+import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
+import { ProductsTable } from 'src/sections/product/products-table';
+import { applyPagination } from 'src/utils/apply-pagination';
+
+import useDebounce from '../hooks/use-debounce';
 
 const now = new Date();
 
@@ -38,17 +40,17 @@ const useProductIds = (products) => {
 };
 
 const Page = () => {
-  const { data = [] } = useQuery(["products"], async () => {
+  const { data = [] } = useQuery(['products'], async () => {
     const res = await axios.get(
-      "https://pricible.azurewebsites.net/api/Product?" +
+      'https://pricible.azurewebsites.net/api/Product?' +
         new URLSearchParams({
           pageSize: 10000000,
-        })
+        }),
     );
     return res.data.data;
   });
   const [page, setPage] = useState(0);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const debounceSearchValue = useDebounce(searchValue, 500);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const products = useProducts(
@@ -56,10 +58,10 @@ const Page = () => {
       (item) =>
         item.name.includes(debounceSearchValue) ||
         item.link.includes(debounceSearchValue) ||
-        item.provider.includes(debounceSearchValue)
+        item.provider.includes(debounceSearchValue),
     ),
     page,
-    rowsPerPage
+    rowsPerPage,
   );
   const productsIds = useProductIds(products);
   const productsSelection = useSelection(productsIds);
@@ -81,8 +83,7 @@ const Page = () => {
         sx={{
           flexGrow: 1,
           py: 8,
-        }}
-      >
+        }}>
         <Container maxWidth="xl">
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
@@ -98,8 +99,7 @@ const Page = () => {
                       <PlusIcon />
                     </SvgIcon>
                   }
-                  variant="contained"
-                >
+                  variant="contained">
                   Add
                 </Button>
               </div>
