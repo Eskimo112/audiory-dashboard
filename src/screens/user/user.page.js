@@ -1,93 +1,162 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 
-import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
+  Avatar,
   Box,
   Button,
   Card,
+  Chip,
+  CircularProgress,
   Container,
-  InputAdornment,
-  OutlinedInput,
+  MenuItem,
   Stack,
   SvgIcon,
   Typography,
 } from '@mui/material';
+import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
-import AppMultiSelect from '../../components/app-multi-select';
-import useDebounce from '../../hooks/use-debounce';
 import UserService from '../../services/user';
-import { applyPagination } from '../../utils/apply-pagination';
-import FilterPile from './filter-pile.component';
-import { UsersTable } from './user-table.component';
+import { formatDate } from '../../utils/formatters';
 
-const ROLE_MAP = {
-  'b794308e-4b3a-11ee-9d9d-00155d78bd44': 'user',
-  'b341e067-4b3a-11ee-9d9d-00155d78bd44': 'admin',
+const ROLE_ID_MAP = {
+  'b794308e-4b3a-11ee-9d9d-00155d78bd44': 'Người dùng',
+  'b341e067-4b3a-11ee-9d9d-00155d78bd44': 'Quản trị viên',
 };
 
 const UserPage = () => {
-  const { data = [] } = useQuery(
+  const { data: users, isLoading } = useQuery(
     ['users'],
     async () => await UserService.getAll(),
   );
 
-  const [page, setPage] = useState(0);
-  const [searchValue, setSearchValue] = useState('');
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const debounceSearchValue = useDebounce(searchValue, 500);
+  // const filteredUsers = (users ?? []).filter((user) => !!user.role_id);
 
-  const [roleFilter, setRoleFilter] = useState([]);
-  const [statusFilter, setStatusFilter] = useState([]);
+  const router = useRouter();
 
-  const filteredUsers = useMemo(() => {
-    if (!data) return [];
-    // Filter by search value
-    let result = data.filter((item) =>
-      Object.values(item).some((value) => {
-        if (!value) return false;
-        if (
-          value
-            .toString()
-            .toLowerCase()
-            .includes(debounceSearchValue.toLowerCase())
-        )
-          return true;
-        return false;
-      }),
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: 'id',
+        header: 'Id',
+      },
+      {
+        accessorKey: 'full_name',
+        header: 'Thông tin',
+        Cell: (cell) => {
+          const user = cell.row.original;
+          return (
+            <Stack
+              alignItems="center"
+              // justifyContent="center"
+              direction="row"
+              spacing={2}>
+              <Avatar src={user.avatar_url} width={50} height={50}></Avatar>
+              <Stack alignItems="start">
+                <Typography variant="subtitle2">
+                  {user.full_name ?? 'Không có tên'}
+                </Typography>
+                <Typography
+                  variant="subtitle2"
+                  fontStyle="italic"
+                  color="ink.lighter">
+                  {user.username ?? 'Không có username'}
+                </Typography>
+              </Stack>
+            </Stack>
+          );
+        },
+      },
+      {
+        accessorKey: 'email', // access nested data with dot notation
+        header: 'Email',
+      },
+      {
+        accessorKey: 'role_id',
+        header: 'Vai trò',
+        accessorFn: (row) => {
+          if (!row.role_id) return 'Người dùng';
+          return ROLE_ID_MAP[row.role_id];
+        },
+        filterFn: 'equals',
+        filterSelectOptions: [
+          { text: 'Người dùng', value: 'Người dùng' },
+          {
+            text: 'Quản trị viên',
+            value: 'Quản trị viên',
+          },
+        ],
+        filterVariant: 'select',
+        Cell: ({ cell }) => {
+          if (!cell.getValue()) return <></>;
+          return (
+            <Chip
+              label={cell.getValue()}
+              sx={{
+                backgroundColor:
+                  cell.getValue() === 'Người dùng'
+                    ? 'success.alpha20'
+                    : 'error.alpha20',
+              }}
+            />
+          );
+        },
+      },
+      {
+        accessorKey: 'created_date',
+        header: 'Ngày tạo',
+        accessorFn: (row) => formatDate(row.created_date),
+        // Cell: ({ cell }) => <Chip label={cell.getValue()} />,
+      },
+      {
+        accessorKey: 'is_online',
+        header: 'Trạng thái',
+        size: 80,
+        filterFn: 'equals',
+        filterSelectOptions: [
+          { text: 'Online', value: true },
+          { text: 'Offline', value: false },
+        ],
+        filterVariant: 'select',
+        Cell: ({ cell }) => (
+          <Chip
+            label={cell.getValue() ? 'Online' : 'Offline'}
+            sx={{
+              backgroundColor: cell.getValue()
+                ? 'success.alpha20'
+                : 'error.alpha20',
+            }}
+          />
+        ),
+      },
+    ],
+    [],
+  );
+
+  const initialState = {
+    columnVisibility: {
+      id: false,
+    },
+    showGlobalFilter: true,
+  };
+
+  if (isLoading)
+    return (
+      <Card
+        sx={{
+          display: 'flex',
+          width: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '500px',
+        }}>
+        <CircularProgress />
+      </Card>
     );
-
-    // Filter by role value
-    if (roleFilter.length > 0) {
-      result = result.filter((item) =>
-        roleFilter.some((role) => role === ROLE_MAP[item.role_id]),
-      );
-    }
-
-    // Filter by role value
-    if (statusFilter.length > 0) {
-      result = result.filter((item) => {
-        const statusValue = item.is_enabled ? 'active' : 'inactive';
-
-        return statusFilter.some((status) => status === statusValue);
-      });
-    }
-
-    return result;
-  }, [data, debounceSearchValue, roleFilter, statusFilter]);
-
-  // const usersSelection = useSelection(users);
-
-  const handlePageChange = useCallback((event, value) => {
-    setPage(value);
-  }, []);
-
-  const handleRowsPerPageChange = useCallback((event) => {
-    setRowsPerPage(event.target.value);
-  }, []);
 
   return (
     <>
@@ -107,115 +176,65 @@ const UserPage = () => {
                 <Typography variant="h4">Người dùng</Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
-              <div>
-                <Button
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <PlusIcon />
-                    </SvgIcon>
-                  }
-                  variant="contained">
-                  Thêm người dùng
-                </Button>
-              </div>
+              <Button
+                startIcon={
+                  <SvgIcon fontSize="small">
+                    <PlusIcon />
+                  </SvgIcon>
+                }
+                variant="contained">
+                Thêm người dùng
+              </Button>
             </Stack>
-            <Card sx={{ padding: 2 }}>
-              <Stack direction="row" gap="16px">
-                <Box display="flex" flex="1">
-                  <OutlinedInput
-                    value={searchValue}
-                    fullWidth
-                    placeholder="Tìm kiếm người dùng"
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    startAdornment={
-                      <InputAdornment position="start">
-                        <SvgIcon color="action" fontSize="small">
-                          <MagnifyingGlassIcon />
-                        </SvgIcon>
-                      </InputAdornment>
-                    }
-                  />
-                </Box>
-
-                <Box display="flex" width="150px">
-                  <AppMultiSelect
-                    value={roleFilter}
-                    options={[
-                      { value: 'admin', label: 'Quản trị viên' },
-                      { value: 'user', label: 'Người dùng' },
-                    ]}
-                    onChange={(values) => {
-                      setRoleFilter(values);
-                    }}
-                    placeholder="Vai trò"
-                  />
-                </Box>
-                <Box display="flex" width="150px">
-                  <AppMultiSelect
-                    value={statusFilter}
-                    options={[
-                      { value: 'active', label: 'Hoạt động' },
-                      { value: 'inactive', label: 'Vô hiệu hóa' },
-                    ]}
-                    onChange={(values) => {
-                      setStatusFilter(values);
-                    }}
-                    placeholder="Trạng thái"
-                  />
-                </Box>
-              </Stack>
-            </Card>
-
-            {(roleFilter.length > 0 ||
-              statusFilter.length > 0 ||
-              searchValue !== '') && (
-              <Card
-                sx={{
-                  padding: 2,
+            <MaterialReactTable
+              positionActionsColumn="last"
+              displayColumnDefOptions={{ 'mrt-row-actions': { size: 50 } }}
+              enableRowActions
+              renderRowActionMenuItems={({ closeMenu, row, table }) => [
+                <MenuItem
+                  key="edit"
+                  onClick={() => {
+                    router.push(`/users/${row.original.id}`);
+                  }}>
+                  Chỉnh sửa
+                </MenuItem>,
+                <MenuItem key="delete" onClick={() => console.info('Delete')}>
+                  Vô hiệu hóa
+                </MenuItem>,
+              ]}
+              columns={columns}
+              data={users}
+              initialState={initialState}
+              enableGlobalFilterModes
+              positionGlobalFilter="left"
+              muiTablePaperProps={{
+                sx: {
+                  boxShadow: 'none',
                   display: 'flex',
-                  gap: '8px',
                   flexDirection: 'column',
-                }}>
-                <Typography variant="body1" color="ink.main" fontWeight={600}>
-                  {filteredUsers.length} kết quả
-                </Typography>
-
-                <Stack direction="row" gap="16px" alignItems="center">
-                  <FilterPile
-                    contents={searchValue ? [searchValue] : []}
-                    title="Tìm kiếm:"
-                    onDelete={() => setSearchValue('')}
-                  />
-                  <FilterPile
-                    contents={roleFilter}
-                    title="Vai trò:"
-                    onDelete={(value) =>
-                      setRoleFilter(roleFilter.filter((e) => e !== value))
-                    }
-                  />
-                  <FilterPile
-                    contents={statusFilter}
-                    title=" Trạng thái:"
-                    onDelete={(value) =>
-                      setStatusFilter(statusFilter.filter((e) => e !== value))
-                    }
-                  />
-                </Stack>
-              </Card>
-            )}
-
-            <UsersTable
-              count={filteredUsers.length}
-              items={applyPagination(filteredUsers, page, rowsPerPage)}
-              // onDeselectAll={usersSelection.handleDeselectAll}
-              // onDeselectOne={usersSelection.handleDeselectOne}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              // onSelectAll={usersSelection.handleSelectAll}
-              // onSelectOne={usersSelection.handleSelectOne}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              // selected={usersSelection.selected}
+                  gap: '24px',
+                },
+              }}
+              muiTableContainerProps={{
+                sx: {
+                  borderRadius: 1,
+                  boxShadow:
+                    '0px 5px 22px rgba(0, 0, 0, 0.04), 0px 0px 0px 0.5px rgba(0, 0, 0, 0.03)',
+                },
+              }}
+              muiTopToolbarProps={{
+                sx: {
+                  padding: '10px!important',
+                  borderRadius: 1,
+                  boxShadow:
+                    '0px 5px 22px rgba(0, 0, 0, 0.04), 0px 0px 0px 0.5px rgba(0, 0, 0, 0.03)',
+                },
+              }}
+              muiSearchTextFieldProps={{
+                placeholder: 'Tìm người dùng',
+                sx: { width: '500px' },
+                variant: 'outlined',
+              }}
             />
           </Stack>
         </Container>

@@ -1,5 +1,5 @@
-import PropTypes from "prop-types";
-import { format } from "date-fns";
+import PropTypes from 'prop-types';
+import { format } from 'date-fns';
 import {
   Avatar,
   Box,
@@ -13,9 +13,9 @@ import {
   TablePagination,
   TableRow,
   Typography,
-} from "@mui/material";
-import { Scrollbar } from "src/components/scrollbar";
-import { formatPrice } from "../../utils/format-price";
+} from '@mui/material';
+import { Scrollbar } from 'src/components/scrollbar';
+import { formatPrice } from '../../utils/formatters';
 
 export const OrderTable = (props) => {
   const {
@@ -48,7 +48,9 @@ export const OrderTable = (props) => {
                   <TableRow hover key={order.id}>
                     <TableCell>
                       <Stack alignItems="center" direction="row" spacing={2}>
-                        <Typography variant="subtitle2">{order.maDon}</Typography>
+                        <Typography variant="subtitle2">
+                          {order.maDon}
+                        </Typography>
                       </Stack>
                     </TableCell>
                     <TableCell>{order.provider}</TableCell>

@@ -8,6 +8,7 @@ import {
   CardHeader,
   MenuItem,
   Select,
+  Stack,
   SvgIcon,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -15,6 +16,7 @@ import PropTypes from 'prop-types';
 
 import AppChart from '../../components/app-chart';
 import { getBarChartCommonOptions } from './chart.util';
+import { SHARED_SELECT_PROPS } from './constant';
 
 const data = [
   {
@@ -65,7 +67,7 @@ export const CategoryChart = (props) => {
     <Card sx={sx}>
       <CardHeader
         action={
-          <>
+          <Stack direction="row" gap="8px">
             <Button
               color="inherit"
               size="small"
@@ -77,15 +79,9 @@ export const CategoryChart = (props) => {
               }>
               Làm mới
             </Button>
-            <Button color="inherit" size="small">
+            <Button color="inherit" size="small" sx={{ padding: 0 }}>
               <Select
-                slotProps={{
-                  input: {
-                    sx: {
-                      padding: 0,
-                    },
-                  },
-                }}
+                {...SHARED_SELECT_PROPS}
                 sx={{ padding: 0 }}
                 value={option}
                 label="Thời gian"
@@ -97,7 +93,7 @@ export const CategoryChart = (props) => {
                 ))}
               </Select>
             </Button>
-          </>
+          </Stack>
         }
         title="Doanh thu"
       />

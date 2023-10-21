@@ -1,12 +1,15 @@
 import { useRouter } from 'next/router';
 
+import PencilSquareIcon from '@heroicons/react/24/solid/PencilSquareIcon';
 import {
   Avatar,
   Box,
+  Button,
   Card,
-  Checkbox,
   Chip,
+  CircularProgress,
   Stack,
+  SvgIcon,
   Table,
   TableBody,
   TableCell,
@@ -27,22 +30,28 @@ export const UsersTable = (props) => {
   const {
     count = 0,
     items = [],
-    onDeselectAll,
-    onDeselectOne,
+    isLoading,
     onPageChange = () => {},
     onRowsPerPageChange,
-    onSelectAll,
-    onSelectOne,
     page = 0,
     rowsPerPage = 0,
     selected = [],
   } = props;
 
-  const selectedSome = selected.length > 0 && selected.length < items.length;
-  const selectedAll = items.length > 0 && selected.length === items.length;
-
   const router = useRouter();
-
+  if (isLoading)
+    return (
+      <Card
+        sx={{
+          display: 'flex',
+          width: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '500px',
+        }}>
+        <CircularProgress />
+      </Card>
+    );
   return (
     <Card>
       <Scrollbar>
@@ -68,6 +77,7 @@ export const UsersTable = (props) => {
                 <TableCell align="center">Tên đăng nhập</TableCell>
                 <TableCell align="center">Vai trò</TableCell>
                 <TableCell align="center">Trạng thái</TableCell>
+                <TableCell align="center"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -141,6 +151,51 @@ export const UsersTable = (props) => {
                         label={
                           user.is_enabled ? 'Hoạt động' : 'Vô hiệu hóa'
                         }></Chip>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Stack direction="row" gap="0px" alignItems="center">
+                        <Button
+                          sx={{
+                            minWidth: 0,
+                            borderRadius: '30px',
+                            padding: '8px',
+                            height: 'fit-content',
+                          }}>
+                          <SvgIcon sx={{ width: '20px', height: '20px' }}>
+                            <PencilSquareIcon></PencilSquareIcon>
+                          </SvgIcon>
+                        </Button>
+                        {/* <Button
+                          sx={{
+                            minWidth: 0,
+                            borderRadius: '30px',
+                            padding: '8px',
+                            height: 'fit-content',
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            handleClick(e);
+                          }}>
+                          <SvgIcon
+                            sx={{
+                              width: '20px',
+                              height: '20px',
+                              color: 'ink.main',
+                            }}>
+                            <EllipsisHorizontalIcon />
+                          </SvgIcon>
+                        </Button>
+                        <Menu
+                          anchorEl={anchorEl}
+                          open={!!anchorEl}
+                          onClose={handleClose}
+                          PaperProps={{ elevation: 1.5, sx: {} }}>
+                          <MenuItem onClick={handleClose}>
+                            Xóa người dùng
+                          </MenuItem>
+                        </Menu> */}
+                      </Stack>
                     </TableCell>
                   </TableRow>
                 );

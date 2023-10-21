@@ -1,6 +1,6 @@
-import PropTypes from "prop-types";
-import ArrowPathIcon from "@heroicons/react/24/solid/ArrowPathIcon";
-import ArrowRightIcon from "@heroicons/react/24/solid/ArrowRightIcon";
+import PropTypes from 'prop-types';
+import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
+import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
 import {
   Button,
   Card,
@@ -9,32 +9,32 @@ import {
   CardHeader,
   Divider,
   SvgIcon,
-} from "@mui/material";
-import { alpha, useTheme } from "@mui/material/styles";
-import { Chart } from "src/components/chart";
-import { formatPrice } from "../../utils/format-price";
-import { useQuery } from "react-query";
-import axios from "axios";
+} from '@mui/material';
+import { alpha, useTheme } from '@mui/material/styles';
+import { Chart } from 'src/components/chart';
+import { formatPrice } from '../../utils/formatters';
+import { useQuery } from 'react-query';
+import axios from 'axios';
 
 const useChartOptions = (weeklyData) => {
   const theme = useTheme();
 
   return {
     chart: {
-      background: "transparent",
+      background: 'transparent',
       stacked: false,
       toolbar: {
         show: false,
       },
     },
-    colors: ["#DB5461", "#33CA7F", "#686963"],
+    colors: ['#DB5461', '#33CA7F', '#686963'],
     dataLabels: {
       enabled: false,
     },
 
     fill: {
       opacity: 1,
-      type: "solid",
+      type: 'solid',
     },
     grid: {
       borderColor: theme.palette.divider,
@@ -71,7 +71,7 @@ const useChartOptions = (weeklyData) => {
         color: theme.palette.divider,
         show: true,
       },
-      categories: weeklyData.map((item) => "week " + item.week),
+      categories: weeklyData.map((item) => 'week ' + item.week),
       labels: {
         offsetY: 5,
         style: {
@@ -100,8 +100,10 @@ const useChartOptions = (weeklyData) => {
 export const OverviewSales = (props) => {
   const { sx } = props;
 
-  const { data: weeklyData = [] } = useQuery(["weekly_data"], async () => {
-    const res = await axios.get("https://pricible.azurewebsites.net/api/WeekMetric");
+  const { data: weeklyData = [] } = useQuery(['weekly_data'], async () => {
+    const res = await axios.get(
+      'https://pricible.azurewebsites.net/api/WeekMetric',
+    );
     return res.data;
   });
 
@@ -112,15 +114,15 @@ export const OverviewSales = (props) => {
   let formattedSeries = [
     {
       data: [],
-      name: "visit",
+      name: 'visit',
     },
     {
       data: [],
-      name: "new user",
+      name: 'new user',
     },
     {
       data: [],
-      name: "orders",
+      name: 'orders',
     },
   ];
   weeklyData.forEach((week) => {
@@ -140,8 +142,7 @@ export const OverviewSales = (props) => {
               <SvgIcon fontSize="small">
                 <ArrowPathIcon />
               </SvgIcon>
-            }
-          >
+            }>
             Làm mới
           </Button>
         }

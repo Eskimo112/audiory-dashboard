@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import PropTypes from 'prop-types';
 
-import { formatNumber } from '../../utils/format-price';
+import { formatNumber } from '../../utils/formatters';
 
 export const StatCard = (props) => {
   const { difference, positive = false, sx, value, title, icon } = props;
@@ -47,7 +47,7 @@ export const StatCard = (props) => {
           </Stack>
           <Avatar
             sx={{
-              background: '-webkit-linear-gradient(#439A97, #33FFF8)',
+              backgroundColor: 'primary.main',
               height: 40,
               width: 40,
             }}>

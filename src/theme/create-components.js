@@ -232,6 +232,7 @@ export function createComponents(config) {
         root: {
           fontSize: 14,
           fontWeight: 500,
+          lineHeight: '1.6em',
           [`&.${inputLabelClasses.filled}`]: {
             transform: 'translate(12px, 18px) scale(1)',
           },
@@ -269,7 +270,7 @@ export function createComponents(config) {
       styleOverrides: {
         root: {
           borderBottomColor: palette.divider,
-          padding: '14px 14px',
+          padding: '7px 14px!important',
         },
       },
     },
@@ -277,21 +278,25 @@ export function createComponents(config) {
       styleOverrides: {
         root: {
           borderBottom: 'none',
-          height: '56px',
+          background: 'yellow',
+
+          // height: '56px',
           [`& .${tableCellClasses.root}`]: {
             borderBottom: 'none',
             backgroundColor: palette.primary.lightest,
             color: palette.ink.main,
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: 600,
-            lineHeight: 1,
-            fontFamily: 'Source Sans 3',
-            // textTransform: 'uppercase',
+            fontFamily: '"Source Sans 3"',
+            height: '68px',
+            verticalAlign: 'middle',
+            [`& .Mui-TableHeadCell-Content`]: {
+              // justifyContent: 'space-between',
+            },
           },
           [`& .${tableCellClasses.paddingCheckbox}`]: {
             paddingTop: 4,
             paddingBottom: 4,
-            color: 'red',
           },
         },
       },
@@ -299,6 +304,14 @@ export function createComponents(config) {
     MuiTextField: {
       defaultProps: {
         variant: 'filled',
+      },
+      styleOverrides: {
+        // root: {
+        //   [`& .${formLabelClasses.root}`]: {
+        //     background: 'red',
+        //     color: 'red',
+        //   },
+        // },
       },
     },
   };

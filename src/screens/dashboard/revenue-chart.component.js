@@ -8,6 +8,7 @@ import {
   CardHeader,
   MenuItem,
   Select,
+  Stack,
   SvgIcon,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -15,6 +16,7 @@ import PropTypes from 'prop-types';
 
 import AppChart from '../../components/app-chart';
 import { getLineChartCommonOptions } from './chart.util';
+import { SHARED_SELECT_PROPS } from './constant';
 
 const data = [
   {
@@ -134,7 +136,7 @@ export const RevenueChart = (props) => {
     <Card sx={sx}>
       <CardHeader
         action={
-          <>
+          <Stack direction="row" gap="8px">
             <Button
               color="inherit"
               size="small"
@@ -146,16 +148,9 @@ export const RevenueChart = (props) => {
               }>
               Làm mới
             </Button>
-            <Button color="inherit" size="small">
+            <Button color="inherit" size="small" sx={{ padding: 0 }}>
               <Select
-                slotProps={{
-                  input: {
-                    sx: {
-                      padding: 0,
-                    },
-                  },
-                }}
-                sx={{ padding: 0 }}
+                {...SHARED_SELECT_PROPS}
                 value={option}
                 label="Thời gian"
                 onChange={handleChange}>
@@ -166,7 +161,7 @@ export const RevenueChart = (props) => {
                 ))}
               </Select>
             </Button>
-          </>
+          </Stack>
         }
         title="Doanh thu"
       />
@@ -178,20 +173,6 @@ export const RevenueChart = (props) => {
           settings={{ notMerge: true }}
         />
       </CardContent>
-      {/* <Divider />
-      <CardActions sx={{ justifyContent: 'flex-end' }}>
-        <Button
-          color="inherit"
-          endIcon={(
-            <SvgIcon fontSize="small">
-              <ArrowRightIcon />
-            </SvgIcon>
-          )}
-          size="small"
-        >
-          Overview
-        </Button>
-      </CardActions> */}
     </Card>
   );
 };

@@ -1,5 +1,5 @@
-import PropTypes from "prop-types";
-import { format } from "date-fns";
+import PropTypes from 'prop-types';
+import { format } from 'date-fns';
 import {
   Avatar,
   Box,
@@ -13,9 +13,9 @@ import {
   TablePagination,
   TableRow,
   Typography,
-} from "@mui/material";
-import { Scrollbar } from "src/components/scrollbar";
-import { formatPrice } from "../../utils/format-price";
+} from '@mui/material';
+import { Scrollbar } from 'src/components/scrollbar';
+import { formatPrice } from '../../utils/formatters';
 
 export const ProductsTable = (props) => {
   const {
@@ -58,7 +58,7 @@ export const ProductsTable = (props) => {
                 <TableCell>Name</TableCell>
                 <TableCell>Price</TableCell>
                 <TableCell>Provider</TableCell>
-                <TableCell sx={{ maxWidth: "400px" }}>Affiliate link</TableCell>
+                <TableCell sx={{ maxWidth: '400px' }}>Affiliate link</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -81,7 +81,9 @@ export const ProductsTable = (props) => {
                       />
                     </TableCell>
                     <TableCell>{product.name}</TableCell>
-                    <TableCell>{formatPrice(product.discountedPrice)}</TableCell>
+                    <TableCell>
+                      {formatPrice(product.discountedPrice)}
+                    </TableCell>
                     <TableCell>{product.provider}</TableCell>
                     <TableCell>{product.link}</TableCell>
                   </TableRow>

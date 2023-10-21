@@ -1,6 +1,5 @@
 import Head from 'next/head';
 
-import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
   Avatar,
   Box,
@@ -8,9 +7,8 @@ import {
   Card,
   CircularProgress,
   Container,
-  OutlinedInput,
   Stack,
-  SvgIcon,
+  Switch,
   TextField,
   Typography,
   Unstable_Grid2 as Grid,
@@ -21,13 +19,11 @@ import * as Yup from 'yup';
 
 import UserService from '../../services/user';
 
-const UserEditPage = ({ userId }) => {
+const UserDetaiPage = ({ userId }) => {
   const { data: user, isLoading } = useQuery(
     ['users', userId],
     async () => await UserService.getById(userId),
   );
-
-  console.log('render');
 
   const formik = useFormik({
     initialValues: {
@@ -36,6 +32,8 @@ const UserEditPage = ({ userId }) => {
       id: user?.id ?? '',
       full_name: user?.full_name ?? '',
       description: user?.description ?? '',
+      active: user?.is_enabled ?? false,
+      can_show_mature: user?.can_show_mature ?? false,
     },
     enableReinitialize: true,
     validationSchema: Yup.object({
@@ -59,7 +57,7 @@ const UserEditPage = ({ userId }) => {
   return (
     <>
       <Head>
-        <title>Users {user?.username} | Audiory</title>
+        <title>User {user?.username} </title>
       </Head>
       <Box
         component="main"
@@ -167,8 +165,9 @@ const UserEditPage = ({ userId }) => {
                       <TextField
                         fullWidth
                         multiline
+                        maxRows={5}
                         variant="outlined"
-                        label="Description"
+                        label="Giới thiệu"
                         name="description"
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}
@@ -181,17 +180,71 @@ const UserEditPage = ({ userId }) => {
               </Grid>
               <Grid xs={12} lg={4}>
                 <Card sx={{ padding: 2 }}>
-                  <Stack justifyContent="center" alignItems="center" gap="8px">
+                  <Stack justifyContent="center" alignItems="center">
                     <Avatar
                       src={user?.avatar_url}
-                      sx={{ width: '100px', height: '100px' }}
+                      sx={{
+                        width: '80%',
+                        height: 'auto',
+                        marginBottom: '12px',
+                      }}
                     />
-                    <Typography variant="subtitle1" fontStyle="italic">
-                      <b>{user?.number_of_followers ?? 0} </b> follower
+                    <Typography variant="subtitle1" fontWeight={400}>
+                      Người theo dõi: <b>{user?.number_of_followers ?? 0} </b>
                     </Typography>
-                    <Typography variant="subtitle1" fontStyle="italic">
-                      Tác giả <b> cấp {user?.author_level_id ?? 0} </b>
+                    <Typography variant="subtitle1" fontWeight={400}>
+                      Tác giả: <b> cấp {user?.author_level_id ?? 0} </b>
                     </Typography>
+                    <Stack
+                      width="100%"
+                      direction="row"
+                      gap="4px"
+                      alignItems="center"
+                      justifyContent="space-between">
+                      <Stack>
+                        <Typography variant="subtitle1" fontWeight={600}>
+                          Vô hiệu hóa
+                        </Typography>
+                        <Typography
+                          variant="subtitle1"
+                          fontSize="12px"
+                          color="ink.lighter">
+                          Vô hiệu hóa tài khoản người dùng
+                        </Typography>
+                      </Stack>
+                      <Switch
+                        color="primary"
+                        defaultChecked={formik.values.active}
+                        onChange={(value) =>
+                          formik.setFieldValue('active', value)
+                        }
+                      />
+                    </Stack>
+                    <Stack
+                      width="100%"
+                      direction="row"
+                      gap="4px"
+                      alignItems="center"
+                      justifyContent="space-between">
+                      <Stack>
+                        <Typography variant="subtitle1" fontWeight="600">
+                          Nội dung trưởng thành
+                        </Typography>
+                        <Typography
+                          variant="subtitle1"
+                          fontSize="12px"
+                          color="ink.lighter">
+                          Người dùng có thể thấy nội dung trưởng thành
+                        </Typography>
+                      </Stack>
+                      <Switch
+                        color="primary"
+                        defaultChecked={formik.values.can_show_mature}
+                        onChange={(value) =>
+                          formik.setFieldValue('can_show_mature', value)
+                        }
+                      />
+                    </Stack>
                   </Stack>
                 </Card>
               </Grid>
@@ -203,4 +256,4 @@ const UserEditPage = ({ userId }) => {
   );
 };
 
-export default UserEditPage;
+export default UserDetaiPage;
