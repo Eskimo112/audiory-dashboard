@@ -5,19 +5,22 @@ import { useRouter } from 'next/router';
 import { Avatar, CircularProgress, Stack, Typography } from '@mui/material';
 import { useQuery } from 'react-query';
 
+import { useRequestHeader } from '../../hooks/use-request-header';
 import UserService from '../../services/user';
 
-const UserInfo = ({ userId }) => {
+const UserInfo = ({ userId, isReversed }) => {
+  const requestHeader = useRequestHeader();
   const { data: user, isLoading } = useQuery(['user', userId], () =>
-    UserService.getById(userId),
+    new UserService(requestHeader).getById(userId),
   );
   const router = useRouter();
   if (isLoading) return <CircularProgress />;
   return (
     <Stack
       alignItems="center"
-      direction="row"
+      direction={isReversed ? 'row-reverse' : 'row'}
       spacing={1}
+      sx={{ cursor: 'pointer' }}
       onClick={() => {
         router.push(`/users/${userId}`);
       }}>

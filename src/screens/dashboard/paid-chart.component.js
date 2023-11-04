@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
-import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
 import {
   Button,
   Card,
@@ -8,44 +7,64 @@ import {
   CardHeader,
   MenuItem,
   Select,
+  Skeleton,
   Stack,
-  SvgIcon,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
+import { useQuery } from 'react-query';
 
 import AppChart from '../../components/app-chart';
+import DashboardService from '../../services/dashboard';
+import { getRecentDates } from '../../utils/get-recent-dates';
 import { getPieChartCommonOptions } from './chart.util';
-import { SHARED_SELECT_PROPS } from './constant';
-
-const data = {
-  paid_users: 1.8657,
-  free_users: 98.1343,
-};
-
-const OPTIONS = [
-  { label: 'Tuần này', value: 'last_week' },
-  { label: 'Tháng này', value: 'last_month' },
-  { label: 'Năm nay', value: 'last_year' },
-  { label: 'Tùy chọn', value: 'custom' },
-];
+import { SHARED_SELECT_PROPS, TIME_OPTIONS } from './constant';
 
 export const PaidRateChart = (props) => {
   const { sx } = props;
   const theme = useTheme();
+  const [option, setOption] = useState('7_recent_days');
+  const [dates, setDates] = useState(getRecentDates(7));
+  const { data, isLoading, isFetching, refetch } = useQuery(
+    ['dashboard', 'paid', dates[0], dates[1]],
+    () => DashboardService.getPaidRatio(dates[0], dates[1]),
+    { enabled: Boolean(dates[0]) && Boolean(dates[1]) },
+  );
 
-  //   const categories = Object.keys(data);
-  const formattedSeries = Object.entries(data).map(([key, value]) => ({
-    name: key,
-    value,
-  }));
+  const chartOptions = useMemo(() => {
+    if (!data) return null;
+    const formattedSeries = Object.entries(data).map(([key, value]) => ({
+      name: key,
+      value,
+    }));
 
-  const chartOptions = getPieChartCommonOptions(theme, formattedSeries);
+    const result = getPieChartCommonOptions(theme, formattedSeries);
+    return result;
+  }, [data, theme]);
 
-  const [option, setOption] = useState('last_week');
+  // const handleRefresh = async () => {
+  //   await refetch();
+  // };
 
-  const handleRefresh = () => {};
   const handleChange = (event) => {
+    switch (event.target.value) {
+      case '7_recent_days': {
+        setDates(getRecentDates(7));
+        break;
+      }
+      case '14_recent_days': {
+        setDates(getRecentDates(14));
+        break;
+      }
+      case '30_recent_days': {
+        setDates(getRecentDates(30));
+        break;
+      }
+      case '90_recent_days': {
+        setDates(getRecentDates(90));
+        break;
+      }
+    }
     setOption(event.target.value);
   };
 
@@ -54,7 +73,7 @@ export const PaidRateChart = (props) => {
       <CardHeader
         action={
           <Stack direction="row" gap="8px">
-            <Button
+            {/* <Button
               color="inherit"
               size="small"
               onClick={handleRefresh}
@@ -64,7 +83,7 @@ export const PaidRateChart = (props) => {
                 </SvgIcon>
               }>
               Làm mới
-            </Button>
+            </Button> */}
             <Button color="inherit" size="small" sx={{ padding: 0 }}>
               <Select
                 {...SHARED_SELECT_PROPS}
@@ -72,7 +91,7 @@ export const PaidRateChart = (props) => {
                 value={option}
                 label="Thời gian"
                 onChange={handleChange}>
-                {OPTIONS.map((option) => (
+                {TIME_OPTIONS.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>
@@ -81,15 +100,19 @@ export const PaidRateChart = (props) => {
             </Button>
           </Stack>
         }
-        title="Doanh thu"
+        title="Người dùng theo cấp"
       />
       <CardContent>
-        <AppChart
-          renderMode={'canvas'}
-          option={chartOptions}
-          height="280px"
-          settings={{ notMerge: true }}
-        />
+        {isLoading || isFetching ? (
+          <Skeleton height={'380px'} width="100%" />
+        ) : (
+          <AppChart
+            renderMode={'canvas'}
+            option={chartOptions}
+            height="320px"
+            settings={{ notMerge: true }}
+          />
+        )}
       </CardContent>
     </Card>
   );

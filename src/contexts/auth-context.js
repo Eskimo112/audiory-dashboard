@@ -8,6 +8,9 @@ import {
 
 import PropTypes from 'prop-types';
 
+import AuthService from '../services/auth';
+import UserService from '../services/user';
+
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
   SIGN_IN: 'SIGN_IN',
@@ -132,11 +135,20 @@ export const AuthProvider = (props) => {
     });
   };
 
-  const signIn = async (email, password) => {
-    if (email !== 'nguyengl176@gmail.com' || password !== 'nguyen123') {
+  const signInWithPassword = async (email, password) => {
+    // if (email !== 'nguyengl176@gmail.com' || password !== 'nguyen123') {
+    //   throw new Error('Please check your email and password');
+    // }
+
+    const response = await AuthService.signIn(email, password);
+    if (!response) {
       throw new Error('Please check your email and password');
     }
+    const requestHeader = {
+      Authorization: `Bearer ${response}`,
+    };
 
+    const userInfo = await new UserService(requestHeader).getById('me');
     try {
       window.sessionStorage.setItem('authenticated', 'true');
     } catch (err) {
@@ -144,11 +156,14 @@ export const AuthProvider = (props) => {
     }
 
     const user = {
-      id: '5e86809283e28b96d2d38537',
+      id: '629fc91c-39cf-11ee-8181-0242ac120002',
       avatar: '/assets/avatars/avatar-anika-visser.png',
       name: 'Phạm Nguyên',
       email: 'nguyengl176@gmail.com',
+      ...userInfo,
+      token: response,
     };
+    console.log(user);
 
     dispatch({
       type: HANDLERS.SIGN_IN,
@@ -171,7 +186,7 @@ export const AuthProvider = (props) => {
       value={{
         ...state,
         skip,
-        signIn,
+        signInWithPassword,
         signUp,
         signOut,
       }}>

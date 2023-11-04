@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
@@ -22,14 +22,14 @@ const Page = () => {
     enableReinitialize: true,
     validationSchema: Yup.object({
       email: Yup.string()
-        .email('Must be a valid email')
+        // .email('Must be a valid email')
         .max(255)
         .required('Email is required'),
       password: Yup.string().max(255).required('Password is required'),
     }),
     onSubmit: async (values, helpers) => {
       try {
-        await auth.signIn(values.email, values.password);
+        await auth.signInWithPassword(values.email, values.password);
         router.push('/');
       } catch (err) {
         helpers.setStatus({ success: false });
@@ -38,15 +38,6 @@ const Page = () => {
       }
     },
   });
-
-  const handleMethodChange = useCallback((event, value) => {
-    setMethod(value);
-  }, []);
-
-  const handleSkip = useCallback(() => {
-    auth.skip();
-    router.push('/');
-  }, [auth, router]);
 
   return (
     <>

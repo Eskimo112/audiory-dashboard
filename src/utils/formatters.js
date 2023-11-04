@@ -11,6 +11,6 @@ export function formatDate(dateString) {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
 
-  const formattedDate = `${year}-${month}-${day} at ${hours}:${minutes}`;
+  const formattedDate = `${day}-${month}-${year} lúc ${hours}:${minutes}`;
   return formattedDate;
 }

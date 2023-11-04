@@ -4,7 +4,7 @@ export default class CategoryService {
   static async getAll() {
     const url = 'categories';
 
-    const response = await request(url, 'get');
+    const response = await request({ url, method: 'get' });
     if (!response.data) return [];
     return response.data;
   }
@@ -12,7 +12,7 @@ export default class CategoryService {
   static async getById(categoryId) {
     const url = `categories/${categoryId}`;
 
-    const response = await request(url, 'get');
+    const response = await request({ url, method: 'get' });
     if (!response.data) return null;
     return response.data;
   }

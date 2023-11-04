@@ -2,12 +2,12 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Avatar, CircularProgress, Stack, Typography } from '@mui/material';
+import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import { useQuery } from 'react-query';
 
 import StoryService from '../../services/story';
 
-const StoryInfo = ({ userId: storyId }) => {
+const StoryInfo = ({ storyId, isReversed }) => {
   const { data: story, isLoading } = useQuery(['story', storyId], () =>
     StoryService.getById(storyId),
   );
@@ -15,13 +15,14 @@ const StoryInfo = ({ userId: storyId }) => {
   if (isLoading) return <CircularProgress />;
   return (
     <Stack
+      sx={{ cursor: 'pointer' }}
       alignItems="center"
-      direction="row"
-      spacing={2}
+      direction={isReversed ? 'row-reverse' : 'row'}
+      spacing={1}
       onClick={() => {
         router.push(`/stories/${storyId}`);
       }}>
-      <Avatar src={story.cover_url} width={50} height={50}></Avatar>
+      <Box component="img" src={story.cover_url} width={40} height={55}></Box>
       <Stack alignItems="start">
         <Typography variant="subtitle2">
           {story.title ?? 'Không có tên'}

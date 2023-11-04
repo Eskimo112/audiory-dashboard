@@ -4,9 +4,13 @@ export default class StoryService {
   static async getAll() {
     const url = 'stories';
 
-    const response = await request(url, 'get', null, {
-      page: 1,
-      page_size: Number.MAX_SAFE_INTEGER,
+    const response = await request({
+      url,
+      method: 'get',
+      params: {
+        page: 1,
+        page_size: Number.MAX_SAFE_INTEGER,
+      },
     });
     if (!response.data) return [];
     return response.data;
@@ -15,7 +19,7 @@ export default class StoryService {
   static async getById(storyId) {
     const url = `stories/${storyId}`;
 
-    const response = await request(url, 'get');
+    const response = await request({ url, method: 'get' });
     if (!response.data) return null;
     return response.data;
   }

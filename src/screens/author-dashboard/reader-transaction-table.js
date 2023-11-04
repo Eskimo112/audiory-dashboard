@@ -1,42 +1,37 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-
-import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
   Box,
-  Button,
   Card,
+  CardContent,
+  CardHeader,
   Chip,
   CircularProgress,
-  Container,
-  MenuItem,
-  Stack,
-  SvgIcon,
-  Typography,
 } from '@mui/material';
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
 import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '../../constants/chip_colors';
-import { SHARED_PAGE_SX } from '../../constants/page_sx';
 import {
   TRANSACTION_STATUS_MAP,
   TRANSACTION_TYPE_MAP,
 } from '../../constants/status_map';
 import { SHARED_TABLE_PROPS } from '../../constants/table';
-import TransactionService from '../../services/transaction';
+import { useRequestHeader } from '../../hooks/use-request-header';
+import AuthorDashboardService from '../../services/author-dashboard';
 import { formatDate } from '../../utils/formatters';
 import UserInfo from '../report/user-info.component';
 
-const TransactionPage = () => {
-  const { data: transactions, isLoading } = useQuery(
-    ['transaction'],
-    async () => await TransactionService.getAll(),
+const ReaderTransactionsTable = () => {
+  const requestHeader = useRequestHeader();
+  const { data: transactions = [], isLoading } = useQuery(
+    ['author', 'reader-tranactions'],
+    () =>
+      new AuthorDashboardService(requestHeader).getReaderTransactions(
+        1,
+        Number.MAX_SAFE_INTEGER,
+      ),
   );
-
-  const router = useRouter();
 
   const columns = useMemo(
     () => [
@@ -47,7 +42,7 @@ const TransactionPage = () => {
       },
       {
         accessorKey: 'user',
-        header: 'Người dùng',
+        header: 'Độc giả',
         Cell: ({ row }) => <UserInfo userId={row.original.user_id} />,
       },
       {
@@ -150,71 +145,43 @@ const TransactionPage = () => {
       id: false,
     },
     showGlobalFilter: true,
+    pagination: { pageIndex: 0, pageSize: 10 },
   };
 
-  if (isLoading)
-    return (
-      <Card
-        sx={{
-          display: 'flex',
-          width: '100%',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '500px',
-        }}>
-        <CircularProgress />
-      </Card>
-    );
-
   return (
-    <>
-      <Head>
-        <title>Giao dịch | Audiory</title>
-      </Head>
-      <Box component="main" sx={SHARED_PAGE_SX}>
-        <Container maxWidth="xl">
-          <Stack spacing={3}>
-            <Stack direction="row" justifyContent="space-between" spacing={4}>
-              <Stack spacing={1}>
-                <Typography variant="h4">Quản lý giao dịch</Typography>
-                <Stack alignItems="center" direction="row" spacing={1}></Stack>
-              </Stack>
-              <div>
-                <Button
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <PlusIcon />
-                    </SvgIcon>
-                  }
-                  variant="contained">
-                  Thêm giao dịch
-                </Button>
-              </div>
-            </Stack>
-
-            <MaterialReactTable
-              renderRowActionMenuItems={({ closeMenu, row, table }) => [
-                <MenuItem
-                  key="edit"
-                  onClick={() => {
-                    router.push(`/tranactions/${row.original.id}`);
-                  }}>
-                  Chỉnh sửa
-                </MenuItem>,
-                <MenuItem key="delete" onClick={() => console.info('Delete')}>
-                  Vô hiệu hóa
-                </MenuItem>,
-              ]}
-              columns={columns}
-              data={transactions}
-              initialState={initialState}
-              {...SHARED_TABLE_PROPS}
-            />
-          </Stack>
-        </Container>
-      </Box>
-    </>
+    <Card>
+      <CardHeader title="Giao dịch gần đây" />
+      <CardContent sx={{ paddingTop: 0, paddingBottom: 0 }}>
+        {isLoading ? (
+          <CircularProgress />
+        ) : (
+          <MaterialReactTable
+            {...SHARED_TABLE_PROPS}
+            enableRowActions={false}
+            columns={columns}
+            data={transactions ?? []}
+            initialState={initialState}
+            muiTableHeadCellProps={{
+              sx: {
+                height: '48px!important',
+                fontSize: '14px!important',
+              },
+            }}
+            muiTopToolbarProps={{
+              sx: {
+                display: 'none',
+              },
+            }}
+            muiSearchTextFieldProps={{
+              placeholder: 'Nhập từ khóa để tìm kiếm',
+              sx: { width: '200px', padding: 0 },
+              variant: 'outlined',
+            }}
+          />
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
-export default TransactionPage;
+export default ReaderTransactionsTable;

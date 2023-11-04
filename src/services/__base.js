@@ -11,7 +11,13 @@ export function convertHeaderToAxiosHeaders(reqHeaders) {
   return axiosHeaders;
 }
 
-export const request = async (url, method, payload, params, requestHeaders) => {
+export const request = async ({
+  url,
+  method,
+  payload,
+  params,
+  requestHeaders,
+}) => {
   const axiosHeaders = convertHeaderToAxiosHeaders(requestHeaders);
   const baseURL = process.env.API;
   const res = await axios.request({
@@ -21,6 +27,8 @@ export const request = async (url, method, payload, params, requestHeaders) => {
     data: payload,
     headers: axiosHeaders,
   });
-
+  if (res.status !== 200) {
+    throw res.data.message;
+  }
   return res?.data ?? null;
 };

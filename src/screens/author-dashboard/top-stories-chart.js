@@ -4,7 +4,6 @@ import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
 import {
   Button,
   Card,
-  CardContent,
   CardHeader,
   MenuItem,
   Select,
@@ -17,36 +16,42 @@ import PropTypes from 'prop-types';
 import { useQuery } from 'react-query';
 
 import AppChart from '../../components/app-chart';
-import DashboardService from '../../services/dashboard';
+import { useRequestHeader } from '../../hooks/use-request-header';
+import AuthorDashboardService from '../../services/author-dashboard';
 import { getRecentDates } from '../../utils/get-recent-dates';
-import { getLineChartCommonOptions } from './chart.util';
-import { SHARED_SELECT_PROPS, TIME_OPTIONS } from './constant';
+import {
+  METRIC_OPTIONS,
+  SHARED_SELECT_PROPS,
+  TIME_OPTIONS,
+} from '../dashboard/constant';
+import { getAuthorPieChartCommonOptions } from './chart.utils';
 
-export const RevenueChart = (props) => {
+export const TopStoriesChart = (props) => {
   const { sx } = props;
   const theme = useTheme();
-  const [option, setOption] = useState('7_recent_days');
+  const requestHeader = useRequestHeader();
+  const [timeOption, setTimeOption] = useState('7_recent_days');
+  const [metricOption, setMetricOption] = useState('total_read');
   const [dates, setDates] = useState(getRecentDates(7));
   const { data, isLoading, isFetching, refetch } = useQuery(
-    ['dashboard', 'revenue', dates[0], dates[1]],
-    () => DashboardService.getRevenue(dates[0], dates[1]),
+    ['author', 'story-ranking', dates[0], dates[1]],
+    () =>
+      new AuthorDashboardService(requestHeader).getStoryRanking(
+        dates[0],
+        dates[1],
+        metricOption,
+      ),
     { enabled: Boolean(dates[0]) && Boolean(dates[1]) },
   );
 
   const chartOptions = useMemo(() => {
     if (!data) return null;
-    const analytics = data.analytics;
-    if (!analytics) return null;
-    const categories = Object.keys(analytics[0].values);
-    const formattedSeries = analytics.map((series) => ({
-      name: series.metric,
-      data: Object.values(series.values),
+    const formattedSeries = Object.entries(data).map(([key, value]) => ({
+      name: key,
+      value,
     }));
-    const result = getLineChartCommonOptions(
-      theme,
-      categories,
-      formattedSeries,
-    );
+
+    const result = getAuthorPieChartCommonOptions(theme, formattedSeries);
     return result;
   }, [data, theme]);
 
@@ -73,7 +78,7 @@ export const RevenueChart = (props) => {
         break;
       }
     }
-    setOption(event.target.value);
+    setTimeOption(event.target.value);
   };
 
   return (
@@ -95,7 +100,8 @@ export const RevenueChart = (props) => {
             <Button color="inherit" size="small" sx={{ padding: 0 }}>
               <Select
                 {...SHARED_SELECT_PROPS}
-                value={option}
+                sx={{ padding: 0 }}
+                value={timeOption}
                 label="Thời gian"
                 onChange={handleChange}>
                 {TIME_OPTIONS.map((option) => (
@@ -105,26 +111,38 @@ export const RevenueChart = (props) => {
                 ))}
               </Select>
             </Button>
+            <Button color="inherit" size="small" sx={{ padding: 0 }}>
+              <Select
+                {...SHARED_SELECT_PROPS}
+                sx={{ padding: 0 }}
+                value={metricOption}
+                label="Thông số"
+                onChange={(event) => setMetricOption(event.target.value)}>
+                {METRIC_OPTIONS.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Button>
           </Stack>
         }
-        title="Tổng doanh thu"
+        title="Truyện tương tác tốt"
       />
-      <CardContent>
-        {isLoading || isFetching ? (
-          <Skeleton height={'380px'} width="100%" />
-        ) : (
-          <AppChart
-            renderMode={'canvas'}
-            option={chartOptions}
-            height="380px"
-            settings={{ notMerge: true }}
-          />
-        )}
-      </CardContent>
+      {isLoading || isFetching ? (
+        <Skeleton height={'380px'} width="100%" />
+      ) : (
+        <AppChart
+          renderMode={'canvas'}
+          option={chartOptions}
+          height="320px"
+          settings={{ notMerge: true }}
+        />
+      )}
     </Card>
   );
 };
 
-RevenueChart.protoTypes = {
+TopStoriesChart.protoTypes = {
   sx: PropTypes.object,
 };

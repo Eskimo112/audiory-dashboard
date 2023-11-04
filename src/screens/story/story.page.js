@@ -20,6 +20,7 @@ import {
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
+import { SHARED_PAGE_SX } from '../../constants/page_sx';
 import { SHARED_TABLE_PROPS } from '../../constants/table';
 import StoryService from '../../services/story';
 
@@ -58,7 +59,7 @@ const StoryPage = () => {
         header: 'Thể loại',
       },
       {
-        accessorKey: 'author', // normal accessorKey
+        accessorKey: 'author.full_name', // normal accessorKey
         header: 'Tác giả',
         Cell: (cell) => {
           const author = cell.row.original.author;
@@ -133,20 +134,21 @@ const StoryPage = () => {
         accessorKey: 'is_completed',
         header: 'Trạng thái',
         size: 80,
-
+        accessorFn: (row) => (row.is_completed ? 'Hoàn thành' : 'Đang ra'),
         filterFn: 'equals',
         filterSelectOptions: [
-          { text: 'Đang ra', value: false },
-          { text: 'Hoàn thành', value: true },
+          { text: 'Đang ra', value: 'Hoàn thành' },
+          { text: 'Hoàn thành', value: 'Đang ra' },
         ],
         filterVariant: 'select',
         Cell: ({ cell }) => (
           <Chip
-            label={cell.getValue() ? 'Hoàn thành' : 'Đang ra'}
+            label={cell.getValue()}
             sx={{
-              backgroundColor: cell.getValue()
-                ? 'success.alpha20'
-                : 'error.alpha20',
+              backgroundColor:
+                cell.getValue() === 'Hoàn thành'
+                  ? 'success.alpha20'
+                  : 'error.alpha20',
             }}
           />
         ),
@@ -235,12 +237,7 @@ const StoryPage = () => {
       <Head>
         <title>Stories | Audiory</title>
       </Head>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 8,
-        }}>
+      <Box component="main" sx={SHARED_PAGE_SX}>
         <Container maxWidth="xl">
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>

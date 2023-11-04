@@ -1,6 +1,6 @@
 import NextLink from 'next/link';
 
-import { Box, Typography, Unstable_Grid2 as Grid } from '@mui/material';
+import { Box, Unstable_Grid2 as Grid } from '@mui/material';
 import PropTypes from 'prop-types';
 
 import AppIcon from '../../components/app-icon';
@@ -50,7 +50,7 @@ export const Layout = (props) => {
           </Box>
           {children}
         </Grid>
-        <Grid
+        {/* <Grid
           xs={12}
           lg={6}
           sx={{
@@ -84,7 +84,7 @@ export const Layout = (props) => {
             </Typography>
             <img alt="" src="/assets/auth-illustration.svg" />
           </Box>
-        </Grid>
+        </Grid> */}
       </Grid>
     </Box>
   );
