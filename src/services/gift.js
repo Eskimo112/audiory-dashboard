@@ -4,7 +4,7 @@ export default class GiftService {
   static async getAll() {
     const url = 'gifts';
 
-    const response = await request(url, 'get');
+    const response = await request({ url, method: 'get' });
     if (!response.data) return [];
     return response.data;
   }
@@ -12,7 +12,7 @@ export default class GiftService {
   static async getById(giftId) {
     const url = `gifts/${giftId}`;
 
-    const response = await request(url, 'get');
+    const response = await request({ url, method: 'get' });
     if (!response.data) return null;
     return response.data;
   }

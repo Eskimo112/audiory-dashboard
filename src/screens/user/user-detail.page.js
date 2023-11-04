@@ -17,6 +17,8 @@ import { useFormik } from 'formik';
 import { useQuery } from 'react-query';
 import * as Yup from 'yup';
 
+import AppBreadCrumbs from '../../components/app-bread-crumbs';
+import { SHARED_PAGE_SX } from '../../constants/page_sx';
 import UserService from '../../services/user';
 
 const UserDetaiPage = ({ userId }) => {
@@ -59,18 +61,14 @@ const UserDetaiPage = ({ userId }) => {
       <Head>
         <title>User {user?.username} </title>
       </Head>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 8,
-        }}>
+      <Box component="main" sx={SHARED_PAGE_SX}>
         <Container maxWidth="xl">
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
                 <Typography variant="h4">Chỉnh sửa hồ sơ</Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
+                <AppBreadCrumbs />
               </Stack>
               <div>
                 <Button

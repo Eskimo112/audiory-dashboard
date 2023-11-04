@@ -4,7 +4,7 @@ export default class SystemConfigService {
   static async getAll() {
     const url = 'system-configs';
 
-    const response = await request(url, 'get');
+    const response = await request({ url, method: 'get' });
     if (!response.data) return [];
     return response.data;
   }
@@ -12,7 +12,7 @@ export default class SystemConfigService {
   static async getById(configId) {
     const url = `system-configs/${configId}`;
 
-    const response = await request(url, 'get');
+    const response = await request({ url, method: 'get' });
     if (!response.data) return null;
     return response.data;
   }

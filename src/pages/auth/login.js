@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
@@ -9,7 +9,7 @@ import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 import * as Yup from 'yup';
 
-import { signInWithGoogle } from '@/Firebase';
+import { toastError } from '@/utils/notification';
 
 const Page = () => {
   const router = useRouter();
@@ -24,31 +24,33 @@ const Page = () => {
     enableReinitialize: true,
     validationSchema: Yup.object({
       email: Yup.string()
-        .email('Must be a valid email')
+        // .email('Must be a valid email')
         .max(255)
         .required('Email is required'),
       password: Yup.string().max(255).required('Password is required'),
     }),
     onSubmit: async (values, helpers) => {
       try {
-        await auth.signIn(values.email, values.password);
+        await auth.signInWithPassword(values.email, values.password);
         router.push('/');
       } catch (err) {
         helpers.setStatus({ success: false });
         helpers.setErrors({ submit: err.message });
         helpers.setSubmitting(false);
+        toastError('Đăng nhập không thành công');
+
       }
     },
   });
 
-  const handleMethodChange = useCallback((event, value) => {
-    setMethod(value);
-  }, []);
-
-  const handleSkip = useCallback(() => {
-    auth.skip();
-    router.push('/');
-  }, [auth, router]);
+  const handleSignInGoogle = async () => {
+    try {
+      await auth.signInWithGoogle();
+      router.push('/');
+    } catch (error) {
+      toastError('Đăng nhập không thành công');
+    }
+  };
 
   return (
     <>
@@ -138,7 +140,7 @@ const Page = () => {
               size="large"
               sx={{ mt: 3 }}
               variant="outlined"
-              onClick={signInWithGoogle}>
+              onClick={handleSignInGoogle}>
               Đăng nhập với google
             </Button>
           </div>

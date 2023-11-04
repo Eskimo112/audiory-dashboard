@@ -11,7 +11,6 @@ import {
   Chip,
   CircularProgress,
   Container,
-  MenuItem,
   Stack,
   SvgIcon,
   Typography,
@@ -20,29 +19,37 @@ import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
 import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '../../constants/chip_colors';
+import { SHARED_PAGE_SX } from '../../constants/page_sx';
 import { SHARED_TABLE_PROPS } from '../../constants/table';
+import { useRequestHeader } from '../../hooks/use-request-header';
 import ReportService from '../../services/report';
 import { formatDate } from '../../utils/formatters';
 import ChapterInfo from './chapter-info.component';
 import StoryInfo from './story-info.component';
 import UserInfo from './user-info.component';
 
-const REPORT_TYPE_MAP = {
+export const REPORT_TYPE_MAP = {
   USER: 'Người dùng',
   STORY: 'Truyện',
   COMMENT: 'Bình luận',
   CHAPTER: 'Chương',
 };
-const REPORT_STATUS_MAP = {
+export const REPORT_STATUS_MAP = {
   APPROVED: 'Chấp nhận',
   PROCESSING: 'Đang xử lý',
   REJECTED: 'Bị từ chối',
 };
 
 const ReportPage = () => {
+  const requestHeaders = useRequestHeader();
+  const reportService = useMemo(
+    () => new ReportService(requestHeaders),
+    [requestHeaders],
+  );
+
   const { data: reports, isLoading } = useQuery(
     ['report'],
-    async () => await ReportService.getAll(),
+    async () => await reportService.getAll(),
   );
 
   const router = useRouter();
@@ -175,12 +182,7 @@ const ReportPage = () => {
       <Head>
         <title>Báo cáo | Audiory</title>
       </Head>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 8,
-        }}>
+      <Box component="main" sx={SHARED_PAGE_SX}>
         <Container maxWidth="xl">
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
@@ -195,29 +197,36 @@ const ReportPage = () => {
                       <PlusIcon />
                     </SvgIcon>
                   }
-                  variant="contained">
+                  variant="contained"
+                  onClick={() => router.push('reports/create')}>
                   Thêm báo cáo
                 </Button>
               </div>
             </Stack>
 
             <MaterialReactTable
-              renderRowActionMenuItems={({ closeMenu, row, table }) => [
-                <MenuItem
-                  key="edit"
-                  onClick={() => {
-                    router.push(`/reports/${row.original.id}`);
-                  }}>
-                  Chỉnh sửa
-                </MenuItem>,
-                <MenuItem key="delete" onClick={() => console.info('Delete')}>
-                  Vô hiệu hóa
-                </MenuItem>,
-              ]}
+              {...SHARED_TABLE_PROPS}
+              displayColumnDefOptions={{
+                'mrt-row-actions': { header: '', size: 150 },
+              }}
+              renderRowActions={({ row }) => {
+                return (
+                  <Button
+                    sx={{
+                      borderRadius: 4,
+                      padding: '5px 12px',
+                    }}
+                    variant="outlined"
+                    onClick={() => {
+                      router.push(`/reports/${row.original.id}`);
+                    }}>
+                    Xem chi tiết
+                  </Button>
+                );
+              }}
               columns={columns}
               data={reports}
               initialState={initialState}
-              {...SHARED_TABLE_PROPS}
             />
           </Stack>
         </Container>

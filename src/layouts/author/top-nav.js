@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { BarChart, ChatBubbleOutline, Edit, NotificationsNone, Search } from '@mui/icons-material';
 import SendIcon from '@mui/icons-material/Send';
 import { Avatar, Box, Button, Grid, IconButton, Typography } from '@mui/material';
@@ -6,6 +8,7 @@ import PropTypes from 'prop-types';
 import { usePopover } from 'src/hooks/use-popover';
 
 import AppIcon from '@/components/app-icon';
+import { useAuth } from '@/hooks/use-auth';
 
 import { AccountPopover } from '../dashboard/account-popover';
 
@@ -16,7 +19,9 @@ export const TopNav = (props) => {
     // const { onNavOpen } = props;
     // const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
     const accountPopover = usePopover();
-
+    const auth = useAuth();
+    console.log(auth)
+    const [user, setUser] = useState(auth.user);
     return (
         <>
             <Box
@@ -73,15 +78,15 @@ export const TopNav = (props) => {
                                     height: 40,
 
                                 }}
-                                src="/assets/avatars/avatar-anika-visser.png"
+                                src={auth.user.avatar_url}
                             /></Grid>
                             <Grid item xs="auto" container direction="column" justifyContent="space-around" >
                                 <Grid item xs>
                                     <Typography gutterBottom variant="subtitle2" component="div">
-                                        Standard license
+                                        {auth.user.username}
                                     </Typography>
                                     <Typography gutterBottom variant="body2">
-                                        alo
+                                        {auth.user.name}
                                     </Typography>
                                 </Grid>
                             </Grid>

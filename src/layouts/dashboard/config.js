@@ -101,4 +101,13 @@ export const items = [
       </SvgIcon>
     ),
   },
+  {
+    title: 'Số liệu tác giả',
+    path: '/author-dashboard',
+    icon: (
+      <SvgIcon fontSize="small">
+        <ChartBarIcon />
+      </SvgIcon>
+    ),
+  },
 ];

@@ -20,22 +20,15 @@ import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
 import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '../../constants/chip_colors';
+import { SHARED_PAGE_SX } from '../../constants/page_sx';
+import {
+  TRANSACTION_STATUS_MAP,
+  TRANSACTION_TYPE_MAP,
+} from '../../constants/status_map';
 import { SHARED_TABLE_PROPS } from '../../constants/table';
 import TransactionService from '../../services/transaction';
 import { formatDate } from '../../utils/formatters';
 import UserInfo from '../report/user-info.component';
-
-const TRANSACTION_TYPE_MAP = {
-  REWARD_FROM_GIFT: 'Nhận quà',
-  PURCHASE: 'Mua xu',
-  WITHDRAW: 'Rút tiền',
-  GIFT_SENT: 'Tặng quà',
-};
-const TRANSACTION_STATUS_MAP = {
-  SUCCEEDED: 'Thành công',
-  PROCESSING: 'Đang xử lý',
-  FAILED: 'Thất bại',
-};
 
 const TransactionPage = () => {
   const { data: transactions, isLoading } = useQuery(
@@ -88,6 +81,28 @@ const TransactionPage = () => {
             />
           );
         },
+      },
+      {
+        accessorKey: 'coin.image_url',
+        header: 'Loại xu',
+        size: 80,
+        Cell: ({ cell }) => {
+          return (
+            <Box display="flex" alignItems="center">
+              <Box
+                component="img"
+                src={cell.getValue()}
+                alt={cell.getValue()}
+                width={30}
+                height={30}></Box>
+            </Box>
+          );
+        },
+      },
+      {
+        accessorKey: 'coin.value',
+        header: 'Số lượng',
+        size: 80,
       },
       {
         accessorKey: 'created_date',
@@ -156,12 +171,7 @@ const TransactionPage = () => {
       <Head>
         <title>Giao dịch | Audiory</title>
       </Head>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 8,
-        }}>
+      <Box component="main" sx={SHARED_PAGE_SX}>
         <Container maxWidth="xl">
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>

@@ -1,6 +1,10 @@
+/* eslint-disable camelcase */
+import { MRT_Localization_VI } from 'material-react-table/locales/vi';
+
 export const SHARED_TABLE_PROPS = {
+  localization: MRT_Localization_VI,
   positionActionsColumn: 'last',
-  displayColumnDefOptions: { 'row-actions': { header: '', size: 30 } },
+  displayColumnDefOptions: { 'mrt-row-actions': { header: '', size: 100 } },
   enableRowActions: true,
   enableGlobalFilterModes: true,
   positionGlobalFilter: 'left',

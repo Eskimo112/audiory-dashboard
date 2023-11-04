@@ -8,6 +8,11 @@ import {
 
 import PropTypes from 'prop-types';
 
+import { signInWithGooglePopup } from '@/Firebase';
+
+import AuthService from '../services/auth';
+import UserService from '../services/user';
+
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
   SIGN_IN: 'SIGN_IN',
@@ -29,13 +34,13 @@ const handlers = {
       ...// if payload (user) is provided, then is authenticated
       (user
         ? {
-            isAuthenticated: true,
-            isLoading: false,
-            user,
-          }
+          isAuthenticated: true,
+          isLoading: false,
+          user,
+        }
         : {
-            isLoading: false,
-          }),
+          isLoading: false,
+        }),
     };
   },
   [HANDLERS.SIGN_IN]: (state, action) => {
@@ -132,11 +137,20 @@ export const AuthProvider = (props) => {
     });
   };
 
-  const signIn = async (email, password) => {
-    if (email !== 'nguyengl176@gmail.com' || password !== 'nguyen123') {
+  const signInWithPassword = async (email, password) => {
+    // if (email !== 'nguyengl176@gmail.com' || password !== 'nguyen123') {
+    //   throw new Error('Please check your email and password');
+    // }
+
+    const response = await AuthService.signIn(email, password);
+    if (!response) {
       throw new Error('Please check your email and password');
     }
+    const requestHeader = {
+      Authorization: `Bearer ${response}`,
+    };
 
+    const userInfo = await new UserService(requestHeader).getById('me');
     try {
       window.sessionStorage.setItem('authenticated', 'true');
     } catch (err) {
@@ -144,11 +158,41 @@ export const AuthProvider = (props) => {
     }
 
     const user = {
-      id: '5e86809283e28b96d2d38537',
-      avatar: '/assets/avatars/avatar-anika-visser.png',
-      name: 'Phạm Nguyên',
-      email: 'nguyengl176@gmail.com',
+      ...userInfo,
+      token: response,
     };
+    console.log(user);
+
+    dispatch({
+      type: HANDLERS.SIGN_IN,
+      payload: user,
+    });
+  };
+
+  const signInWithGoogle = async () => {
+    const idToken = await signInWithGooglePopup();
+    // console.log('id token', idToken);
+    const response = await AuthService.signInGoogle(idToken, '');
+    console.log('login google', response)
+    if (!response) {
+      throw new Error('Please check your email and password');
+    }
+    const requestHeader = {
+      Authorization: `Bearer ${response}`,
+    };
+
+    const userInfo = await new UserService(requestHeader).getById('me');
+    try {
+      window.sessionStorage.setItem('authenticated', 'true');
+    } catch (err) {
+      console.error(err);
+    }
+
+    const user = {
+      ...userInfo,
+      token: response,
+    };
+    console.log(user);
 
     dispatch({
       type: HANDLERS.SIGN_IN,
@@ -171,7 +215,8 @@ export const AuthProvider = (props) => {
       value={{
         ...state,
         skip,
-        signIn,
+        signInWithPassword,
+        signInWithGoogle,
         signUp,
         signOut,
       }}>

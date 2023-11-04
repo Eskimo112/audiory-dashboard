@@ -74,6 +74,7 @@ export function createComponents(config) {
       defaultProps: {
         titleTypographyProps: {
           variant: 'h6',
+          fontWeight: 600,
         },
         subheaderTypographyProps: {
           variant: 'body2',
@@ -81,7 +82,7 @@ export function createComponents(config) {
       },
       styleOverrides: {
         root: {
-          padding: '32px 24px 16px',
+          padding: '16px',
         },
       },
     },

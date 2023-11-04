@@ -20,6 +20,9 @@ import {
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
+import { SHARED_PAGE_SX } from '../../constants/page_sx';
+import { SHARED_TABLE_PROPS } from '../../constants/table';
+import { useRequestHeader } from '../../hooks/use-request-header';
 import UserService from '../../services/user';
 import { formatDate } from '../../utils/formatters';
 
@@ -29,9 +32,10 @@ const ROLE_ID_MAP = {
 };
 
 const UserPage = () => {
+  const requestHeader = useRequestHeader();
   const { data: users, isLoading } = useQuery(
     ['users'],
-    async () => await UserService.getAll(),
+    async () => await new UserService(requestHeader).getAll(),
   );
 
   // const filteredUsers = (users ?? []).filter((user) => !!user.role_id);
@@ -163,12 +167,7 @@ const UserPage = () => {
       <Head>
         <title>Users | Audiory</title>
       </Head>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 8,
-        }}>
+      <Box component="main" sx={SHARED_PAGE_SX}>
         <Container maxWidth="xl">
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
@@ -187,9 +186,6 @@ const UserPage = () => {
               </Button>
             </Stack>
             <MaterialReactTable
-              positionActionsColumn="last"
-              displayColumnDefOptions={{ 'mrt-row-actions': { size: 50 } }}
-              enableRowActions
               renderRowActionMenuItems={({ closeMenu, row, table }) => [
                 <MenuItem
                   key="edit"
@@ -205,36 +201,7 @@ const UserPage = () => {
               columns={columns}
               data={users}
               initialState={initialState}
-              enableGlobalFilterModes
-              positionGlobalFilter="left"
-              muiTablePaperProps={{
-                sx: {
-                  boxShadow: 'none',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '24px',
-                },
-              }}
-              muiTableContainerProps={{
-                sx: {
-                  borderRadius: 1,
-                  boxShadow:
-                    '0px 5px 22px rgba(0, 0, 0, 0.04), 0px 0px 0px 0.5px rgba(0, 0, 0, 0.03)',
-                },
-              }}
-              muiTopToolbarProps={{
-                sx: {
-                  padding: '10px!important',
-                  borderRadius: 1,
-                  boxShadow:
-                    '0px 5px 22px rgba(0, 0, 0, 0.04), 0px 0px 0px 0.5px rgba(0, 0, 0, 0.03)',
-                },
-              }}
-              muiSearchTextFieldProps={{
-                placeholder: 'Tìm người dùng',
-                sx: { width: '500px' },
-                variant: 'outlined',
-              }}
+              {...SHARED_TABLE_PROPS}
             />
           </Stack>
         </Container>

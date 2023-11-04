@@ -1,8 +1,10 @@
 // Import the functions you need from the SDKs you need
+import { id } from 'date-fns/locale';
 import { getAnalytics } from 'firebase/analytics';
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { getMessaging, getToken } from "firebase/messaging";
+import { useState } from 'react';
 
 
 
@@ -20,28 +22,27 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 if (typeof window !== "undefined") {
-  console.log('aki')
   // browser code
   const analytics = getAnalytics(app);
   const messaging = getMessaging(app);
-  getToken(messaging, {
-    vapidKey: "BEOE9H50LMurPvjrOp7cEMyZK6eChq9W2BQ_mSl4tEfAC-SDNUDB_Flikrl7Zm9d-NsDklu17_mlUzxV_nmlnAE"
-  }).then((currentToken) => {
-    if (currentToken) {
-      console.log(
-        'fmc token', currentToken
-      )
-      // Send the token to your server and update the UI if necessary
-      // ...
-    } else {
-      // Show permission request UI
-      console.log('No registration token available. Request permission to generate one.');
-      // ...
-    }
-  }).catch((err) => {
-    console.log('An error occurred while retrieving token. ', err);
-    // ...
-  });
+  // getToken(messaging, {
+  //   vapidKey: "BEOE9H50LMurPvjrOp7cEMyZK6eChq9W2BQ_mSl4tEfAC-SDNUDB_Flikrl7Zm9d-NsDklu17_mlUzxV_nmlnAE"
+  // }).then((currentToken) => {
+  //   if (currentToken) {
+  //     console.log(
+  //       'fmc token', currentToken
+  //     )
+  //     // Send the token to your server and update the UI if necessary
+  //     // ...
+  //   } else {
+  //     // Show permission request UI
+  //     console.log('No registration token available. Request permission to generate one.');
+  //     // ...
+  //   }
+  // }).catch((err) => {
+  //   console.log('An error occurred while retrieving token. ', err);
+  //   // ...
+  // });
 
 
 
@@ -49,19 +50,21 @@ if (typeof window !== "undefined") {
 export const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-export const signInWithGoogle = async () => {
-
+export const signInWithGooglePopup = async () => {
+  var idToken = '';
   await signInWithPopup(auth, provider).then((result) => {
     console.log('result login google', result);
 
     const gUser = result.user;
-    console.log(gUser.getIdTokenResult())
-
-    //
-    localStorage.setItem('name', gUser.name);
+    gUser.getIdTokenResult().then((res) => {
+      idToken = res.token;
+    })
   }).catch((err) => {
     console.log(err)
+  }).finally(() => {
   })
-    ;
+
+  return idToken;
+
 
 }

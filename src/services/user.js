@@ -1,18 +1,29 @@
 import { request } from './__base';
 
 export default class UserService {
-  static async getAll() {
-    const url = 'users';
+  constructor(requestHeader) {
+    this.requestHeader = requestHeader ?? undefined;
+  }
 
-    const response = await request(url, 'get');
+  async getAll() {
+    const url = 'users';
+    const response = await request({
+      url,
+      method: 'get',
+      requestHeaders: this.requestHeader,
+    });
     if (!response.data) return [];
     return response.data;
   }
 
-  static async getById(userId) {
+  async getById(userId) {
     const url = `users/${userId}`;
 
-    const response = await request(url, 'get');
+    const response = await request({
+      url,
+      method: 'get',
+      requestHeaders: this.requestHeader,
+    });
     if (!response.data) return null;
     return response.data;
   }

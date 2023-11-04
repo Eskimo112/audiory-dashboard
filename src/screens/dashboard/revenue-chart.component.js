@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
 import {
@@ -8,127 +8,71 @@ import {
   CardHeader,
   MenuItem,
   Select,
+  Skeleton,
   Stack,
   SvgIcon,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
+import { useQuery } from 'react-query';
 
 import AppChart from '../../components/app-chart';
+import DashboardService from '../../services/dashboard';
+import { getRecentDates } from '../../utils/get-recent-dates';
 import { getLineChartCommonOptions } from './chart.util';
-import { SHARED_SELECT_PROPS } from './constant';
-
-const data = [
-  {
-    metric: 'profit',
-    values: {
-      '01-10-2023': -750,
-      '02-10-2023': 0,
-      '03-10-2023': -60000,
-      '04-10-2023': 0,
-      '05-09-2023': 0,
-      '05-10-2023': 0,
-      '06-09-2023': 0,
-      '06-10-2023': 0,
-      '07-09-2023': 0,
-      '07-10-2023': 45000,
-      '08-09-2023': 0,
-      '08-10-2023': 0,
-      '09-09-2023': 0,
-      '09-10-2023': 172200,
-      '10-09-2023': 0,
-      '10-10-2023': 0,
-      '11-09-2023': 0,
-      '12-09-2023': 0,
-      '13-09-2023': 0,
-      '14-09-2023': 0,
-      '15-09-2023': 0,
-      '16-09-2023': 0,
-      '17-09-2023': 0,
-      '18-09-2023': 0,
-      '19-09-2023': 0,
-      '20-09-2023': 0,
-      '21-09-2023': 0,
-      '22-09-2023': 0,
-      '23-09-2023': -750,
-      '24-09-2023': -300,
-      '25-09-2023': -1250,
-      '26-09-2023': 0,
-      '27-09-2023': 0,
-      '28-09-2023': 0,
-      '29-09-2023': 0,
-      '30-09-2023': 0,
-    },
-  },
-  {
-    metric: 'revenue',
-    values: {
-      '01-10-2023': 0,
-      '02-10-2023': 0,
-      '03-10-2023': 0,
-      '04-10-2023': 0,
-      '05-09-2023': 0,
-      '05-10-2023': 0,
-      '06-09-2023': 0,
-      '06-10-2023': 0,
-      '07-09-2023': 0,
-      '07-10-2023': 45000,
-      '08-09-2023': 0,
-      '08-10-2023': 0,
-      '09-09-2023': 0,
-      '09-10-2023': 180000,
-      '10-09-2023': 0,
-      '10-10-2023': 0,
-      '11-09-2023': 0,
-      '12-09-2023': 0,
-      '13-09-2023': 0,
-      '14-09-2023': 0,
-      '15-09-2023': 0,
-      '16-09-2023': 0,
-      '17-09-2023': 0,
-      '18-09-2023': 0,
-      '19-09-2023': 0,
-      '20-09-2023': 0,
-      '21-09-2023': 0,
-      '22-09-2023': 0,
-      '23-09-2023': 0,
-      '24-09-2023': 0,
-      '25-09-2023': 0,
-      '26-09-2023': 0,
-      '27-09-2023': 0,
-      '28-09-2023': 0,
-      '29-09-2023': 0,
-      '30-09-2023': 0,
-    },
-  },
-];
-
-const OPTIONS = [
-  { label: 'Tuần này', value: 'last_week' },
-  { label: 'Tháng này', value: 'last_month' },
-  { label: 'Năm nay', value: 'last_year' },
-  { label: 'Tùy chọn', value: 'custom' },
-];
+import { SHARED_SELECT_PROPS, TIME_OPTIONS } from './constant';
 
 export const RevenueChart = (props) => {
   const { sx } = props;
   const theme = useTheme();
-
-  const categories = Object.keys(data[0].values);
-  const formattedSeries = data.map((series) => ({
-    name: series.metric,
-    data: Object.values(series.values),
-  }));
-  const chartOptions = getLineChartCommonOptions(
-    theme,
-    categories,
-    formattedSeries,
+  const [option, setOption] = useState('7_recent_days');
+  const [dates, setDates] = useState(getRecentDates(7));
+  const { data, isLoading, isFetching, refetch } = useQuery(
+    ['dashboard', 'revenue', dates[0], dates[1]],
+    () => DashboardService.getRevenue(dates[0], dates[1]),
+    { enabled: Boolean(dates[0]) && Boolean(dates[1]) },
   );
 
-  const [option, setOption] = useState('last_week');
+  const chartOptions = useMemo(() => {
+    if (!data) return null;
+    const analytics = data.analytics;
+    if (!analytics) return null;
+    const categories = Object.keys(analytics[0].values);
+    const formattedSeries = analytics.map((series) => ({
+      name: series.metric,
+      data: Object.values(series.values),
+    }));
+    const result = getLineChartCommonOptions(
+      theme,
+      categories,
+      formattedSeries,
+    );
+    return result;
+  }, [data, theme]);
 
-  const handleRefresh = () => {};
+  const handleRefresh = async () => {
+    await refetch();
+  };
+
   const handleChange = (event) => {
+    switch (event.target.value) {
+      case '7_recent_days': {
+        setDates(getRecentDates(7));
+        break;
+      }
+      case '14_recent_days': {
+        setDates(getRecentDates(14));
+        break;
+      }
+      case '30_recent_days': {
+        setDates(getRecentDates(30));
+        break;
+      }
+      case '90_recent_days': {
+        setDates(getRecentDates(90));
+        break;
+      }
+    }
     setOption(event.target.value);
   };
 
@@ -154,7 +98,7 @@ export const RevenueChart = (props) => {
                 value={option}
                 label="Thời gian"
                 onChange={handleChange}>
-                {OPTIONS.map((option) => (
+                {TIME_OPTIONS.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>
@@ -163,15 +107,19 @@ export const RevenueChart = (props) => {
             </Button>
           </Stack>
         }
-        title="Doanh thu"
+        title="Tổng doanh thu"
       />
       <CardContent>
-        <AppChart
-          renderMode={'canvas'}
-          option={chartOptions}
-          height="380px"
-          settings={{ notMerge: true }}
-        />
+        {isLoading || isFetching ? (
+          <Skeleton height={'380px'} width="100%" />
+        ) : (
+          <AppChart
+            renderMode={'canvas'}
+            option={chartOptions}
+            height="380px"
+            settings={{ notMerge: true }}
+          />
+        )}
       </CardContent>
     </Card>
   );

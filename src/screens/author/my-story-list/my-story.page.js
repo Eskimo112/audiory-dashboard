@@ -23,15 +23,17 @@ import IconButton from '@mui/material/IconButton';
 import { usePopover } from '@/hooks/use-popover';
 import { MyStoryPopover } from '@/layouts/author/my-story-popover';
 import StoryService from '@/services/story';
+import { useAuth } from '@/hooks/use-auth';
 
 
 const MyStoryPage = () => {
     const router = useRouter();
+    const auth = useAuth();
     const myStoryPopover = usePopover();
     const [myStories, setMyStories] = useState([]);
 
     useEffect(() => {
-        StoryService.getMyStories().then((res) => {
+        StoryService.getMyStories(auth.user.token).then((res) => {
             setMyStories(res);
         });
 

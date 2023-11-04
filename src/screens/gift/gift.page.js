@@ -18,6 +18,7 @@ import {
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
+import { SHARED_PAGE_SX } from '../../constants/page_sx';
 import { SHARED_TABLE_PROPS } from '../../constants/table';
 import GiftService from '../../services/gift';
 import { formatDate } from '../../utils/formatters';
@@ -136,12 +137,7 @@ const GiftPage = () => {
       <Head>
         <title>Quà | Audiory</title>
       </Head>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 8,
-        }}>
+      <Box component="main" sx={SHARED_PAGE_SX}>
         <Container maxWidth="xl">
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>

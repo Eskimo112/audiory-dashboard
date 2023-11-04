@@ -1,9 +1,10 @@
+import ChevronDoubleDownIcon from '@heroicons/react/24/solid/ChevronDoubleDownIcon';
 import ChevronDoubleUpIcon from '@heroicons/react/24/solid/ChevronDoubleUpIcon';
 import {
   Avatar,
-  Box,
   Card,
   CardContent,
+  Skeleton,
   Stack,
   SvgIcon,
   Typography,
@@ -13,10 +14,22 @@ import PropTypes from 'prop-types';
 import { formatNumber } from '../../utils/formatters';
 
 export const StatCard = (props) => {
-  const { difference, positive = false, sx, value, title, icon } = props;
+  const { difference, sx, value, title, icon, isLoading, isError } = props;
+  if (isError) return <></>;
+  if (isLoading) return <Skeleton width="270px" height="160px" />;
 
+  const positive = difference >= 0;
   return (
-    <Card sx={{ ...sx, padding: 0 }}>
+    <Card
+      sx={{
+        ...sx,
+        padding: 0,
+        backgroundColor: difference
+          ? positive
+            ? 'primary.alpha20'
+            : 'secondary.alpha20'
+          : '',
+      }}>
       <CardContent sx={{ padding: '24px', paddingBottom: '24px!important' }}>
         <Stack
           alignItems="flex-start"
@@ -26,32 +39,42 @@ export const StatCard = (props) => {
           <Stack spacing={1.5}>
             <Typography
               color="ink.main"
-              sx={{ fontWeight: 600, fontSize: '14px' }}>
+              sx={{ fontWeight: 600, fontSize: '16px' }}>
               {title}
             </Typography>
-            {difference ? (
+            {difference && (
               <Typography
                 color="ink.main"
                 sx={{ fontWeight: 600, fontSize: '16px' }}>
-                <SvgIcon sx={{ marginBottom: '-6px', color: 'success.main' }}>
-                  <ChevronDoubleUpIcon width="16px" />
+                <SvgIcon
+                  sx={{
+                    marginBottom: '-6px',
+                    color: positive ? 'success.main' : 'error.main',
+                  }}>
+                  {positive ? (
+                    <ChevronDoubleUpIcon width="16px" />
+                  ) : (
+                    <ChevronDoubleDownIcon width="16px" />
+                  )}
                 </SvgIcon>
-                {`${positive ? '+' : '-'}${formatNumber(difference)}%`}
+                {formatNumber(difference) + '%'}
               </Typography>
-            ) : (
-              <Box></Box>
             )}
-            <Typography variant="h3" sx={{ fontWeight: 700 }}>
+            <Typography variant="h4" sx={{ fontWeight: 700 }}>
               {formatNumber(value)}
             </Typography>
           </Stack>
           <Avatar
             sx={{
-              backgroundColor: 'primary.main',
+              backgroundColor: difference
+                ? positive
+                  ? 'primary.main'
+                  : 'secondary.main'
+                : 'primary.main',
               height: 40,
               width: 40,
             }}>
-            <SvgIcon sx={{ width: '18px' }}>{icon}</SvgIcon>
+            <SvgIcon sx={{ width: '20px' }}>{icon}</SvgIcon>
           </Avatar>
         </Stack>
       </CardContent>
