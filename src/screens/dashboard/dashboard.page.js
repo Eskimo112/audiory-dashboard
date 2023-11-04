@@ -39,7 +39,7 @@ const DashboardPage = () => {
             <CircularProgress />
           ) : (
             <Grid container spacing={3}>
-              <Grid xs={12} sm={6} lg={3}>
+              {/* <Grid xs={12} sm={6} lg={3}>
                 <StatCard
                   value={stats.total_users}
                   title="Tổng người dùng"
@@ -70,7 +70,7 @@ const DashboardPage = () => {
                   difference={30}
                   icon={<CurrencyDollarIcon />}
                 />
-              </Grid>
+              </Grid> */}
             </Grid>
           )}
           <Grid container spacing={3}>

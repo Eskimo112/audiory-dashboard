@@ -6,14 +6,19 @@ export default class CategoryService {
 
     const response = await request(url, 'get');
     if (!response.data) return [];
+
     return response.data;
   }
 
   static async getById(categoryId) {
     const url = `categories/${categoryId}`;
-
-    const response = await request(url, 'get');
+    const reqHeader = {
+      'Access-Control-Allow-Origin': '*',
+    }
+    const response = await request(url, 'get', null, null, reqHeader);
     if (!response.data) return null;
     return response.data;
   }
+
+
 }

@@ -9,6 +9,8 @@ import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 import * as Yup from 'yup';
 
+import { signInWithGoogle } from '@/Firebase';
+
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
@@ -117,6 +119,7 @@ const Page = () => {
                   variant="contained">
                   Tiếp tục
                 </Button>
+
                 {/* <Button fullWidth size="large" sx={{ mt: 3 }} onClick={handleSkip}>
                   Skip authentication
                 </Button> */}
@@ -126,7 +129,18 @@ const Page = () => {
                   </div>
                 </Alert> */}
               </form>
+
+
             )}
+
+            <Button
+              fullWidth
+              size="large"
+              sx={{ mt: 3 }}
+              variant="outlined"
+              onClick={signInWithGoogle}>
+              Đăng nhập với google
+            </Button>
           </div>
         </Box>
       </Box>
