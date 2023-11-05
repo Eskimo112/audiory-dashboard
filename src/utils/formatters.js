@@ -1,5 +1,5 @@
 export const formatNumber = (value) => {
-  const formattedValue = value.toLocaleString('en-US');
+  const formattedValue = (Math.round(value * 10) / 10).toLocaleString('en-US');
   return `${formattedValue}`;
 };
 

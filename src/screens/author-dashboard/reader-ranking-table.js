@@ -2,12 +2,10 @@ import React, { useMemo } from 'react';
 
 import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
 import {
-  Avatar,
   Button,
   Card,
   CardContent,
   CardHeader,
-  Chip,
   CircularProgress,
   Stack,
   SvgIcon,
@@ -35,8 +33,17 @@ const ReaderRankingTable = () => {
   const columns = useMemo(
     () => [
       {
+        accessorKey: 'index',
+        header: 'Thứ tự',
+        size: 20,
+        Cell: (cell) => {
+          return cell.row.index + 1;
+        },
+      },
+      {
         accessorKey: 'full_name',
         header: 'Thông tin',
+
         Cell: (cell) => {
           const user = cell.row.original;
           return (
@@ -45,16 +52,9 @@ const ReaderRankingTable = () => {
               // justifyContent="center"
               direction="row"
               spacing={2}>
-              <Avatar src={user.avatar_url} width={50} height={50}></Avatar>
               <Stack alignItems="start">
                 <Typography variant="subtitle2">
                   {user.full_name ?? 'Không có tên'}
-                </Typography>
-                <Typography
-                  variant="subtitle2"
-                  fontStyle="italic"
-                  color="ink.lighter">
-                  {user.username ?? 'Không có username'}
                 </Typography>
               </Stack>
             </Stack>
@@ -62,25 +62,14 @@ const ReaderRankingTable = () => {
         },
       },
       {
-        accessorKey: 'is_online',
-        header: 'Trạng thái',
-        size: 80,
-        filterFn: 'equals',
-        filterSelectOptions: [
-          { text: 'Online', value: true },
-          { text: 'Offline', value: false },
-        ],
-        filterVariant: 'select',
-        Cell: ({ cell }) => (
-          <Chip
-            label={cell.getValue() ? 'Online' : 'Offline'}
-            sx={{
-              backgroundColor: cell.getValue()
-                ? 'success.alpha20'
-                : 'error.alpha20',
-            }}
-          />
-        ),
+        accessorKey: 'total_chapters_bought',
+        header: 'Chương mua',
+        size: 40,
+      },
+      {
+        accessorKey: 'total_donation',
+        header: 'Quà tặng',
+        size: 40,
       },
     ],
     [],
@@ -99,7 +88,7 @@ const ReaderRankingTable = () => {
   };
 
   return (
-    <Card>
+    <Card sx={{ p: 2 }}>
       <CardHeader
         action={
           <Stack direction="row" gap="8px">
@@ -138,6 +127,9 @@ const ReaderRankingTable = () => {
           <MaterialReactTable
             {...SHARED_TABLE_PROPS}
             enableRowActions={false}
+            enableSorting={false}
+            enableColumnActions={false}
+            enableGlobalFilterModes={false}
             columns={columns}
             data={users ?? []}
             initialState={initialState}

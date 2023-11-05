@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 
-import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
 import {
   Button,
   Card,
@@ -9,7 +8,6 @@ import {
   Select,
   Skeleton,
   Stack,
-  SvgIcon,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
@@ -27,13 +25,12 @@ import {
 import { getAuthorPieChartCommonOptions } from './chart.utils';
 
 export const TopStoriesChart = (props) => {
-  const { sx } = props;
   const theme = useTheme();
   const requestHeader = useRequestHeader();
   const [timeOption, setTimeOption] = useState('7_recent_days');
   const [metricOption, setMetricOption] = useState('total_read');
   const [dates, setDates] = useState(getRecentDates(7));
-  const { data, isLoading, isFetching, refetch } = useQuery(
+  const { data, isLoading, isFetching } = useQuery(
     ['author', 'story-ranking', dates[0], dates[1]],
     () =>
       new AuthorDashboardService(requestHeader).getStoryRanking(
@@ -46,18 +43,19 @@ export const TopStoriesChart = (props) => {
 
   const chartOptions = useMemo(() => {
     if (!data) return null;
-    const formattedSeries = Object.entries(data).map(([key, value]) => ({
-      name: key,
-      value,
+
+    const formattedSeries = data.map((story) => ({
+      name: story.title,
+      value: story[metricOption],
     }));
 
     const result = getAuthorPieChartCommonOptions(theme, formattedSeries);
     return result;
-  }, [data, theme]);
+  }, [data, metricOption, theme]);
 
-  const handleRefresh = async () => {
-    await refetch();
-  };
+  // const handleRefresh = async () => {
+  //   await refetch();
+  // };
 
   const handleChange = (event) => {
     switch (event.target.value) {
@@ -82,11 +80,11 @@ export const TopStoriesChart = (props) => {
   };
 
   return (
-    <Card sx={sx}>
+    <Card sx={{ p: 2 }}>
       <CardHeader
         action={
           <Stack direction="row" gap="8px">
-            <Button
+            {/* <Button
               color="inherit"
               size="small"
               onClick={handleRefresh}
@@ -96,7 +94,7 @@ export const TopStoriesChart = (props) => {
                 </SvgIcon>
               }>
               Làm mới
-            </Button>
+            </Button> */}
             <Button color="inherit" size="small" sx={{ padding: 0 }}>
               <Select
                 {...SHARED_SELECT_PROPS}

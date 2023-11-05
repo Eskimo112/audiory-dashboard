@@ -24,7 +24,6 @@ import { SHARED_SELECT_PROPS, TIME_OPTIONS } from '../dashboard/constant';
 import { getAuthorChartCommonOptions } from './chart.utils';
 
 export const AuthorRevenueChart = (props) => {
-  const { sx } = props;
   const theme = useTheme();
   const requestHeader = useRequestHeader();
   const [option, setOption] = useState('7_recent_days');
@@ -80,7 +79,7 @@ export const AuthorRevenueChart = (props) => {
   };
 
   return (
-    <Card sx={sx}>
+    <Card sx={{ p: 2 }}>
       <CardHeader
         action={
           <Stack direction="row" gap="8px">

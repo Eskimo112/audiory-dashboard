@@ -149,7 +149,7 @@ const ReaderTransactionsTable = () => {
   };
 
   return (
-    <Card>
+    <Card sx={{ p: 2 }}>
       <CardHeader title="Giao dịch gần đây" />
       <CardContent sx={{ paddingTop: 0, paddingBottom: 0 }}>
         {isLoading ? (

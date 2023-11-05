@@ -1,11 +1,13 @@
+import { useState } from 'react';
+
 import { Avatar, Box, Stack } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { usePopover } from 'src/hooks/use-popover';
 
-import { AccountPopover } from './account-popover';
 import { useAuth } from '@/hooks/use-auth';
-import { useState } from 'react';
+
+import { AccountPopover } from './account-popover';
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -17,7 +19,6 @@ export const TopNav = (props) => {
   const auth = useAuth();
 
   const [user, setUser] = useState(auth.user);
-  console.log(user);
   return (
     <>
       <Box

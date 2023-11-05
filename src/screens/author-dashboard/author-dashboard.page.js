@@ -23,8 +23,14 @@ const AuthorDashboardPage = () => {
         <title>Author | Audiory</title>
       </Head>
       <Box component="main" sx={SHARED_PAGE_SX}>
-        <Container maxWidth="xl">
-          <Stack py={4}>
+        <Container
+          sx={{
+            width: '80%',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px',
+          }}>
+          <Stack py={2}>
             <Typography variant="h4">Tổng quan số liệu</Typography>
             <AppBreadCrumbs />
           </Stack>

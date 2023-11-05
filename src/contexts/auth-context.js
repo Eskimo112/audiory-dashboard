@@ -34,13 +34,13 @@ const handlers = {
       ...// if payload (user) is provided, then is authenticated
       (user
         ? {
-          isAuthenticated: true,
-          isLoading: false,
-          user,
-        }
+            isAuthenticated: true,
+            isLoading: false,
+            user,
+          }
         : {
-          isLoading: false,
-        }),
+            isLoading: false,
+          }),
     };
   },
   [HANDLERS.SIGN_IN]: (state, action) => {
@@ -82,20 +82,25 @@ export const AuthProvider = (props) => {
     initialized.current = true;
 
     let isAuthenticated = false;
+    let token = null;
 
     try {
       isAuthenticated =
         window.sessionStorage.getItem('authenticated') === 'true';
+      token = window.sessionStorage.getItem('token');
     } catch (err) {
       console.error(err);
     }
 
-    if (isAuthenticated) {
+    if (isAuthenticated && token) {
+      const requestHeader = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      const userInfo = await new UserService(requestHeader).getById('me');
       const user = {
-        id: '5e86809283e28b96d2d38537',
-        avatar: '/assets/avatars/avatar-anika-visser.png',
-        name: 'Phạm Nguyên',
-        email: 'nguyengl176@gmail.com',
+        ...userInfo,
+        token,
       };
 
       dispatch({
@@ -117,25 +122,25 @@ export const AuthProvider = (props) => {
     [],
   );
 
-  const skip = () => {
-    try {
-      window.sessionStorage.setItem('authenticated', 'true');
-    } catch (err) {
-      console.error(err);
-    }
+  // const skip = () => {
+  //   try {
+  //     window.sessionStorage.setItem('authenticated', 'true');
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
 
-    const user = {
-      id: '5e86809283e28b96d2d38537',
-      avatar: '/assets/avatars/avatar-anika-visser.png',
-      name: 'Phạm Nguyên',
-      email: 'nguyengl176@gmail.com',
-    };
+  //   const user = {
+  //     id: '5e86809283e28b96d2d38537',
+  //     avatar: '/assets/avatars/avatar-anika-visser.png',
+  //     name: 'Phạm Nguyên',
+  //     email: 'nguyengl176@gmail.com',
+  //   };
 
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user,
-    });
-  };
+  //   dispatch({
+  //     type: HANDLERS.SIGN_IN,
+  //     payload: user,
+  //   });
+  // };
 
   const signInWithPassword = async (email, password) => {
     // if (email !== 'nguyengl176@gmail.com' || password !== 'nguyen123') {
@@ -153,6 +158,7 @@ export const AuthProvider = (props) => {
     const userInfo = await new UserService(requestHeader).getById('me');
     try {
       window.sessionStorage.setItem('authenticated', 'true');
+      window.sessionStorage.setItem('token', response);
     } catch (err) {
       console.error(err);
     }
@@ -161,7 +167,6 @@ export const AuthProvider = (props) => {
       ...userInfo,
       token: response,
     };
-    console.log(user);
 
     dispatch({
       type: HANDLERS.SIGN_IN,
@@ -173,7 +178,7 @@ export const AuthProvider = (props) => {
     const idToken = await signInWithGooglePopup();
     // console.log('id token', idToken);
     const response = await AuthService.signInGoogle(idToken, '');
-    console.log('login google', response)
+    console.log('login google', response);
     if (!response) {
       throw new Error('Please check your email and password');
     }
@@ -214,7 +219,7 @@ export const AuthProvider = (props) => {
     <AuthContext.Provider
       value={{
         ...state,
-        skip,
+        // skip,
         signInWithPassword,
         signInWithGoogle,
         signUp,

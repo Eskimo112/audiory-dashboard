@@ -102,8 +102,8 @@ export const getAuthorPieChartCommonOptions = (theme, series) => {
     series: {
       data: [...series],
       type: 'pie',
-      radius: ['50%', '70%'],
-      center: ['50%', '50%'],
+      radius: ['45%', '70%'],
+      center: ['70%', '50%'],
 
       label: {
         show: false,
@@ -119,8 +119,9 @@ export const getAuthorPieChartCommonOptions = (theme, series) => {
       padding: [10, 0],
       // show: false,
       type: 'scroll',
-      orient: 'horizontal',
-      left: 'center',
+      orient: 'vertical',
+      left: 50,
+      top: 'center',
       itemWidth: 16,
       itemHeight: 16,
       itemGap: 16,
@@ -146,7 +147,7 @@ export const getAuthorPieChartCommonOptions = (theme, series) => {
           `<div style="display:flex; flex-direction:column; gap:4px;">` +
           `<div style="font-size:14px;line-height:18px;font-weight:500;color:${
             theme.palette.text[0]
-          }">${formatNumber(value)}%</div>` +
+          }">${formatNumber(value)}</div>` +
           `</div>` +
           `</div>`
         );

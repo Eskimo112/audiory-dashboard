@@ -18,6 +18,10 @@ export const StatCard = (props) => {
   if (isError) return <></>;
   if (isLoading) return <Skeleton width="270px" height="160px" />;
 
+  let percent = 0;
+  if (value !== 0) {
+    percent = (difference / value) * 100;
+  }
   const positive = difference >= 0;
   return (
     <Card
@@ -57,7 +61,7 @@ export const StatCard = (props) => {
                     <ChevronDoubleDownIcon width="16px" />
                   )}
                 </SvgIcon>
-                {formatNumber(difference) + '%'}
+                {formatNumber(percent) + '%'}
               </Typography>
             )}
             <Typography variant="h4" sx={{ fontWeight: 700 }}>
