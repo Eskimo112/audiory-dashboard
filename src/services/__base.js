@@ -30,5 +30,5 @@ export const request = async ({
   if (res.status !== 200) {
     throw res.data.message;
   }
-  return res?.data ?? null;
+  return res.data ?? null;
 };

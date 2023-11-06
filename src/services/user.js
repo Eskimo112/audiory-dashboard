@@ -27,4 +27,16 @@ export default class UserService {
     if (!response.data) return null;
     return response.data;
   }
+
+  async getStoriesByUserId(userId) {
+    const url = `users/${userId}/stories`;
+
+    const response = await request({
+      url,
+      method: 'get',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return [];
+    return response.data;
+  }
 }

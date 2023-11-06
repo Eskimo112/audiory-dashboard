@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import { Box, FormLabel, Input, Stack, Typography } from '@mui/material';
 
-export const AppImageUpload = ({ defaultValue, onChange }) => {
-  const [selectedFile, setSelectedFile] = useState(defaultValue);
-  const [preview, setPreview] = useState();
-
+export const AppImageUpload = (props) => {
+  const { defaultUrl, onChange } = props;
+  const [selectedFile, setSelectedFile] = useState();
+  const [preview, setPreview] = useState(defaultUrl);
   // create a preview as a side effect, whenever selected file is changed
   useEffect(() => {
     if (!selectedFile) {
@@ -33,7 +33,7 @@ export const AppImageUpload = ({ defaultValue, onChange }) => {
   return (
     <Box
       width="100%"
-      height="100%"
+      height="fit-content%"
       sx={{
         border: '1px solid',
         borderColor: 'ink.alpha20',
@@ -55,7 +55,7 @@ export const AppImageUpload = ({ defaultValue, onChange }) => {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        {!selectedFile && (
+        {!selectedFile && !defaultUrl && (
           <Stack justifyItems="center" alignItems="center" display="flex">
             <AddPhotoAlternateIcon
               sx={{ color: 'primary.main', fontSize: '48px' }}
@@ -72,7 +72,7 @@ export const AppImageUpload = ({ defaultValue, onChange }) => {
         sx={{ display: 'none' }}
         onChange={onSelectFile}
       />
-      {selectedFile && (
+      {selectedFile ? (
         <Box
           sx={{
             borderRadius: 1.75,
@@ -82,6 +82,18 @@ export const AppImageUpload = ({ defaultValue, onChange }) => {
           }}>
           <Box component="img" src={preview} width="100%" height="100%" />
         </Box>
+      ) : (
+        defaultUrl && (
+          <Box
+            sx={{
+              borderRadius: 1.75,
+              overflow: 'hidden',
+              width: '100%',
+              height: '100%',
+            }}>
+            <Box component="img" src={defaultUrl} width="100%" height="100%" />
+          </Box>
+        )
       )}
     </Box>
   );

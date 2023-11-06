@@ -12,7 +12,6 @@ import {
   Chip,
   CircularProgress,
   Container,
-  MenuItem,
   Stack,
   SvgIcon,
   Typography,
@@ -144,6 +143,8 @@ const UserPage = () => {
   const initialState = {
     columnVisibility: {
       id: false,
+      created_date: false,
+      email: false,
     },
     showGlobalFilter: true,
   };
@@ -186,22 +187,40 @@ const UserPage = () => {
               </Button>
             </Stack>
             <MaterialReactTable
-              renderRowActionMenuItems={({ closeMenu, row, table }) => [
-                <MenuItem
-                  key="edit"
-                  onClick={() => {
-                    router.push(`/users/${row.original.id}`);
-                  }}>
-                  Chỉnh sửa
-                </MenuItem>,
-                <MenuItem key="delete" onClick={() => console.info('Delete')}>
-                  Vô hiệu hóa
-                </MenuItem>,
-              ]}
+              // renderRowActionMenuItems={({ closeMenu, row, table }) => [
+              //   <MenuItem
+              //     key="edit"
+              //     onClick={() => {
+              //       router.push(`/users/${row.original.id}`);
+              //     }}>
+              //     Chỉnh sửa
+              //   </MenuItem>,
+              //   <MenuItem key="delete" onClick={() => console.info('Delete')}>
+              //     Vô hiệu hóa
+              //   </MenuItem>,
+              // ]}
               columns={columns}
               data={users}
               initialState={initialState}
               {...SHARED_TABLE_PROPS}
+              displayColumnDefOptions={{
+                'mrt-row-actions': { header: '', size: 150 },
+              }}
+              renderRowActions={({ row }) => {
+                return (
+                  <Button
+                    sx={{
+                      borderRadius: 4,
+                      padding: '5px 12px',
+                    }}
+                    variant="outlined"
+                    onClick={() => {
+                      router.push(`/users/${row.original.id}`);
+                    }}>
+                    Xem chi tiết
+                  </Button>
+                );
+              }}
             />
           </Stack>
         </Container>
