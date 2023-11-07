@@ -34,13 +34,13 @@ const handlers = {
       ...// if payload (user) is provided, then is authenticated
       (user
         ? {
-            isAuthenticated: true,
-            isLoading: false,
-            user,
-          }
+          isAuthenticated: true,
+          isLoading: false,
+          user,
+        }
         : {
-            isLoading: false,
-          }),
+          isLoading: false,
+        }),
     };
   },
   [HANDLERS.SIGN_IN]: (state, action) => {
@@ -91,11 +91,12 @@ export const AuthProvider = (props) => {
     } catch (err) {
       console.error(err);
     }
-
+    console.log('token', token);
     if (isAuthenticated && token) {
       const requestHeader = {
         Authorization: `Bearer ${token}`,
       };
+
 
       const userInfo = await new UserService(requestHeader).getById('me');
       const user = {
@@ -189,6 +190,8 @@ export const AuthProvider = (props) => {
     const userInfo = await new UserService(requestHeader).getById('me');
     try {
       window.sessionStorage.setItem('authenticated', 'true');
+      window.sessionStorage.setItem('token', response);
+
     } catch (err) {
       console.error(err);
     }
@@ -210,6 +213,7 @@ export const AuthProvider = (props) => {
   };
 
   const signOut = () => {
+    window.sessionStorage.clear();
     dispatch({
       type: HANDLERS.SIGN_OUT,
     });

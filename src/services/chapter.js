@@ -5,14 +5,16 @@ export default class ChapterService {
     this.requestHeader = requestHeader ?? undefined;
   }
 
-  static async getById(chapterId) {
+  static async getById({ chapterId, jwt }) {
     const url = `chapters/${chapterId}`;
-
-
+    const requestHeaders =
+    {
+      'Authorization': "Bearer " + jwt,
+    }
     const response = await request({
       url,
       method: 'get',
-      requestHeaders: this.requestHeader,
+      requestHeaders,
     }); if (!response.data) return null;
     return response.data;
   }
@@ -23,6 +25,17 @@ export default class ChapterService {
       url,
       method: 'post',
       requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return null;
+    return response.data;
+  }
+
+  static async create(body) {
+    const url = `chapters`;
+    const response = await request({
+      url,
+      method: 'post',
+      payload: body
     });
     if (!response.data) return null;
     return response.data;

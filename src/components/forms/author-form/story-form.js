@@ -4,32 +4,42 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { CloudUpload, HelpOutline } from '@mui/icons-material';
-import { Button, Grid, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material';
+import { Button, Card, CircularProgress, Grid, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material';
 import { FieldArray, useFormik } from 'formik';
+import { useQuery } from 'react-query';
 import * as Yup from 'yup';
 
+import { AppImageUpload } from '@/components/app-image-upload';
+import { useAuth } from '@/hooks/use-auth';
 import CategoryService from '@/services/category';
 import StoryService from '@/services/story';
+import { toastError } from '@/utils/notification';
 
 const StoryForm = () => {
     const router = useRouter();
+    const auth = useAuth();
+    const jwt = auth.user.token;
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [tag, setTag] = useState('');
+    const { data: categoriesData, isLoading, isSuccess } = useQuery(
+        ['categories'],
+        async () => await CategoryService.getAll(),
+    );
     useEffect(() => {
-        CategoryService.getAll().then((res) => {
-            setCategories(res);
-            setSelectedCategory(res[0].id);
-        });
 
-    }, [])
+        setCategories(categoriesData);
+        setSelectedCategory(isSuccess ? categoriesData[0].id : '');
+
+
+    }, [categoriesData])
 
     const formik = useFormik({
         initialValues: {
             title: '',
             description: '',
             currentTag: '',
-            tags: [{ name: 'tag1' }, { name: 'tag2' }],
+            tags: [],
             category: selectedCategory,
             isMature: false,
             isCopyright: false,
@@ -38,10 +48,11 @@ const StoryForm = () => {
         },
         // enableReinitialize: true,
         validationSchema: Yup.object({
-            title: Yup.string()
-                .min(1)
-                .max(255),
-            description: Yup.string().min(1).max(255).required('Miêu tả là bắt buộc'),
+            title: Yup.string().trim()
+                .min(1, 'Tiêu đề ít nhất 1 ký tự')
+                .max(255).required('Bắt buộc nhập tiêu đề'),
+            description: Yup.string().trim().min(1, 'Miêu tả ít nhất 1 ký tự').max(500, 'Miêu tả tối đa 500 ký tự').required('Miêu tả là bắt buộc'),
+            tags: Yup.array().min(1, 'Ít nhất 1 thẻ')
         }),
         onSubmit: async (values, helpers) => {
             try {
@@ -76,7 +87,7 @@ const StoryForm = () => {
     const handleCreate = async () => {
         const values = formik.values;
         var body = new FormData();
-        body.append('author_id', '55e181ba-4ee7-11ee-b742-0242c0a8b002');
+        body.append('author_id', auth.user?.id ?? '');
         body.append('category_id', values.category);
         body.append('description', values.description);
         body.append('tags', values.tags);
@@ -88,25 +99,56 @@ const StoryForm = () => {
         body.append('form_file', values.formFile);
 
         try {
-            const data = await StoryService.create(body);
+            const data = await StoryService.create({ body, jwt });
             console.log('data', data);
             const storyId = data.id;
             const chapterId = data.chapters[0].id;
             router.push(`/my-works/${storyId}/write/${chapterId}`);
 
         } catch (error) {
-            console.log('error', error)
+            toastError(error)
         }
     }
+
+    const handleAddTag = (event) => {
+        var val = event.target.value;
+        console.log(val, 'code ', event.keyCode)
+        if (event.keyCode === 32 && val.trim() !== '') {
+
+            console.log(formik.values.tags.filter((ele) => ele.name === val.trim()))
+            const isDuplicate = formik.values.tags.filter((ele) => ele.name === val.replace(',', '').trim()).length > 0;
+            if (isDuplicate) {
+                toastError('Trùng thẻ');
+            } else {
+                formik.setFieldValue('tags', [...formik.values.tags, { name: val.trim() }]);
+            }
+            val = '';
+            console.log(val)
+            setTag('');
+
+        };
+    }
+    if (isLoading)
+        return (
+            <Card
+                sx={{
+                    display: 'flex',
+                    width: '100%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '500px',
+                }}>
+                <CircularProgress />
+            </Card>
+        );
 
     return (
         <>
             <div>
-
                 <form noValidate onSubmit={(e) => { e.preventDefault(); handleCreate() }}>
-                    <Stack spacing={3}>
-                        <Grid container spacing={0}>
-                            <Grid xs={8} spacing={0}>
+                    <Stack spacing={3} >
+                        <Grid container spacing={0} sx={{ paddingTop: '2em' }}>
+                            <Grid xs={8} sx={{ paddingRight: '2em' }}>
                                 <TextFieldLabel label='Tiêu đề truyện' isRequired={true} />
                                 <TextField
                                     variant="outlined"
@@ -121,7 +163,7 @@ const StoryForm = () => {
                                     size="small"
                                     value={formik.values.title}
                                 />
-                                <TextFieldLabel label='Miêu tả truyện' isRequired={false} />
+                                <TextFieldLabel label='Miêu tả truyện' isRequired={true} />
                                 <TextField
                                     multiline={true}
                                     minRows={5}
@@ -142,9 +184,9 @@ const StoryForm = () => {
                                 />
                                 <TextFieldLabel label='Thể loại' isRequired={true} />
                                 <TextField
+                                    fullWidth
                                     variant="outlined"
                                     select
-                                    defaultValue={selectedCategory}
                                     helperText={formik.touched.category && formik.errors.category}
                                     name="category"
                                     onBlur={formik.handleBlur}
@@ -152,8 +194,9 @@ const StoryForm = () => {
                                     type="text"
                                     size="small"
                                     value={formik.values.category}
+
                                 >
-                                    {categories.map((category) => (
+                                    {categories && categories.map((category) => (
                                         <MenuItem key={category.id} value={category.id}>
                                             {category.name}
                                         </MenuItem>
@@ -161,26 +204,21 @@ const StoryForm = () => {
                                 </TextField>
                                 <TextFieldLabel label='Thẻ' isRequired={true} />
                                 <TextField
+                                    fullWidth
                                     variant="outlined"
                                     placeholder='Ngăn cách thẻ bởi dấu cách'
-                                    error={!!(formik.touched.currentTag && formik.errors.currentTag)}
-                                    helperText={formik.touched.currentTag && formik.errors.currentTag}
-                                    name="currentTag"
-                                    onBlur={formik.handleBlur}
-                                    onChange={formik.handleChange}
                                     type="text"
                                     size="small"
                                     value={tag}
-                                    sx={{ width: 1 / 2 }}
+                                    onChange={(e) => setTag(e.target.value)}
+                                    onKeyDown={(e) => handleAddTag(e)}
                                 />
-
                                 <Grid container>
                                     {formik.values.tags.length > 0 && formik.values.tags.map((tag, index) => (
                                         <div key={index}>
                                             {tag.name}
-
                                             <button type="button" onClick={() => {
-                                                formik.values.tags.remove();
+                                                formik.setFieldValue('tags', formik.values.tags.filter((e, idx) => index !== idx));
                                             }}>
                                                 -
                                             </button>
@@ -189,8 +227,8 @@ const StoryForm = () => {
                                 </Grid>
 
 
-                                {({ values }) => (
 
+                                {({ values }) => (
                                     <FieldArray name='tags' render={arrayHelpers => {
 
                                         <div>
@@ -224,7 +262,7 @@ const StoryForm = () => {
 
                                 >
                                     <Grid xs={8}>
-                                        <TextFieldLabel label='Cảnh báo truyện trưởng thành' isRequired={true} />
+                                        <TextFieldLabel label='Gắn mác truyện trưởng thành' isRequired={true} />
                                     </Grid>
                                     <Grid xs={1}>
                                         <Switch
@@ -262,13 +300,7 @@ const StoryForm = () => {
                                 </Grid>
                             </Grid>
                             <Grid xs={4} spacing={0}>
-                                <Button component="label" variant="contained" startIcon={<CloudUpload />}>
-                                    Upload file
-                                    <TextField onChange={(e) => {
-                                        e.preventDefault();
-                                        formik.setFieldValue('formFile', e.currentTarget.files[0])
-                                    }} inputProps={{ accept: '.jpg,.jpeg,.png' }} hidden type="file" />
-                                </Button>
+                                <AppImageUpload onChange={(file) => { formik.setFieldValue('form_file', file) }} />
 
 
                             </Grid>
@@ -281,11 +313,10 @@ const StoryForm = () => {
                             {formik.errors.submit}
                         </Typography>
                     )}
-
-
                     <Button
                         fullWidth
                         sx={{ mt: 3 }}
+                        disabled={!formik.isValid}
                         type="submit"
                         variant="contained">
                         Tạo

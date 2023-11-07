@@ -10,6 +10,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
 import ChapterVersionService from "@/services/chapter-version";
+import { toastError, toastSuccess } from "@/utils/notification";
 
 
 const { useRouter } = require("next/router")
@@ -18,15 +19,18 @@ const PreviewChapterPage = () => {
     const router = useRouter();
     const [chapter, setChapter] = useState({ title: '' });
     const [chapterId, setChapterId] = useState('');
+
     const [value, setValue] = useState([]);
     const [html, setHtml] = useState('<p></p>');
 
     const ReactQuill = typeof window === 'object' ? require('react-quill') : () => false;
 
+
     useEffect(() => {
         const fetchChapterVersion = async () => {
             const res = await ChapterVersionService.getById(router.query['chapter-version-id'])
-            setValue(JSON.parse(res.rich_text));
+            console.log(res.rich_text)
+            setValue(JSON.parse(res?.rich_text == '' ?? {}));
             setChapterId(res.chapter_id);
             var cfg = {};
 
@@ -108,6 +112,21 @@ const PreviewChapterPage = () => {
         );
     }
 
+    const handleRevertChapterVersion = async (e) => {
+        e.preventDefault();
+        console.log('su')
+        try {
+            await ChapterVersionService.revert({ chapterVersionId: router.query['chapter-version-id'] });
+            toastSuccess('Khôi phục thành công');
+
+            router.push(`/my-works/${router.query.id}/write/${chapterId}`);
+
+        } catch (error) {
+            toastError('Khôi phục không thành công')
+
+        }
+    }
+
     return (
         <>
             <Grid container direction="column"
@@ -122,7 +141,7 @@ const PreviewChapterPage = () => {
 
                 <Grid xs={8} direction="row" container >
                     <Grid xs={2} >
-                        <Typography variant="h5" color="initial">Data info</Typography>
+                        <Typography variant="h5" color="initial"></Typography>
                     </Grid>
                     <Grid xs={8} >
                         <MediaControlCard />
@@ -130,6 +149,9 @@ const PreviewChapterPage = () => {
                             readOnly theme='bubble' value={html} />
                         <Button fullWidth variant="contained" color="primary">
                             Đọc phần tiếp theo
+                        </Button>
+                        <Button fullWidth variant="outlined" color="primary" onClick={handleRevertChapterVersion}>
+                            Khôi phục
                         </Button>
                     </Grid>
                     <Grid xs={2} spacing={0} container justifyContent="center" direction="column">

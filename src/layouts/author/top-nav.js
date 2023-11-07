@@ -11,6 +11,7 @@ import AppIcon from '@/components/app-icon';
 import { useAuth } from '@/hooks/use-auth';
 
 import { AccountPopover } from '../dashboard/account-popover';
+import { useRouter } from 'next/router';
 
 
 const TOP_NAV_HEIGHT = 60;
@@ -18,6 +19,7 @@ const TOP_NAV_HEIGHT = 60;
 export const TopNav = (props) => {
     // const { onNavOpen } = props;
     // const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+    const router = useRouter();
     const accountPopover = usePopover();
     const auth = useAuth();
     console.log(auth)
@@ -46,13 +48,13 @@ export const TopNav = (props) => {
                         <AppIcon />
                     </Grid>
                     <Grid item xs="auto" justifyContent="center" container direction="row" alignItems="center" alignContent="center">
-                        <Button startIcon={<SendIcon />} variant="text" color="primary">
+                        {/* <Button startIcon={<SendIcon />} variant="text" color="primary">
                             Khám phá
+                        </Button> */}
+                        <Button startIcon={<BarChart />} variant={router.pathname === '/author-dashboard' ? 'contained' : 'text'} color="primary" onClick={() => { router.push('/author-dashboard') }}>
+                            Thống kê
                         </Button>
-                        <Button startIcon={<BarChart />} variant="text" color="primary">
-                            Xếp hạng
-                        </Button>
-                        <Button startIcon={<Edit />} variant="contained" color="primary">
+                        <Button startIcon={<Edit />} variant={router.pathname === '/my-works' ? 'contained' : 'text'} color="primary" onClick={() => { router.push('/my-works') }}>
                             Sáng tác
                         </Button>
                     </Grid>

@@ -71,6 +71,8 @@ export const AppImageUpload = ({ defaultValue, onChange }) => {
         type="file"
         sx={{ display: 'none' }}
         onChange={onSelectFile}
+        inputProps={{ accept: '.jpg,.jpeg,.png' }}
+
       />
       {selectedFile && (
         <Box

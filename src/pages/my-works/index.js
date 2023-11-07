@@ -1,6 +1,6 @@
 import { Layout as AuthorLayout } from 'src/layouts/author/layout';
 
-import MyStoryPage from '../../screens/author/my-story-list/my-story.page';
+import MyStoryPage from '@/screens/author/my-story-list/my-story.page';
 
 const Page = () => <MyStoryPage />;
 
