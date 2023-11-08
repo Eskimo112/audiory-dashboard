@@ -34,12 +34,13 @@ import { usePopover } from '@/hooks/use-popover';
 import { MyStoryPopover } from '@/layouts/author/my-story-popover';
 import StoryService from '@/services/story';
 import { toastSuccess } from '@/utils/notification';
+import ConfirmDialog from '@/components/dialog/reuse-confirm-dialog';
 
 
 const MyStoryPage = () => {
     const router = useRouter();
     const auth = useAuth();
-    const jwt = auth.user.token;
+    const jwt = auth?.user.token;
     const [myStories, setMyStories] = useState([]);
     const { data: storiesData = [], isLoading, isSuccess, refetch } = useQuery(
         ['myStories'],
@@ -49,75 +50,42 @@ const MyStoryPage = () => {
         setMyStories(storiesData);
     }, [storiesData]);
 
-    const AlertDialog = ({ title }) => {
-        const [open, setOpen] = React.useState(false);
-
-        const handleClickOpen = (e) => {
-            setOpen(true);
-        };
-
-        const handleClose = (isConfirm) => {
-            console.log(isConfirm)
-            setOpen(false);
-        };
 
 
 
-        return (
-            <React.Fragment>
-                <Button variant="text" color='secondary' onClick={(e) => handleClickOpen}>
-                    Xóa truyện
-                </Button>
-                <Dialog
-
-                    open={open}
-                    onClose={handleClose}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                >
-                    <DialogTitle id="alert-dialog-title">
-                        Xác nhận xóa  {title}
-                    </DialogTitle>
-                    <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                            Tất xả lượt đọc, bình chọn, bình luận của truyện này sẽ bị xóa vĩnh viễn
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleClose(true)} autoFocus color='secondary'>Xác nhận xóa</Button>
-                        <Button onClick={handleClose} >
-                            Hủy thao tác
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-            </React.Fragment>
-        );
-    }
-    const handleDelete = async ({ id }) => {
+    const handleDelete = async ({ id }, title) => {
         try {
-            await StoryService.delete(id)
-            toastSuccess();
-            refetch();
-
+            await StoryService.delete(id).then(res => {
+                toastSuccess('Xóa thành công truyện');
+                refetch();
+            })
         } catch (error) {
 
         }
     }
     const StoryOverViewCard = ({ story }) => {
         const [anchorEl, setAnchorEl] = React.useState(null);
-
         const handleClick = (event) => {
             setAnchorEl(event.currentTarget);
         };
-
         const handleClose = () => {
-
             setAnchorEl(null);
         };
-
         const open = Boolean(anchorEl);
         const id = open ? 'simple-popover' : undefined;
-        console.log(story.cover_url)
+
+
+        const [isOpen, setIsOpen] = React.useState(false)
+        const handleDialogOpen = () => {
+            setIsOpen(true);
+        }
+        const handleDialogClose = (isConfirm, id) => {
+            console.log(isConfirm)
+            // setIsOpen(false);
+            // if (isConfirm === true) {
+            //     handleDelete({ id })
+            // }
+        }
         // const theme = useTheme();
         const DetailInfo = ({ icon, content, isHighlight = false }) => {
             return <>
@@ -171,16 +139,26 @@ const MyStoryPage = () => {
                                             vertical: 'bottom',
                                             horizontal: 'left',
                                         }}
-
-
                                     >
                                         <Grid container direction="column">
-
-                                            {story.is_draft ? <Button variant="text" color="primary">Đăng tải</Button> : <></>}
-
-                                            <AlertDialog title={story.title} />
-
-
+                                            {story.is_draft === false && story.is_paywalled === false ? <Button variant="text" color="primary"> Gỡ đăng tải </Button> : <></>}
+                                            {story.is_paywalled ? <></> : <Button variant="text" color='secondary' onClick={handleDialogOpen}>
+                                                Xóa truyện
+                                            </Button>}
+                                            <ConfirmDialog
+                                                title={`Xác nhận xóa truyện ${story.title}`}
+                                                actionBgColor='secondary'
+                                                isReverse={true}
+                                                content={<Grid container direction="column" >
+                                                    <Typography>Tất cả <strong>lượt đoc</strong> , nội dung sẽ bị <strong>xóa</strong></Typography>
+                                                    <Typography>Tất cả <strong>bình luận</strong> , nội dung sẽ bị <strong>xóa</strong></Typography>
+                                                    <Typography>Tất cả <strong>bình luận</strong> , nội dung sẽ bị <strong>xóa</strong></Typography>
+                                                </Grid>}
+                                                isOpen={isOpen}
+                                                handleClose={() => { handleDialogClose(true, story.id) }}
+                                                actionContent='Xác nhận xóa'
+                                                cancelContent='Hủy thao tác'
+                                            />
                                         </Grid>
 
                                     </Popover>
@@ -191,15 +169,13 @@ const MyStoryPage = () => {
                                 {story.title}
                             </Typography>
                             <Typography component="div" variant="body1">
-                                ({story.is_draft === false ? 'Đã đăng tải' : "Bản nháp"})
+                                ({story.is_draft === false ? story.is_paywalled ? 'Đã đăng tải,truyện trả phí' : 'Đã đăng tải' : "Bản nháp"})
                             </Typography>
-
                             <Box
                                 sx={{
                                     display: 'grid',
                                     gap: 1,
                                     gridTemplateColumns: 'repeat(2, 1fr)',
-
                                 }}
                             >
                                 <DetailInfo icon={<EyeIcon strokeWidth={3}></EyeIcon>} content={`${story.read_count ?? 0} lượt đọc`} />
@@ -262,7 +238,7 @@ const MyStoryPage = () => {
 
                             <Stack spacing={4}>
                                 <Grid container direction="row" alignItems="center" xs={{ height: "20px" }}>
-                                    <Grid xs={8}>
+                                    <Grid xs={10}>
                                         <TextField
                                             fullWidth
                                             id="outlined-controlled"
@@ -273,23 +249,12 @@ const MyStoryPage = () => {
                                             }}
                                         />
                                     </Grid>
-                                    <Grid xs={4} container direction="row" justifyContent="end" columnGap={1}>
+                                    <Grid xs={2} container direction="row" justifyContent="end" columnGap={1}>
                                         <Button style={{
-                                            borderRadius: 35,
                                             backgroundColor: (theme) => theme.palette.ink.main,
-                                            padding: "0.5em 2em",
-                                            height: "36px"
+                                            fontSize: "1.2em"
 
-                                        }} size="small" variant='outlined' onClick={(e) => { router.push('/author-dashboard') }}>
-                                            Xem thống kê
-                                        </Button>
-                                        <Button style={{
-                                            borderRadius: 35,
-                                            backgroundColor: (theme) => theme.palette.ink.main,
-                                            padding: "0.5em 2em",
-                                            height: "36px"
-
-                                        }} size="small" variant='contained' onClick={() => router.push('/my-works/create', { scroll: false })
+                                        }} size="medium" variant='contained' onClick={() => router.push('/my-works/create', { scroll: false })
                                         }>
                                             Thêm truyện
                                         </Button>

@@ -1,12 +1,8 @@
-/* eslint-disable camelcase */
-
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
-import ReportCreatePage from '../../screens/report/report-create.page';
+import TransactionPage from '../../../screens/transaction/transaction.page';
 
-const Page = ({ params }) => {
-  return <ReportCreatePage />;
-};
+const Page = () => <TransactionPage />;
 
 Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 

@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/router';
 
 import { styled } from '@mui/material/styles';
 import { withAuthGuard } from 'src/hocs/with-auth-guard';
 
-import { TopNav } from './top-nav';
 import AuthorBreadcrum from './bread-crum';
-import { useRouter } from 'next/router';
+import { TopNav } from './top-nav';
+import path from 'path';
 
 const SIDE_NAV_WIDTH = 0;
 
@@ -33,15 +34,18 @@ export const Layout = withAuthGuard((props) => {
     const [openNav, setOpenNav] = useState(false);
     const router = useRouter();
 
+
     const handlePathnameChange = useCallback(() => {
         if (openNav) {
             setOpenNav(false);
         }
+
     }, [openNav]);
 
     useEffect(
         () => {
             handlePathnameChange();
+
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [pathname],

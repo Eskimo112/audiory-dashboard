@@ -1,8 +1,14 @@
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
-import StoryPage from '../../screens/story/story.page';
+import DashboardPage from '@/screens/dashboard/dashboard.page';
 
-const Page = () => <StoryPage />;
+
+const Page = () => (
+
+    <>
+        <DashboardPage />
+    </>
+);
 
 Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 

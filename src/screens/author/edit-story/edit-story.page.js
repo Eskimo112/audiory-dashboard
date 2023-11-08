@@ -53,18 +53,24 @@ const EditStoryPage = () => {
     const storyId = router.query.id;
     console.log(storyId)
     const auth = useAuth();
-    const jwt = auth.user.token;
+    const jwt = auth?.user.token;
     const [tabValue, setTabValue] = useState(0);
     const [imageFile, setImageFile] = useState();
 
     const handleChangeTab = (event, newValue) => {
+        if (newValue === 0) {
+            console.log('alo')
+            refetch();
+        }
         setTabValue(newValue);
     }
 
-    const { data: story, isLoading } = useQuery(
+    const { data: story = {}, isLoading, refetch } = useQuery(
         ['story'],
         async () => await StoryService.getById({ storyId, jwt }),
     );
+
+
 
     if (isLoading)
         return (
@@ -83,27 +89,30 @@ const EditStoryPage = () => {
     return (
         <>
             <div>
-                <Grid
-                    container
-                    justifyContent="center"
-                    direction="row"
-                    alignItems="center"
-                    alignContent="center"
-                    wrap="wrap"
-                >
-                    <Container sx={{
-                        width: "18em",
-                        height: "20em"
-                    }} >
-                        <AppImageUpload onChange={(file) => setImageFile(file)} />
-                    </Container>
-                </Grid>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider', display: "flex", justifyContent: "center" }}>
+                <Container maxWidth="lg">
+                    <Box
+                        container
+                        justifyContent="center"
+                        direction="row"
+                        alignItems="center"
+                        alignContent="center"
+                        wrap="wrap"
+                    >
+                        <Container sx={{
+                            width: "18em",
+                        }} >
+                            <AppImageUpload defaultUrl={story.cover_url ?? ''} onChange={(file) => setImageFile(file)} />
+                        </Container>
+                    </Box>
+                </Container>
+
+                <Container sx={{ borderBottom: 1, borderColor: 'divider', display: "flex", justifyContent: "center" }}>
+
                     <Tabs value={tabValue} onChange={handleChangeTab} aria-label="basic tabs example">
                         <Tab label="Chi tiết truyện" {...a11yProps(0)} />
                         <Tab label="Mục lục" {...a11yProps(1)} />
                     </Tabs>
-                </Box>
+                </Container>
                 <CustomTabPanel value={tabValue} index={0}>
                     <DetailStoryTab story={story} />
                 </CustomTabPanel>

@@ -14,16 +14,16 @@ import StoryService from "@/services/story";
 import { toastError, toastSuccess } from "@/utils/notification";
 
 const DetailStoryTab = ({ story }) => {
-
+    console.log(story?.tags?.map(a => a.name))
     const router = useRouter();
     const auth = useAuth();
-    const jwt = auth.user.token;
-    const userId = auth.user.id;
+    const jwt = auth?.user.token;
+    const userId = auth?.user.id;
 
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [tag, setTag] = useState('');
-    const [tagList, setTagList] = useState(story.tags ?? [])
+    const [tagList, setTagList] = useState(story?.tags?.map(a => a.name) ?? [])
 
 
     const { data: categoriesData = [], isLoading } = useQuery(
@@ -55,7 +55,7 @@ const DetailStoryTab = ({ story }) => {
             title: Yup.string()
                 .min(1)
                 .max(255),
-            description: Yup.string().min(1).max(1000, 'Tối đa 1000 chữ').required('Miêu tả là bắt buộc'),
+            description: Yup.string().min(5, 'Ít nhất 5 ký tự').max(1000, 'Tối đa 1000 chữ').required('Miêu tả là bắt buộc'),
         }),
         onSubmit: async (values, helpers) => {
             try {
@@ -91,19 +91,28 @@ const DetailStoryTab = ({ story }) => {
         const values = formik.values;
         var body = new FormData();
 
-        // body.append('category_id', values.category);
-        // body.append('description', values.description);
-        // body.append('tags', tagList);
+        body.append('category_id', values.category);
+        body.append('description', values.description);
+        body.append('tags', tagList);
         body.append('title', values.title);
-        // body.append('is_mature', values.isMature);
-        // body.append('is_copyright', values.isCopyright);
-        // body.append('is_completed', values.isComplete);
-        // body.append('is_draft', true);
+        body.append('is_mature', values.isMature);
+        body.append('is_copyright', values.isCopyright);
+        body.append('is_completed', values.isComplete);
+        body.append('is_draft', true);
         // body.append('form_file', values.formFile);
 
         try {
-            await StoryService.edit({ body, jwt });
-            toastSuccess('Sửa thành công')
+            await StoryService.edit({ body, storyId: story.id }).then(
+                res => {
+                    console.log(res)
+                    if (res.status === 200) {
+                        toastSuccess('Sửa thành công')
+                    } else {
+                        toastError(res.statusText)
+                    }
+                }
+            );
+
 
         } catch (error) {
             console.log('error', error)
@@ -114,10 +123,9 @@ const DetailStoryTab = ({ story }) => {
     const handleAddTag = (event) => {
         var val = event.target.value;
         if (event.keyCode === 32 && val.trim() !== '') {
-            val.replace(',', '')
-            console.log(val)
+
             if (val.trim().length >= 2) {
-                const isDuplicate = tagList.filter((ele) => ele.name === val.trim()).length > 0;
+                const isDuplicate = tagList.find((ele) => ele === val.trim());
                 if (isDuplicate) {
                     toastError('Trùng thẻ');
                 } else {
@@ -127,11 +135,8 @@ const DetailStoryTab = ({ story }) => {
             } else {
                 toastError('Thẻ ít nhất 2 ký tự')
             }
-
-
             val = '';
             setTag(val);
-
         }
     }
     return (
@@ -225,11 +230,10 @@ const DetailStoryTab = ({ story }) => {
                         <Grid container direction="row">
                             {tagList.length > 0 && tagList?.map((tag, index) => (
                                 <Box color="ink.main" key={index} >
-
-                                    <Button type="button" onClick={() => {
-                                        setTagList(tagList.filter((ele) => ele.name !== tag.name))
-                                    }}>
-                                        {tag.name}  <DeleteOutline fontSize="1em" sx={{ marginLeft: "2em" }} />
+                                    <Button type="button" >
+                                        {tag}  <DeleteOutline onClick={() => {
+                                            setTagList(tagList.filter((ele) => ele !== tag))
+                                        }} fontSize="1em" sx={{ marginLeft: "2em" }} />
                                     </Button>
                                 </Box>
 

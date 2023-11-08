@@ -3,6 +3,14 @@ export const formatNumber = (value) => {
   return `${formattedValue}`;
 };
 
+export function countDiffenceFromNow(dateString) {
+  const date = new Date(dateString);
+  const now = Date.now();
+  const diffTime = Math.abs(now - date);//milliseconds
+  return Math.ceil(diffTime / ((1000 * 60 * 60 * 24)));
+  return formatDate(dateString);
+}
+
 export function formatDate(dateString) {
   const date = new Date(dateString);
   const year = date.getFullYear();

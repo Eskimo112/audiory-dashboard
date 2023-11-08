@@ -28,8 +28,7 @@ export default class ChapterVersionService {
             'Authorization': "Bearer " + jwt,
         }
         const response = await request({ url, method: 'post', payload: body, requestHeaders });
-        if (!response.data) return null;
-        return response.data;
+        return response;
     }
 
     static async revert({ chapterVersionId }) {

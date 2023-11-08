@@ -36,7 +36,7 @@ export const AccountPopover = (props) => {
       >
         <Typography variant="overline">Tài khoản</Typography>
         <Typography color="text.secondary" variant="body2">
-          {auth.user.username}
+          {auth?.user?.username ?? ''}
         </Typography>
       </Box>
       <Divider />

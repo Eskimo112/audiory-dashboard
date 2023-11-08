@@ -47,17 +47,12 @@ export default class StoryService {
     return response.data;
   }
 
-  static async edit({ body, jwt }) {
-    const requestHeaders =
-    {
+  static async edit({ body, storyId }) {
+    const requestHeaders = {
       'Content-Type': "multipart/form-data",
-      'Authorization': "Bearer " + jwt,
     }
-    const url = `stories`;
-
-    const response = await axios.patch(url, body, { requestHeaders });
-    if (!response.code) return null;
-    return response.data;
+    const response = await axios.patch(`${process.env.API}stories/${storyId}`, body, { requestHeaders });
+    return response;
   }
 
   static async create({ body, jwt }) {
@@ -76,7 +71,7 @@ export default class StoryService {
 
   static async delete(storyId) {
 
-    const url = `stories/$storyId`;
+    const url = `stories/${storyId}`;
     const response = await request({ url, method: 'delete' });
 
     if (!response.code) return response.data;

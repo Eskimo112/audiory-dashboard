@@ -2,8 +2,11 @@ import { useRouter } from "next/router";
 
 import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
 import { Button, Grid, Typography } from "@mui/material";
+
 import ChapterService from "@/services/chapter";
 import { toastError, toastSuccess } from "@/utils/notification";
+import { MoreHoriz } from "@mui/icons-material";
+import { countDiffenceFromNow } from "@/utils/formatters";
 
 const ChapterListTab = ({ list, storyId }) => {
     const router = useRouter();
@@ -23,9 +26,11 @@ const ChapterListTab = ({ list, storyId }) => {
                         <Typography variant="subtitle1">Chương {index + 1}: {chapter.title ?? 'Tiêu đề chương'}  {isDraft ? '( Bản thảo )' : ''} </Typography>
                     </Grid>
                     <Grid xs={2} spacing={0}>
-                        20 gio truoc
+                        {countDiffenceFromNow(chapter.updated_date)}
                     </Grid>
-
+                    <Grid>
+                        <MoreHoriz />
+                    </Grid>
                 </Grid>
             </Button>
         )

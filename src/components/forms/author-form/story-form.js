@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { CloudUpload, HelpOutline } from '@mui/icons-material';
-import { Button, Card, CircularProgress, Grid, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material';
+import { Clear, DeleteOutline, HelpOutline, Remove } from '@mui/icons-material';
+import { Box, Button, Card, CircularProgress, Container, Grid, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material';
 import { FieldArray, useFormik } from 'formik';
 import { useQuery } from 'react-query';
 import * as Yup from 'yup';
@@ -18,21 +18,18 @@ import { toastError } from '@/utils/notification';
 const StoryForm = () => {
     const router = useRouter();
     const auth = useAuth();
-    const jwt = auth.user.token;
-    const [categories, setCategories] = useState([]);
+    const jwt = auth?.user.token;
     const [selectedCategory, setSelectedCategory] = useState('');
     const [tag, setTag] = useState('');
-    const { data: categoriesData, isLoading, isSuccess } = useQuery(
+    const [tagList, setTagList] = useState([])
+
+    const { data: categoriesData = [], isLoading, isSuccess } = useQuery(
         ['categories'],
         async () => await CategoryService.getAll(),
     );
     useEffect(() => {
-
-        setCategories(categoriesData);
-        setSelectedCategory(isSuccess ? categoriesData[0].id : '');
-
-
-    }, [categoriesData])
+        setSelectedCategory(categoriesData[0]?.id ?? '');
+    }, [categoriesData, isSuccess])
 
     const formik = useFormik({
         initialValues: {
@@ -40,19 +37,20 @@ const StoryForm = () => {
             description: '',
             currentTag: '',
             tags: [],
-            category: selectedCategory,
+            category: selectedCategory ?? '',
             isMature: false,
             isCopyright: false,
-            formFile: null,
+            formFile: '',
             submit: null,
         },
-        // enableReinitialize: true,
+        enableReinitialize: true,
         validationSchema: Yup.object({
             title: Yup.string().trim()
                 .min(1, 'Tiêu đề ít nhất 1 ký tự')
                 .max(255).required('Bắt buộc nhập tiêu đề'),
-            description: Yup.string().trim().min(1, 'Miêu tả ít nhất 1 ký tự').max(500, 'Miêu tả tối đa 500 ký tự').required('Miêu tả là bắt buộc'),
-            tags: Yup.array().min(1, 'Ít nhất 1 thẻ')
+            description: Yup.string().trim().min(5, 'Miêu tả ít nhất 5 ký tự').max(1000, 'Miêu tả tối đa 1000 ký tự').required('Miêu tả là bắt buộc'),
+            tags: Yup.array().min(1, 'Ít nhất 1 thẻ'),
+            formFile: Yup.string().required('Bắt buộc chọn ảnh bìa'),
         }),
         onSubmit: async (values, helpers) => {
             try {
@@ -86,8 +84,8 @@ const StoryForm = () => {
 
     const handleCreate = async () => {
         const values = formik.values;
-        var body = new FormData();
-        body.append('author_id', auth.user?.id ?? '');
+        const body = new FormData();
+        body.append('author_id', auth?.user?.id ?? '');
         body.append('category_id', values.category);
         body.append('description', values.description);
         body.append('tags', values.tags);
@@ -111,22 +109,24 @@ const StoryForm = () => {
     }
 
     const handleAddTag = (event) => {
-        var val = event.target.value;
-        console.log(val, 'code ', event.keyCode)
+        var val = event.target.value.trim();
         if (event.keyCode === 32 && val.trim() !== '') {
-
-            console.log(formik.values.tags.filter((ele) => ele.name === val.trim()))
-            const isDuplicate = formik.values.tags.filter((ele) => ele.name === val.replace(',', '').trim()).length > 0;
-            if (isDuplicate) {
-                toastError('Trùng thẻ');
+            console.log(val)
+            if (val.trim().length >= 2) {
+                const isDuplicate = tagList.find((ele) => ele === val.trim());
+                if (isDuplicate) {
+                    toastError('Trùng thẻ');
+                } else {
+                    setTagList([...tagList, val.trim()]);
+                    formik.setFieldValue('tags', tagList);
+                    console.log(tagList)
+                }
             } else {
-                formik.setFieldValue('tags', [...formik.values.tags, { name: val.trim() }]);
+                toastError('Thẻ ít nhất 2 ký tự')
             }
             val = '';
-            console.log(val)
-            setTag('');
-
-        };
+            setTag(val);
+        }
     }
     if (isLoading)
         return (
@@ -179,7 +179,6 @@ const StoryForm = () => {
                                     name="description"
                                     onBlur={formik.handleBlur}
                                     onChange={formik.handleChange}
-                                    type=""
                                     value={formik.values.description}
                                 />
                                 <TextFieldLabel label='Thể loại' isRequired={true} />
@@ -193,10 +192,10 @@ const StoryForm = () => {
                                     onChange={formik.handleChange}
                                     type="text"
                                     size="small"
-                                    value={formik.values.category}
+                                    value={formik.values.category || ''}
 
                                 >
-                                    {categories && categories.map((category) => (
+                                    {categoriesData && categoriesData?.map((category) => (
                                         <MenuItem key={category.id} value={category.id}>
                                             {category.name}
                                         </MenuItem>
@@ -209,51 +208,27 @@ const StoryForm = () => {
                                     placeholder='Ngăn cách thẻ bởi dấu cách'
                                     type="text"
                                     size="small"
+                                    name='currentTag'
                                     value={tag}
                                     onChange={(e) => setTag(e.target.value)}
                                     onKeyDown={(e) => handleAddTag(e)}
+                                    helperText={formik.touched.currentTag && formik.errors.tags}
                                 />
-                                <Grid container>
-                                    {formik.values.tags.length > 0 && formik.values.tags.map((tag, index) => (
-                                        <div key={index}>
-                                            {tag.name}
-                                            <button type="button" onClick={() => {
-                                                formik.setFieldValue('tags', formik.values.tags.filter((e, idx) => index !== idx));
-                                            }}>
-                                                -
-                                            </button>
-                                        </div>
+                                <Grid container direction="row" sx={{ marginTop: "10px" }}>
+                                    {tagList.length > 0 && tagList?.map((tag, index) => (
+                                        <Box color="secondary" key={index} >
+                                            <Button variant='outlined' type="button" size='small' sx={{ marginRight: "0.3em", marginBottom: "0.3em" }} >
+                                                {tag}  <Clear onClick={() => {
+                                                    setTagList(tagList.filter((ele) => ele !== tag))
+                                                }} fontSize="1em" sx={{ marginLeft: "2em" }} />
+                                            </Button>
+                                        </Box>
                                     ))}
                                 </Grid>
 
 
-
-                                {({ values }) => (
-                                    <FieldArray name='tags' render={arrayHelpers => {
-
-                                        <div>
-                                            {formik.values.tags.length > 0 && values.tags.map((tag, index) => (
-                                                <div key={index}>
-                                                    {tag.name}
-
-                                                    <button type="button" onClick={() => arrayHelpers.remove(index)}>
-                                                        -
-                                                    </button>
-                                                </div>
-                                            ))}
-                                            <button
-                                                type="button"
-                                                onClick={() => arrayHelpers.push({ name: 'milu' })}
-                                            >
-                                                +
-                                            </button>
-                                            alo
-                                        </div>
-                                    }} />
-                                )}
                                 <Grid
                                     container
-                                    spacing={1}
                                     direction="row"
                                     justifyContent="space-between"
                                     alignItems="flex-start"
@@ -277,7 +252,6 @@ const StoryForm = () => {
                                 </Grid>
                                 <Grid
                                     container
-                                    spacing={1}
                                     direction="row"
                                     justifyContent="space-between"
                                     alignItems="flex-start"
@@ -300,14 +274,20 @@ const StoryForm = () => {
                                 </Grid>
                             </Grid>
                             <Grid xs={4} spacing={0}>
-                                <AppImageUpload onChange={(file) => { formik.setFieldValue('form_file', file) }} />
-
+                                <Container maxWidth="lg" >
+                                    <AppImageUpload sx={{ width: "20em", height: "30em" }} onChange={(file) => { formik.setFieldValue('formFile', file) }} />
+                                </Container>
 
                             </Grid>
                         </Grid>
 
 
                     </Stack>
+                    {formik.errors.submit && (
+                        <Typography color="error" sx={{ mt: 3 }} variant="body2">
+                            {formik.errors.formFile}
+                        </Typography>
+                    )}
                     {formik.errors.submit && (
                         <Typography color="error" sx={{ mt: 3 }} variant="body2">
                             {formik.errors.submit}

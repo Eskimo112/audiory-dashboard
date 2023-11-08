@@ -1,7 +1,8 @@
+import { useState } from 'react';
+
 import Head from 'next/head';
 
 import {
-  Avatar,
   Box,
   Button,
   Card,
@@ -18,15 +19,19 @@ import { useQuery } from 'react-query';
 import * as Yup from 'yup';
 
 import AppBreadCrumbs from '../../components/app-bread-crumbs';
+import { AppImageUpload } from '../../components/app-image-upload';
 import { SHARED_PAGE_SX } from '../../constants/page_sx';
+import { useRequestHeader } from '../../hooks/use-request-header';
 import UserService from '../../services/user';
+import UserStoriesTable from './user-stories-table';
 
 const UserDetaiPage = ({ userId }) => {
+  const requestHeader = useRequestHeader();
   const { data: user, isLoading } = useQuery(
     ['users', userId],
-    async () => await UserService.getById(userId),
+    async () => await new UserService(requestHeader).getStoriesByUserId(userId),
   );
-
+  const [selectedFile, setSelectedFile] = useState();
   const formik = useFormik({
     initialValues: {
       email: user?.email ?? '',
@@ -179,14 +184,17 @@ const UserDetaiPage = ({ userId }) => {
               <Grid xs={12} lg={4}>
                 <Card sx={{ padding: 2 }}>
                   <Stack justifyContent="center" alignItems="center">
-                    <Avatar
-                      src={user?.avatar_url}
+                    <Box
                       sx={{
                         width: '80%',
-                        height: 'auto',
-                        marginBottom: '12px',
-                      }}
-                    />
+                        // marginBottom: '12px',
+                      }}>
+                      <AppImageUpload
+                        defaultUrl={user?.avatar_url}
+                        onChange={(file) => setSelectedFile(file)}
+                      />
+                    </Box>
+
                     <Typography variant="subtitle1" fontWeight={400}>
                       Người theo dõi: <b>{user?.number_of_followers ?? 0} </b>
                     </Typography>
@@ -247,6 +255,9 @@ const UserDetaiPage = ({ userId }) => {
                 </Card>
               </Grid>
             </Grid>
+          </Stack>
+          <Stack>
+            <UserStoriesTable userId={userId} />
           </Stack>
         </Container>
       </Box>

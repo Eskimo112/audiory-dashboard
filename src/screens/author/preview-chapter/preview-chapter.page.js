@@ -4,52 +4,54 @@ import 'react-quill/dist/quill.snow.css';
 
 import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import { FastForward, FastRewind, FavoriteBorderOutlined, FavoriteOutlined, GifBoxOutlined, ListAlt, PlayArrow, Settings, SettingsOutlined } from "@mui/icons-material";
-import { Box, Button, Card, CardContent, Container, Grid, IconButton, makeStyles, Stack, Typography } from "@mui/material";
+import { FastForward, FastRewind, FavoriteBorderOutlined, FavoriteOutlined, GifBoxOutlined, Image, ListAlt, PlayArrow, Settings, SettingsOutlined } from "@mui/icons-material";
+import { Box, Button, Card, CardContent, CardMedia, Container, Grid, IconButton, makeStyles, Skeleton, Stack, Typography } from "@mui/material";
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+import { any } from "prop-types";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
+import { useQuery } from "react-query";
 
+import { useAuth } from "@/hooks/use-auth";
+import ChapterService from "@/services/chapter";
 import ChapterVersionService from "@/services/chapter-version";
 import { toastError, toastSuccess } from "@/utils/notification";
+import AppImage from "@/components/app-image";
 
 
 const { useRouter } = require("next/router")
 
 const PreviewChapterPage = () => {
     const router = useRouter();
+    const auth = useAuth();
+    const jwt = auth.user.token;
     const [chapter, setChapter] = useState({ title: '' });
     const [chapterId, setChapterId] = useState('');
 
-    const [value, setValue] = useState([]);
+    const [value, setValue] = useState('');
     const [html, setHtml] = useState('<p></p>');
 
     const ReactQuill = typeof window === 'object' ? require('react-quill') : () => false;
 
+    const { data: chapterVersionData = [], isLoading, isSucces, refetch } = useQuery(
+        ['chapterVersionData', router.isReady],
+        async () => await ChapterVersionService.getById(router.query['chapter-version-id']),
+    );
 
+
+    const { data: chapterData = [], isLoading2 } = useQuery(
+        ['chapterData', isSucces],
+        async () => await ChapterService.getById({ chapterId: chapterVersionData?.chapter_id, jwt }),
+
+    );
     useEffect(() => {
-        const fetchChapterVersion = async () => {
-            const res = await ChapterVersionService.getById(router.query['chapter-version-id'])
-            console.log(res.rich_text)
-            setValue(JSON.parse(res?.rich_text == '' ?? {}));
-            setChapterId(res.chapter_id);
-            var cfg = {};
+        setValue(JSON.parse(chapterVersionData?.rich_text === '' ?? '{}'));
+        setChapterId(chapterVersionData.chapter_id);
+        var cfg = {};
+        var converter = new QuillDeltaToHtmlConverter(value, cfg);
 
-            var converter = new QuillDeltaToHtmlConverter(value, cfg);
+        setHtml(converter.convert())
 
-            setHtml(converter.convert())
-
-        }
-        // const fetchChapter = async () => {
-        //     const res = await ChapterService.getById(chapterId);
-        //     setChapter(res)
-        // }
-
-        fetchChapterVersion();
-        // fetchChapter();
-
-    }, [value])
-
-
+    }, [chapterVersionData, isSucces, chapterData])
 
     const MediaControlCard = () => {
         const theme = useTheme();
@@ -83,10 +85,9 @@ const PreviewChapterPage = () => {
                         </CardContent>
                     </Grid>
 
-
                     <Grid container xs={12} direction="column" >
                         <Grid xs={12} >
-                            <BorderLinearProgress variant="determinate" value={50} sx={{ margin: '0em 1em' }} />
+                            <BorderLinearProgress variant="determinate" value={35} sx={{ margin: '0em 1em' }} />
                         </Grid>
                         <Stack
                             direction="row"
@@ -111,10 +112,12 @@ const PreviewChapterPage = () => {
             </Card>
         );
     }
+    console.log(chapterData);
+    console.log(chapterVersionData);
 
     const handleRevertChapterVersion = async (e) => {
         e.preventDefault();
-        console.log('su')
+
         try {
             await ChapterVersionService.revert({ chapterVersionId: router.query['chapter-version-id'] });
             toastSuccess('Khôi phục thành công');
@@ -130,13 +133,14 @@ const PreviewChapterPage = () => {
     return (
         <>
             <Grid container direction="column"
-                alignItems="center" sx={{ marginTop: '2em' }}>
-                <Grid spacing={0} container sx={12} direction="column" alignItems="center">
-                    <Typography variant="h5" color="initial">Chương 1</Typography>
-                    <Typography variant="overline" color="initial">(Bản thảo)</Typography>
-
-                    <Typography variant="h6" color="initial">Tiêu đề</Typography>
-
+                alignItems="center" sx={{ margin: '1em 0' }}>
+                <Grid container>
+                    {/* <image src={chapterVersionData?.banner_url} /> */}
+                    {/* {isLoading ? <Skeleton /> : <Card><CardMedia alt='Banner' image={chapterVersionData?.banner_url === "" ? "https://www.eclosio.ong/wp-content/uploads/2018/08/default.png" : chapterVersionData?.banner_url ?? ""} width="20em" height="10em" loading="lazy" /></Card>} */}
+                </Grid>
+                <Grid spacing={0} container direction="column" alignItems="center" sx={{ margin: '2em 0' }}>
+                    <Typography variant="h6" color="initial">{isLoading2 ? <Skeleton /> : `Chương ${chapterData?.position ?? 1}`}    <Typography variant="overline" color="initial">({chapterData?.is_draft ? 'Bản thảo' : 'Đă đăng tải'})</Typography></Typography>
+                    <Typography variant="h6" color="initial">{isLoading2 ? <Skeleton /> : chapterData?.title ?? 'Tiêu đề'} </Typography>
                 </Grid>
 
                 <Grid xs={8} direction="row" container >
@@ -144,10 +148,14 @@ const PreviewChapterPage = () => {
                         <Typography variant="h5" color="initial"></Typography>
                     </Grid>
                     <Grid xs={8} >
-                        <MediaControlCard />
-                        <ReactQuill
-                            readOnly theme='bubble' value={html} />
-                        <Button fullWidth variant="contained" color="primary">
+                        {isLoading ? <Skeleton /> : <MediaControlCard />}
+
+                        {isLoading ? <Skeleton sx={{ bgcolor: 'sky.light' }}
+                            variant="rectangular"
+                            width="100%"
+                            height={118} /> : <ReactQuill
+                            readOnly theme='bubble' value={JSON.parse(chapterVersionData?.rich_text === "" ? '{}' : chapterVersionData?.rich_text)} />}
+                        <Button fullWidth variant="contained" color="primary" sx={{ margin: "1em 0" }}>
                             Đọc phần tiếp theo
                         </Button>
                         <Button fullWidth variant="outlined" color="primary" onClick={handleRevertChapterVersion}>
@@ -175,9 +183,7 @@ const PreviewChapterPage = () => {
                                 <GifBoxOutlined />
                             </IconButton>
                         </Container>
-
                     </Grid>
-
                 </Grid>
             </Grid>
 

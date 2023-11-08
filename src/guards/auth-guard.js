@@ -28,10 +28,10 @@ export const AuthGuard = (props) => {
     }
 
     ignore.current = true;
-
     if (!isAuthenticated) {
       // role
       console.log('Not authenticated, redirecting');
+
       router
         .replace({
           pathname: '/auth/login',
@@ -39,10 +39,19 @@ export const AuthGuard = (props) => {
             router.asPath !== '/' ? { continueUrl: router.asPath } : undefined,
         })
         .catch(console.error);
-    } else {
+    } else
+      // if (isAuthenticated && user.role_id === 1) {
+      //   console.log(router.asPath)
+      //   router.replace('/my-works');
+      //   setChecked(true)
+
+      // } else if (isAuthenticated && user.role_id === 2) {
+      //   router.replace('/admin');
+      //   setChecked(true)
+      // }
+
       setChecked(true);
-    }
-  }, [router.isReady]);
+  }, [router.isReady, user]);
 
   if (!checked) {
     return null;

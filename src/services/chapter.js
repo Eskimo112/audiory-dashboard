@@ -24,10 +24,8 @@ export default class ChapterService {
     const response = await request({
       url,
       method: 'post',
-      requestHeaders: this.requestHeader,
     });
-    if (!response.data) return null;
-    return response.data;
+    return response;
   }
 
   static async create(body) {
