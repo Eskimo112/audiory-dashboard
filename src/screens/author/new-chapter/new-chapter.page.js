@@ -4,54 +4,54 @@ import React, { useEffect, useState } from 'react';
 
 import 'react-quill/dist/quill.snow.css';
 
-import { Card, CircularProgress, Container, MenuItem, Stack, TextField } from '@mui/material';
+import { Box, Card, CircularProgress, Container, Divider, MenuItem, Popover, Skeleton, Stack, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { CloudUpload } from '@mui/icons-material';
 import ChapterVersionService from '@/services/chapter-version';
 import { useRouter } from 'next/router';
 import ChapterService from '@/services/chapter';
-import StoryService from '@/services/story';
 import { useQuery } from 'react-query';
 import { useAuth } from '@/hooks/use-auth';
 import { toastError, toastSuccess } from '@/utils/notification';
 import { AppImageUpload } from '@/components/app-image-upload';
+import AuthorBreadcrum from '@/layouts/author/bread-crum';
+import AuthorBreadCrumbs from '@/components/author-bread-crumbs';
+import { CheckBoxSharp, CheckCircle } from '@mui/icons-material';
+import { formatDate } from '@/utils/formatters';
 
 const toolbarOptions = [
     ['bold', 'italic', 'underline'],        // toggled buttons
 
 
-    [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-    [{ 'direction': 'rtl' }],                         // text direction
+    // [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+    // [{ 'direction': 'rtl' }],                         // text direction
 
     [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+    // [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
     ['image'],          // add's image support
 
     [{ 'font': [] }],
     [{ 'align': [] }],
 
-    ['clean']                                         // remove formatting button
 ];
 const MIN_WORDS = 5;
 const NewChapterPage = () => {
-
     const router = useRouter();
+
     const storyId = router.query.id;
     const chapterId = router.query['chapter-id'];
 
     const auth = useAuth();
     const jwt = auth?.user.token;
 
-    const { data: chapterData = {}, isLoading, isSuccess } = useQuery(
+    const { data: chapterData = {}, isLoading, isSuccess, refetch, isRefetching } = useQuery(
         ['chapter'],
         async () => await ChapterService.getById({ chapterId, jwt }),
     );
 
-    const { data: chapterVersionsData = [], isSucces2, refetch } = useQuery(
+    const { data: chapterVersionsData = [], isSucces2, refetch: refetch2 } = useQuery(
         ['chapterVersionList'],
         async () => await ChapterVersionService.getAll({ chapterId, jwt }),
 
@@ -60,9 +60,31 @@ const NewChapterPage = () => {
     const [currentChapterVersion, setCurrentChapterVersion] = useState({});
     const [value, setValue] = useState('');
 
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const handleClick = (event, storyData) => {
+        setStoryData(storyData);
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+    const open = Boolean(anchorEl);
+    const id = open ? 'simple-popover' : undefined;
+
+    const [storyData, setStoryData] = useState({});
+
+
     useEffect(() => {
         setCurrentChapterVersion(chapterData?.current_chapter_version);
+
     }, [chapterData, chapterVersionsData])
+    useEffect(() => {
+        setCurrentChapterVersion(chapterData?.current_chapter_version);
+        refetch();
+        refetch2();
+    }, [router])
+    console.log('chapterData');
+    console.log('chapterVersionData')
 
     const ReactQuill = typeof window === 'object' ? require('react-quill') : () => false;
     const formik = useFormik({
@@ -92,12 +114,14 @@ const NewChapterPage = () => {
     })
 
     const onEditorChange = (content, delta, source, editor) => {
+        console.log('size', new Blob(editor.getContents()))
         console.log('EDITor', editor.getContents().ops); // rich_text
         console.log('EDITor', JSON.stringify(editor.getContents().ops)); // rich_text
         console.log('Text', editor.getText()); // content
         console.log('content ', content);
         console.log('richtext', formik.values.rich_text);
         console.log('CHARACTERS COUNT', editor.getLength())
+        console.log('IMAGES', editor.getContents().ops?.filter(ele => ele.insert.image !== undefined)?.map((image) => image?.insert?.image));// get base 64 array for image moderation
 
         setValue(editor.getText().trim())
         formik.setFieldValue('rich_text', JSON.stringify(editor.getContents()));
@@ -154,9 +178,9 @@ const NewChapterPage = () => {
                     if (res.code === 200) {
                         if (isPreview) {
                             console.log('pre');
-                            refetch().then(res => {
+                            refetch2().then(res => {
                                 console.log(res);
-                                // router.push(`/my-works/${router.query?.id}/preview/${chapterVersionsData[chapterVersionsData.length - 1].id}`)
+                                router.replace(`/my-works/${router.query?.id}/preview/${chapterVersionsData[chapterVersionsData.length - 1].id}`)
 
                             });
 
@@ -174,7 +198,7 @@ const NewChapterPage = () => {
                             }
                         } else {
                             toastSuccess('Lưu bản thảo thành công');
-                            refetch();
+                            refetch2();
                         }
 
 
@@ -211,49 +235,106 @@ const NewChapterPage = () => {
     return (
 
         <>
-            <Grid
-                container
-                direction="row"
-                justifyContent="center"
-                alignItems="center"
-                alignContent="center"
-                sx={{ paddingTop: "2em", columnGap: "0.5em" }}
-            >
-                <Button disabled={!formik.isValid} variant="contained" color="primary" onClick={() => { onSaveDraftChapter(false, true) }}>
-                    Đăng tải
-                </Button>
-                <Button disabled={!formik.isValid} variant="outlined" color="inherit" onClick={() => { onSaveDraftChapter(false, false) }}>
-                    Lưu bản thảo
-                </Button>
-                <Button disabled={!formik.isValid} variant="outlined" color="inherit" onClick={() => { onSaveDraftChapter(true, false) }} >
-                    Xem trước
-                </Button>
-            </Grid>
+            <Stack direction="column" justifyContent="center" alignItems="center">
+
+                <Grid width={1 / 2}>
+                    {isRefetching ? <Skeleton /> : <AuthorBreadCrumbs storyGenerator={true} chapterTitle={` ${chapterData?.title ?? 'Tiêu đề chương'}`} handleOpen={handleClick} />}
+
+                    <Popover
+                        id={id}
+                        open={open}
+                        anchorEl={anchorEl}
+                        onBlur={handleClose}
+
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'center',
+                        }}
+                        sx={{ maxHeight: "25em" }}
+
+                    >
+                        <Grid container direction="column" >
+                            {storyData && storyData?.chapters?.map((chapter, index) => (
+                                <Button key={chapter?.id} spacing={0} sx={{ minWidth: "30em", maxWidth: "25em", display: 'flex', direction: "row", border: "none", borderBottom: "0.5px solid #F1EFEF", padding: "0.6em 1.2em" }} onClick={(e) => {
+                                    console.log(`/my-works/${storyId}/write/${chapterId}`);
+                                    router.push(`/my-works/${storyData?.id}/write/${chapter?.id}`);
+
+                                }}>
+                                    <Grid xs={10} container spacing={0}>
+                                        <Grid container spacing={0} direction="row" justifyContent="flex-start">
+                                            <Typography sx={{ fontWeight: "bold" }} variant="subtitle1" color="ink.main">Chương {index + 1} -</Typography>
+                                            <Typography noWrap sx={{ fontWeight: "bold", textAlign: "start", width: "12em", textOverflow: "ellipsis" }} variant="subtitle1" color="ink.main">{chapter?.title ?? ' Tiêu đề'}</Typography>
+                                        </Grid>
+                                        <Grid container spacing={0} direction="row" columnGap="0.2em">
+                                            <Typography color={chapter?.is_draft ? 'ink.lighter' : 'primary'} variant="body1" >({chapter?.is_draft ? 'Bản thảo' : 'Đã đăng tải'}) </Typography>
+                                            <Typography variant="body1" color="sky.dark">{`${formatDate(chapter?.updated_date ?? chapter?.created_date).split(' ')[0]}`}</Typography>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid xs={2} container justifyContent="end" alignItems="center">
+                                        {chapterData && chapterData?.id === chapter.id ? <CheckCircle color='primary' fontSize='medium' /> : <></>}
+                                    </Grid>
+                                </Button>
+                            ))}
+                        </Grid>
+                    </Popover>
+                </Grid></Stack>
+
 
             <Stack direction="column" justifyContent="center" alignItems="center">
                 <Grid width={1 / 2}>
-                    <TextField
-                        variant="outlined"
-                        select
-                        placeholder='Chọn chapter'
-                        onBlur={formik.handleBlur}
-                        type="text"
-                        size="small"
-                        value={currentChapterVersion?.id ?? ''}
+                    <Grid
+                        container
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="center"
                         sx={{ margin: "1em 0" }}
-
                     >
-                        {chapterVersionsData && chapterVersionsData?.sort((a, b) => a?.created_date > b?.created_date).map((category, index) => (
-                            <MenuItem key={index} value={category.id} onClick={() => {
-                                router.push(`/my-works/${router.query?.id}/preview/${category.id}`)
-                            }}>
-                                {category.version_name}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                    <Container maxWidth="lg">
+                        <Grid xs={5} container spacing={0}>
+                            <TextField
+                                variant="outlined"
+                                select
+                                placeholder='Chọn chapter'
+                                onBlur={formik.handleBlur}
+                                type="text"
+                                size="small"
+                                value={currentChapterVersion?.id ?? ''}
+
+                            >
+                                {chapterVersionsData && chapterVersionsData?.sort((a, b) => a?.created_date > b?.created_date).map((category, index) => (
+                                    <MenuItem key={index} value={category.id} onClick={() => {
+                                        router.push(`/my-works/${router.query?.id}/preview/${category.id}`)
+                                    }}>
+                                        {category.version_name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid
+                            xs={7}
+                            container
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="end"
+                            alignContent="flex-end"
+                            columnGap="0.2em"
+                        >
+
+                            <Button disabled={!formik.isValid} variant="contained" color="primary" onClick={() => { onSaveDraftChapter(false, true) }}>
+                                Đăng tải
+                            </Button>
+                            <Button disabled={!formik.isValid} variant="outlined" color="inherit" onClick={() => { onSaveDraftChapter(false, false) }}>
+                                Lưu bản thảo
+                            </Button>
+                            <Button disabled={!formik.isValid} variant="outlined" color="inherit" onClick={() => { onSaveDraftChapter(true, false) }} >
+                                Xem trước
+                            </Button>
+                        </Grid>
+
+                    </Grid>
+
+                    <Grid maxWidth="lg">
                         <form noValidate onSubmit={formik.handleSubmit}>
-                            <AppImageUpload onChange={(file) => { formik.setFieldValue('form_file', file) }} />
+                            {isRefetching ? <Skeleton /> : <AppImageUpload defaultUrl={currentChapterVersion?.banner_url} onChange={(file) => { formik.setFieldValue('form_file', file) }} />}
                             <TextField
                                 variant="standard"
                                 placeholder='Đặt tên cho chương'
@@ -269,11 +350,12 @@ const NewChapterPage = () => {
                             />
 
                         </form>
-                    </Container>
+                    </Grid>
 
                     <Container sx={{ marginTop: "2em" }} >
-                        {formik.values.rich_text === "" ? <></> : <ReactQuill modules={{
+                        {formik.values.rich_text === "" ? <></> : <ReactQuill sx={{ border: "none" }} modules={{
                             toolbar: toolbarOptions,
+
                         }} value={JSON.parse(formik.values.rich_text === '' ? '{}' : formik.values.rich_text)} placeholder='Viết gì đó' onChange={onEditorChange} theme='snow' />}
                     </Container>
 

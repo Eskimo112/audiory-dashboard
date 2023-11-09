@@ -2,144 +2,112 @@ import React, { useEffect, useState } from "react";
 
 import 'react-quill/dist/quill.snow.css';
 
-import { useTheme } from "@emotion/react";
-import styled from "@emotion/styled";
-import { FastForward, FastRewind, FavoriteBorderOutlined, FavoriteOutlined, GifBoxOutlined, ListAlt, PlayArrow, Settings, SettingsOutlined } from "@mui/icons-material";
-import { Box, Button, Card, CardContent, Container, Grid, IconButton, makeStyles, Stack, Typography } from "@mui/material";
+import CurrencyDollarIcon from "@heroicons/react/24/outline/CurrencyDollarIcon";
+import { FastForward, FastRewind, FavoriteBorderOutlined, GifBoxOutlined, ListAlt, PlayArrow, Settings, SettingsOutlined } from "@mui/icons-material";
+import { Box, Button, Card, CardContent, Container, Grid, IconButton, Stack, Typography } from "@mui/material";
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
-import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
+import { useQuery } from "react-query";
 
-import ChapterVersionService from "@/services/chapter-version";
+import { useAuth } from "@/hooks/use-auth";
+import StoryService from "@/services/story";
+import { formatDate } from "@/utils/formatters";
+import ChapterService from "@/services/chapter";
+
 
 
 const { useRouter } = require("next/router")
 
-const PreviewStoryPage = ({ storyId }) => {
+const PreviewStoryPage = () => {
     const router = useRouter();
-    const [chapter, setChapter] = useState({ title: '' });
-    const [chapterId, setChapterId] = useState('');
-    const [value, setValue] = useState([]);
-    const [html, setHtml] = useState('<p></p>');
+    const storyId = router.query.id;
+    const auth = useAuth();
+    const jwt = auth.user.token;
 
-    const ReactQuill = typeof window === 'object' ? require('react-quill') : () => false;
+
+
+    const { data: storyData = {}, isLoading, isSuccess } = useQuery(
+        ['story', router.isReady],
+        async () => await StoryService.getById({ storyId: router.query.id, jwt }),
+    );
 
     useEffect(() => {
-
-
-
     }, [])
 
-
-
-    const MediaControlCard = () => {
-        const theme = useTheme();
-        const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
-            height: 8,
-            borderRadius: 5,
-            [`&.${linearProgressClasses.colorPrimary}`]: {
-                backgroundColor: 'sky.light',
+    const ChapterCard = ({ chapter, index }) => {
+        const handleNavigate = async () => {
+            await ChapterService.getById({ chapterId: chapter?.id, jwt }).then(res => {
+                console.log(res)
+                console.log(res?.current_chapter_version?.id);
+                router.push(`/story/${storyId}/${res?.current_chapter_version?.id}`);
             },
-            [`& .${linearProgressClasses.bar}`]: {
-                borderRadius: 5,
-                backgroundColor: 'primary.dark',
-            },
-        }));
 
+            )
+
+        }
+        const isDraft = chapter?.is_draft;
         return (
-            <Card sx={{ width: '100%', backgroundColor: 'sky.lightest' }}>
-                <Grid xs={{ width: '100%' }} container direction="column" alignItems="center">
-                    <Grid
-                        container
-                        direction="column"
-                        alignItems="center"
-                        alignContent="center"
-                        xs={12}
-                    >
-                        <CardContent>
-                            <Typography component="div" variant="h6">
-                                {storyId}
-                            </Typography>
-                        </CardContent>
-                    </Grid>
+            <Button fullWidth color={isDraft ? 'inherit' : "inherit"} variant={isDraft ? 'text' : 'outlined'} key={index} sx={{ marginTop: "0.5em", backgroundColor: !isDraft ? 'primary.lightest' : 'sky.lightest' }}>
+                <Grid
+                    container
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    wrap="wrap"
+                >
+                    <Grid xs={8} spacing={0} container justifyContent="flex-start" onClick={handleNavigate}>
+                        <Grid container spacing={0} direction="column" alignItems="flex-start">
+                            <Typography variant="subtitle1" noWrap sx={{ paddingRight: "2em" }}>Chương {index + 1}: {chapter?.title ?? 'Tiêu đề chương'}   </Typography>
+                            <Typography color={isDraft ? 'ink.main' : 'ink.main'} variant="subtitle2" noWrap sx={{ paddingRight: "2em" }}>  {isDraft ? 'Bản thảo ' : 'Đã đăng tải '} {formatDate(chapter.updated_date ?? chapter?.created_date).split(' ')[0]} </Typography>
 
-
-                    <Grid container xs={12} direction="column" >
-                        <Grid xs={12} >
-                            <BorderLinearProgress variant="determinate" value={50} sx={{ margin: '0em 1em' }} />
                         </Grid>
-                        <Stack
-                            direction="row"
-                            justifyContent="center"
-                            alignItems="center"
-                            spacing={2}
-                        ><IconButton aria-label="previous">
-                                {theme.direction === 'rtl' ? <FastForward /> : <FastRewind />}
-                            </IconButton>
-                            <IconButton aria-label="play/pause">
-                                <PlayArrow sx={{ height: 38, width: 38 }} />
-                            </IconButton>
-                            <IconButton aria-label="next" >
-                                {theme.direction === 'rtl' ? <FastRewind /> : <FastForward />}
-                            </IconButton>
-
-                        </Stack>
-
-
                     </Grid>
+                    {chapter?.price !== 0 ? <Grid xs={1} container justifyContent="flex-start" alignItems="center" onClick={handleNavigate}>
+                        {chapter?.price} <CurrencyDollarIcon width="1.5em" color="primary" />
+                    </Grid> : <></>}
+
+
                 </Grid>
-            </Card>
-        );
+            </Button>
+        )
     }
 
     return (
         <>
-            <Grid container direction="column"
-                alignItems="center" sx={{ marginTop: '2em' }}>
-                <Grid spacing={0} container sx={12} direction="column" alignItems="center">
-                    <Typography variant="h5" color="initial">{storyId}</Typography>
-                    <Typography variant="overline" color="initial">(Bản thảo)</Typography>
+            <Grid container width={1 / 1} direction="column" alignItems="center">
 
-                    <Typography variant="h6" color="initial">Tiêu đề</Typography>
+                {/* banner */}
+                <Grid container spacing={0}>
+                    <Container maxWidth="lg" width="100%">
+                        <Box component="img" sx={{
+                            height: "16em",
+                            width: "12em",
+                            objectFit: "inherit"
 
+                        }}
+                            alt="The house from the offer."
+                            src={storyData?.cover_url}></Box>
+                    </Container>
+                </Grid>
+                <Grid width={2 / 3} >
+                    {storyData?.title}
+                    <Grid
+                        container
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="flex-start"
+                        alignContent="stretch"
+                        wrap="wrap"
+                    >
+                        {storyData && storyData?.chapters?.map((chapter, index) => (
+                            <Grid container xs={6} key={index} columnGap="1em">
+                                <ChapterCard chapter={chapter} index={index} />
+
+                            </Grid>
+                        ))}
+                    </Grid>
                 </Grid>
 
-                <Grid xs={8} direction="row" container >
-                    <Grid xs={2} >
-                        <Typography variant="h5" color="initial">Data info</Typography>
-                    </Grid>
-                    <Grid xs={8} >
-                        <MediaControlCard />
-                        <ReactQuill
-                            readOnly theme='bubble' value={html} />
-                        <Button fullWidth variant="contained" color="primary">
-                            Đọc phần tiếp theo
-                        </Button>
-                    </Grid>
-                    <Grid xs={2} spacing={0} container justifyContent="center" direction="column">
-                        <Container maxWidth="2em">
-                            <IconButton aria-label="" size="medium" color="sky" sx={{ backgroundColor: 'ink.base' }}>
-                                <SettingsOutlined />
-                            </IconButton>
-                        </Container>
-                        <Container maxWidth="2em">
-                            <IconButton aria-label="" size="medium" color="sky" sx={{ backgroundColor: 'ink.base' }}>
-                                <FavoriteBorderOutlined />
-                            </IconButton>
-                        </Container>
-                        <Container maxWidth="2em">
-                            <IconButton size="medium" color="sky" sx={{ backgroundColor: 'ink.base' }}>
-                                <ListAlt />
-                            </IconButton>
-                        </Container>
-                        <Container maxWidth="2em">
-                            <IconButton size="medium" color="sky" sx={{ backgroundColor: 'ink.base' }}>
-                                <GifBoxOutlined />
-                            </IconButton>
-                        </Container>
 
-                    </Grid>
-
-                </Grid>
             </Grid>
 
 

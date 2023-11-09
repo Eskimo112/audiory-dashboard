@@ -3,12 +3,12 @@ import React, { useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Box, Card, CircularProgress, Container, Grid, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Card, CircularProgress, Container, Grid, Skeleton, Tab, Tabs, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useQuery } from "react-query";
-import * as Yup from 'yup';
 
 import { AppImageUpload } from '@/components/app-image-upload';
+import AuthorBreadCrumbs from '@/components/author-bread-crumbs';
 import ChapterListTab from '@/components/forms/author-form/tabs/chapter-list-tab';
 import DetailStoryTab from '@/components/forms/author-form/tabs/detail-story-tab';
 import { useAuth } from '@/hooks/use-auth';
@@ -51,7 +51,6 @@ const EditStoryPage = () => {
     const router = useRouter();
 
     const storyId = router.query.id;
-    console.log(storyId)
     const auth = useAuth();
     const jwt = auth?.user.token;
     const [tabValue, setTabValue] = useState(0);
@@ -65,8 +64,8 @@ const EditStoryPage = () => {
         setTabValue(newValue);
     }
 
-    const { data: story = {}, isLoading, refetch } = useQuery(
-        ['story'],
+    const { data: story = {}, isLoading, refetch, isRefetching } = useQuery(
+        ['story', storyId],
         async () => await StoryService.getById({ storyId, jwt }),
     );
 
@@ -89,7 +88,9 @@ const EditStoryPage = () => {
     return (
         <>
             <div>
+
                 <Container maxWidth="lg">
+                    <AuthorBreadCrumbs storyTitle={story.title} />
                     <Box
                         container
                         justifyContent="center"
@@ -118,7 +119,9 @@ const EditStoryPage = () => {
                 </CustomTabPanel>
                 <CustomTabPanel value={tabValue} index={1}>
                     <Container maxWidth="lg" sx={{ width: 1 / 2 }}>
-                        <ChapterListTab list={story.chapters ?? []} storyId={storyId} />
+                        {isLoading || isRefetching ? <>
+                            {Array(10).map((e, index) => <Skeleton key={index} animation="wave" />)}
+                        </> : <ChapterListTab list={story.chapters ?? []} storyId={storyId} refetch={refetch} />}
                     </Container>
                 </CustomTabPanel>
 

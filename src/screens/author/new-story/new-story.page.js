@@ -10,6 +10,7 @@ import {
     Stack,
 } from '@mui/material';
 
+import AuthorBreadCrumbs from '@/components/author-bread-crumbs';
 import StoryForm from '@/components/forms/author-form/story-form';
 
 
@@ -32,7 +33,7 @@ const NewStoryPage = () => {
                         justifyContent: "center",
                     }}>
                     <Container sx={{ width: '100%' }}>
-
+                        <AuthorBreadCrumbs />
                         <Stack>
                             <StoryForm />
                         </Stack>

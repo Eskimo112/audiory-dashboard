@@ -39,19 +39,10 @@ export const AuthGuard = (props) => {
             router.asPath !== '/' ? { continueUrl: router.asPath } : undefined,
         })
         .catch(console.error);
-    } else
-      // if (isAuthenticated && user.role_id === 1) {
-      //   console.log(router.asPath)
-      //   router.replace('/my-works');
-      //   setChecked(true)
+    }
 
-      // } else if (isAuthenticated && user.role_id === 2) {
-      //   router.replace('/admin');
-      //   setChecked(true)
-      // }
-
-      setChecked(true);
-  }, [router.isReady, user]);
+    setChecked(true);
+  }, [router.isReady]);
 
   if (!checked) {
     return null;
@@ -59,6 +50,18 @@ export const AuthGuard = (props) => {
 
   // If got here, it means that the redirect did not occur, and that tells us that the user is
   // authenticated / authorized.
+  if (!user) return null;
+
+
+  if (user.role_id === 1 && router.asPath.includes('admin')) {
+    router.replace('/my-works');
+    return null;
+  }
+  if (user.role_id === 2 && !router.asPath.includes('admin')) {
+    router.replace('/admin');
+    return null;
+
+  }
 
   return children;
 };
@@ -66,3 +69,4 @@ export const AuthGuard = (props) => {
 AuthGuard.propTypes = {
   children: PropTypes.node,
 };
+

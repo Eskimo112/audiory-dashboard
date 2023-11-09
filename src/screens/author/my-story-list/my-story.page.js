@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import Head from "next/head";
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 import EyeIcon from '@heroicons/react/24/solid/EyeIcon';
@@ -10,13 +11,7 @@ import {
     Button,
     CircularProgress,
     Container,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
     Grid,
-    MenuItem,
     Popover,
     Stack,
     SvgIcon,
@@ -29,12 +24,12 @@ import CardMedia from '@mui/material/CardMedia';
 import IconButton from '@mui/material/IconButton';
 import { useQuery } from 'react-query';
 
-import { useAuth } from '@/hooks/use-auth';
-import { usePopover } from '@/hooks/use-popover';
-import { MyStoryPopover } from '@/layouts/author/my-story-popover';
-import StoryService from '@/services/story';
-import { toastSuccess } from '@/utils/notification';
+import AppImage from '@/components/app-image';
 import ConfirmDialog from '@/components/dialog/reuse-confirm-dialog';
+import { useAuth } from '@/hooks/use-auth';
+import StoryService from '@/services/story';
+import { countDiffenceFromNow } from '@/utils/formatters';
+import { toastSuccess } from '@/utils/notification';
 
 
 const MyStoryPage = () => {
@@ -42,15 +37,14 @@ const MyStoryPage = () => {
     const auth = useAuth();
     const jwt = auth?.user.token;
     const [myStories, setMyStories] = useState([]);
-    const { data: storiesData = [], isLoading, isSuccess, refetch } = useQuery(
+    const { data: storiesData = [], isLoading, isSuccess, refetch, isError } = useQuery(
         ['myStories'],
         async () => await StoryService.getMyStories(jwt),
     );
     useEffect(() => {
-        setMyStories(storiesData);
+        console.log(isError)
+        setMyStories(storiesData ?? []);
     }, [storiesData]);
-
-
 
 
     const handleDelete = async ({ id }, title) => {
@@ -80,16 +74,15 @@ const MyStoryPage = () => {
             setIsOpen(true);
         }
         const handleDialogClose = (isConfirm, id) => {
-            console.log(isConfirm)
-            // setIsOpen(false);
-            // if (isConfirm === true) {
-            //     handleDelete({ id })
-            // }
+            setIsOpen(false);
+            if (isConfirm === true) {
+                handleDelete({ id })
+            }
         }
         // const theme = useTheme();
         const DetailInfo = ({ icon, content, isHighlight = false }) => {
             return <>
-                <Stack direction="row" justifyContent="flex-start">
+                <Stack direction="row" justifyContent="flex-start" columnGap="0.2em">
                     <SvgIcon sx={{ width: '14px', color: 'primary.secondary', strokeWidth: 3 }}>
                         {icon ?? <MenuBook></MenuBook>}
                     </SvgIcon>
@@ -108,28 +101,31 @@ const MyStoryPage = () => {
                         width: '100%',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        height: '500px',
+                        height: '14em',
                     }}>
                     <CircularProgress />
                 </Card>
             );
         return (
             <>
-                <Card aria-describedby="alo" sx={{ display: 'flex', width: "100%", height: "20em" }}>
+                <Card aria-describedby="alo" sx={{ display: 'flex', width: "100%", height: "14em", }}>
                     <CardMedia
                         onClick={() => { router.push(`my-works/${story.id}`) }}
                         component="img"
-                        sx={{ width: "35%", objectFit: "inherit" }}
+                        sx={{ width: "18em", height: "14em", objectFit: "inherit" }}
                         src={story.cover_url !== '' ? story.cover_url : "https://imgv3.fotor.com/images/gallery/Fiction-Book-Covers.jpg"}
                         alt="Live from space album cover"
                     />
-                    <CardContent sx={{ display: 'flex', flexDirection: 'column', width: "100%", height: "10em" }}>
-                        <Stack direction="column"  >
-                            <Stack direction="row" justifyContent="flex-end">
-                                <Box sx={{}}>
-                                    <Button aria-describedby={id} variant="text" onClick={handleClick}>
+                    <CardContent sx={{ boxSizing: "border-box", display: 'flex', flexDirection: 'column', width: "100%", alignItems: "stretch", padding: 1, }}>
+                        <Stack direction="column" justifyContent="space-around" >
+                            <Stack direction="row" justifyContent="space-between">
+                                <Typography onClick={() => { router.push(`my-works/${story.id}`) }} component="div" variant="h6">
+                                    {story.title}
+                                </Typography>
+                                <Box >
+                                    <IconButton color='inherit' aria-describedby={id} variant="text" onClick={handleClick}>
                                         <MoreVert />
-                                    </Button>
+                                    </IconButton>
                                     <Popover
                                         id={id}
                                         open={open}
@@ -160,21 +156,18 @@ const MyStoryPage = () => {
                                                 cancelContent='Hủy thao tác'
                                             />
                                         </Grid>
-
                                     </Popover>
                                 </Box>
+
                             </Stack>
 
-                            <Typography onClick={() => { router.push(`my-works/${story.id}`) }} component="div" variant="h5">
-                                {story.title}
-                            </Typography>
-                            <Typography component="div" variant="body1">
-                                ({story.is_draft === false ? story.is_paywalled ? 'Đã đăng tải,truyện trả phí' : 'Đã đăng tải' : "Bản nháp"})
+                            <Typography component="div" variant="subtitle1" color="sky.dark">
+                                ({story.is_draft === false ? story.is_paywalled ? 'Đã đăng tải, truyện trả phí' : 'Đã đăng tải' : "Bản nháp"})
                             </Typography>
                             <Box
                                 sx={{
                                     display: 'grid',
-                                    gap: 1,
+                                    rowGap: '0.1em',
                                     gridTemplateColumns: 'repeat(2, 1fr)',
                                 }}
                             >
@@ -185,15 +178,14 @@ const MyStoryPage = () => {
                                 <DetailInfo icon={<FavoriteBorder strokeWidth={3}></FavoriteBorder>} content={`${story.vote_count ?? 0} lượt`} />
 
                             </Box>
-
                             <Box sx={{
                                 display: 'flex',
                                 justifyContent: "space-between",
                                 alignItems: "end"
 
                             }} >
-                                <Typography component="div" variant="caption">
-                                    Cập nhật 13 ngày trước
+                                <Typography component="div" variant="subtitle1" color="sky.base">
+                                    Cập nhật vào {countDiffenceFromNow(story.updated_date)}
                                 </Typography>
                                 <Button sx={{
                                     borderRadius: 35,
