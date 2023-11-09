@@ -71,6 +71,8 @@ export const AppImageUpload = (props) => {
         type="file"
         sx={{ display: 'none' }}
         onChange={onSelectFile}
+        inputProps={{ accept: '.jpg,.jpeg,.png' }}
+
       />
       {selectedFile ? (
         <Box
@@ -79,6 +81,8 @@ export const AppImageUpload = (props) => {
             overflow: 'hidden',
             width: '100%',
             height: '100%',
+            display: "flex",
+            alignItems: "center"
           }}>
           <Box component="img" src={preview} width="100%" height="100%" />
         </Box>

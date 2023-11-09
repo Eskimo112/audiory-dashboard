@@ -13,7 +13,7 @@ import { SvgIcon } from '@mui/material';
 export const items = [
   {
     title: 'Tổng quan',
-    path: '/',
+    path: '/admin',
     icon: (
       <SvgIcon fontSize="small">
         <ChartBarIcon />
@@ -22,7 +22,7 @@ export const items = [
   },
   {
     title: 'Quản lý báo cáo',
-    path: '/reports',
+    path: '/admin/reports',
     icon: (
       <SvgIcon fontSize="small">
         <FlagIcon />
@@ -31,7 +31,7 @@ export const items = [
   },
   {
     title: 'Quản lý người dùng',
-    path: '/users',
+    path: '/admin/users',
     icon: (
       <SvgIcon fontSize="small">
         <UsersIcon />
@@ -40,7 +40,7 @@ export const items = [
   },
   {
     title: 'Quản lý truyện',
-    path: '/stories',
+    path: '/admin/stories',
     icon: (
       <SvgIcon fontSize="small">
         <BookOpenIcon />
@@ -49,7 +49,7 @@ export const items = [
   },
   {
     title: 'Quản lý thể loại',
-    path: '/categories',
+    path: '/admin/categories',
     icon: (
       <SvgIcon fontSize="small">
         <RectangleStackIcon />
@@ -58,7 +58,7 @@ export const items = [
   },
   {
     title: 'Quản lý gói xu',
-    path: '/coinpacks',
+    path: '/admin/coinpacks',
     icon: (
       <SvgIcon fontSize="small">
         <CircleStackIcon />
@@ -67,7 +67,7 @@ export const items = [
   },
   {
     title: 'Quản lý quà',
-    path: '/gifts',
+    path: '/admin/gifts',
     icon: (
       <SvgIcon fontSize="small">
         <GiftIcon />
@@ -76,7 +76,7 @@ export const items = [
   },
   {
     title: 'Quản lý giao dịch',
-    path: '/transactions',
+    path: '/admin/transactions',
     icon: (
       <SvgIcon fontSize="small">
         <BankNotesIcon />
@@ -85,7 +85,7 @@ export const items = [
   },
   {
     title: 'Thông số hệ thống',
-    path: '/system-configs',
+    path: '/admin/system-configs',
     icon: (
       <SvgIcon fontSize="small">
         <Cog8ToothIcon />
@@ -94,20 +94,20 @@ export const items = [
   },
   {
     title: 'Hồ sơ bản thân',
-    path: '/me',
+    path: '/admin/me',
     icon: (
       <SvgIcon fontSize="small">
         <UserCircleIcon />
       </SvgIcon>
     ),
   },
-  {
-    title: 'Số liệu tác giả',
-    path: '/author-dashboard',
-    icon: (
-      <SvgIcon fontSize="small">
-        <ChartBarIcon />
-      </SvgIcon>
-    ),
-  },
+  // {
+  //   title: 'Số liệu tác giả',
+  //   path: '/author-dashboard',
+  //   icon: (
+  //     <SvgIcon fontSize="small">
+  //       <ChartBarIcon />
+  //     </SvgIcon>
+  //   ),
+  // },
 ];

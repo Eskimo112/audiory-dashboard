@@ -118,8 +118,9 @@ const Page = () => {
                   size="large"
                   sx={{ mt: 3 }}
                   type="submit"
-                  variant="contained">
-                  Tiếp tục
+                  variant="contained"
+                  disabled={!formik.isValid}>
+                  Đăng nhập
                 </Button>
 
                 {/* <Button fullWidth size="large" sx={{ mt: 3 }} onClick={handleSkip}>

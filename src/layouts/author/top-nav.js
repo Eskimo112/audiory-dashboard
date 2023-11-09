@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { useRouter } from 'next/router';
+
 import { BarChart, ChatBubbleOutline, Edit, NotificationsNone, Search } from '@mui/icons-material';
 import SendIcon from '@mui/icons-material/Send';
 import { Avatar, Box, Button, Grid, IconButton, Typography } from '@mui/material';
@@ -18,10 +20,11 @@ const TOP_NAV_HEIGHT = 60;
 export const TopNav = (props) => {
     // const { onNavOpen } = props;
     // const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+    const router = useRouter();
     const accountPopover = usePopover();
     const auth = useAuth();
     console.log(auth)
-    const [user, setUser] = useState(auth.user);
+    const [user, setUser] = useState(auth?.user);
     return (
         <>
             <Box
@@ -46,13 +49,13 @@ export const TopNav = (props) => {
                         <AppIcon />
                     </Grid>
                     <Grid item xs="auto" justifyContent="center" container direction="row" alignItems="center" alignContent="center">
-                        <Button startIcon={<SendIcon />} variant="text" color="primary">
+                        {/* <Button startIcon={<SendIcon />} variant="text" color="primary">
                             Khám phá
+                        </Button> */}
+                        <Button startIcon={<BarChart />} variant={router.pathname.startsWith('/author-dashboard') ? 'contained' : 'text'} color="primary" onClick={() => { router.push('/author-dashboard') }}>
+                            Thống kê
                         </Button>
-                        <Button startIcon={<BarChart />} variant="text" color="primary">
-                            Xếp hạng
-                        </Button>
-                        <Button startIcon={<Edit />} variant="contained" color="primary">
+                        <Button startIcon={<Edit />} variant={router.pathname.startsWith('/my-works') ? 'contained' : 'text'} color="primary" onClick={() => { router.push('/my-works') }}>
                             Sáng tác
                         </Button>
                     </Grid>
@@ -78,15 +81,15 @@ export const TopNav = (props) => {
                                     height: 40,
 
                                 }}
-                                src={auth.user.avatar_url}
+                                src={auth?.user?.avatar_url ?? ''}
                             /></Grid>
                             <Grid item xs="auto" container direction="column" justifyContent="space-around" >
                                 <Grid item xs>
                                     <Typography gutterBottom variant="subtitle2" component="div">
-                                        {auth.user.username}
+                                        {auth?.user?.username ?? ''}
                                     </Typography>
                                     <Typography gutterBottom variant="body2">
-                                        {auth.user.name}
+                                        {auth?.user?.full_name ?? ''}
                                     </Typography>
                                 </Grid>
                             </Grid>
@@ -94,7 +97,7 @@ export const TopNav = (props) => {
                     </Grid>
                 </Grid>
 
-            </Box>
+            </Box >
             <AccountPopover
                 anchorEl={accountPopover.anchorRef.current}
                 open={accountPopover.open}

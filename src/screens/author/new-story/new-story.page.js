@@ -10,15 +10,15 @@ import {
     Stack,
 } from '@mui/material';
 
+import AuthorBreadCrumbs from '@/components/author-bread-crumbs';
 import StoryForm from '@/components/forms/author-form/story-form';
-import PreviewStoryPage from '../preview-story/preview-story.page';
-import EditStoryForm from '@/components/forms/author-form/edit-story-form';
+
 
 
 const NewStoryPage = () => {
     const router = useRouter();
-
-    const [storyId, setStoryId] = useState(router.query.id === 'new-story' ? '' : router.query.id)
+    console.log(router.query.id === 'new-story')
+    const [storyId, setStoryId] = useState(router.query.id)
     console.log(router.query.id)
     return (
         <>
@@ -33,15 +33,10 @@ const NewStoryPage = () => {
                         justifyContent: "center",
                     }}>
                     <Container sx={{ width: '100%' }}>
-
-                        {storyId === '' ? <Stack>
+                        <AuthorBreadCrumbs />
+                        <Stack>
                             <StoryForm />
-                        </Stack> : <Stack>
-                            <EditStoryForm storyId={storyId} />
-                        </Stack>}
-
-
-
+                        </Stack>
 
                     </Container>
                 </Box>

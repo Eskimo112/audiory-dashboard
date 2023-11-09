@@ -3,6 +3,22 @@ export const formatNumber = (value) => {
   return `${formattedValue}`;
 };
 
+export function countDiffenceFromNow(dateString) {
+  const date = new Date(dateString);
+  const now = Date.now();
+  const diffTime = Math.abs(now - date);//milliseconds
+  const diffInSecs = Math.ceil(diffTime / ((1000)));
+  const diffInMinutes = Math.ceil(diffTime / ((1000 * 60)));
+  const diffInHours = Math.ceil(diffTime / ((1000 * 60 * 60)));
+  if (diffInMinutes < 1) {
+    return diffInMinutes + ' giây trước';
+  } else if (diffInHours < 1) {
+    return diffInHours + ' phút trước'
+  } else if (diffInHours <= 23)
+    return diffInHours + ' giờ trước';
+  return formatDate(dateString).split(' ')[0];
+}
+
 export function formatDate(dateString) {
   const date = new Date(dateString);
   const year = date.getFullYear();

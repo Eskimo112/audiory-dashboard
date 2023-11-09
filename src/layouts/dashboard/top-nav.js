@@ -18,7 +18,7 @@ export const TopNav = (props) => {
   const accountPopover = usePopover();
   const auth = useAuth();
 
-  const [user, setUser] = useState(auth.user);
+  const [user, setUser] = useState(auth?.user);
   return (
     <>
       <Box

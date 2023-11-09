@@ -1,9 +1,9 @@
 import { Layout as AuthorLayout } from 'src/layouts/author/layout';
 
-import EditStoryPage from '@/screens/author/edit-story/edit-story.page';
+import PreviewStoryPage from '@/screens/author/preview-story/preview-story.page';
 
 
-const Page = () => <EditStoryPage />;
+const Page = () => <PreviewStoryPage />;
 
 Page.getLayout = (page) => <AuthorLayout>{page}</AuthorLayout>;
 

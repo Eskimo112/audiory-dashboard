@@ -21,10 +21,11 @@ import {
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
-import { SHARED_PAGE_SX, TABLE_ACTION_BUTTON_SX } from '@/constants/page_sx';
+import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { SHARED_TABLE_PROPS } from '@/constants/table';
 import StoryService from '@/services/story';
 import { Edit, Visibility } from '@mui/icons-material';
+import { formatDate } from '../../../utils/formatters';
 
 const StoryPage = () => {
   const { data: stories, isLoading } = useQuery(
@@ -36,6 +37,15 @@ const StoryPage = () => {
 
   const columns = useMemo(
     () => [
+      {
+        accessorKey: 'order',
+        header: 'STT',
+        size: 20,
+        accessorFn: (_, index) => {
+          return index + 1;
+        },
+        enableColumnActions: false,
+      },
       {
         accessorKey: 'cover_url',
         header: 'Ảnh bìa',
@@ -248,17 +258,7 @@ const StoryPage = () => {
                 <Typography variant="h4">Quản lý truyện</Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
-              <div>
-                <Button
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <PlusIcon />
-                    </SvgIcon>
-                  }
-                  variant="contained">
-                  Thêm truyện
-                </Button>
-              </div>
+              <div></div>
             </Stack>
 
             <MaterialReactTable
@@ -266,15 +266,18 @@ const StoryPage = () => {
                 <MenuItem
                   key="edit"
                   onClick={() => {
-                    router.push(`/stories/${row.original.id}`);
+                    router.push(`admin/stories/${row.original.id}`);
                   }}>
                   <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
                     <Visibility />
                   </SvgIcon>
-                  Chỉnh sửa
+                  Xem
                 </MenuItem>,
                 <MenuItem key="delete" onClick={() => console.info('Delete')}>
-                  Vô hiệu hóa
+                  <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+                    <Edit />
+                  </SvgIcon>
+                  Chỉnh sửa
                 </MenuItem>,
               ]}
               {...SHARED_TABLE_PROPS}

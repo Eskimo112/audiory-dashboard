@@ -3,6 +3,7 @@ const AppImage = ({ src, alt, ...rest }) => {
     console.error("Both 'src' and 'baseUrl' props are required.");
     return null;
   }
+  console.log(rest)
 
   return <image src={src} alt={alt} {...rest} />;
 };

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import Head from "next/head";
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 import EyeIcon from '@heroicons/react/24/solid/EyeIcon';
@@ -8,8 +9,10 @@ import { Comment, FavoriteBorder, Menu, MenuBook, MoreVert } from '@mui/icons-ma
 import {
     Box,
     Button,
+    CircularProgress,
     Container,
     Grid,
+    Popover,
     Stack,
     SvgIcon,
     TextField,
@@ -19,31 +22,67 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import IconButton from '@mui/material/IconButton';
+import { useQuery } from 'react-query';
 
-import { usePopover } from '@/hooks/use-popover';
-import { MyStoryPopover } from '@/layouts/author/my-story-popover';
-import StoryService from '@/services/story';
+import AppImage from '@/components/app-image';
+import ConfirmDialog from '@/components/dialog/reuse-confirm-dialog';
 import { useAuth } from '@/hooks/use-auth';
+import StoryService from '@/services/story';
+import { countDiffenceFromNow } from '@/utils/formatters';
+import { toastSuccess } from '@/utils/notification';
 
 
 const MyStoryPage = () => {
     const router = useRouter();
     const auth = useAuth();
-    const myStoryPopover = usePopover();
+    const jwt = auth?.user.token;
     const [myStories, setMyStories] = useState([]);
-
+    const { data: storiesData = [], isLoading, isSuccess, refetch, isError } = useQuery(
+        ['myStories'],
+        async () => await StoryService.getMyStories(jwt),
+    );
     useEffect(() => {
-        StoryService.getMyStories(auth.user.token).then((res) => {
-            setMyStories(res);
-        });
+        console.log(isError)
+        setMyStories(storiesData ?? []);
+    }, [storiesData]);
 
-    }, [])
 
+    const handleDelete = async ({ id }, title) => {
+        try {
+            await StoryService.delete(id).then(res => {
+                toastSuccess('Xóa thành công truyện');
+                refetch();
+            })
+        } catch (error) {
+
+        }
+    }
     const StoryOverViewCard = ({ story }) => {
+        const [anchorEl, setAnchorEl] = React.useState(null);
+        const handleClick = (event) => {
+            setAnchorEl(event.currentTarget);
+        };
+        const handleClose = () => {
+            setAnchorEl(null);
+        };
+        const open = Boolean(anchorEl);
+        const id = open ? 'simple-popover' : undefined;
+
+
+        const [isOpen, setIsOpen] = React.useState(false)
+        const handleDialogOpen = () => {
+            setIsOpen(true);
+        }
+        const handleDialogClose = (isConfirm, id) => {
+            setIsOpen(false);
+            if (isConfirm === true) {
+                handleDelete({ id })
+            }
+        }
         // const theme = useTheme();
         const DetailInfo = ({ icon, content, isHighlight = false }) => {
             return <>
-                <Stack direction="row" justifyContent="flex-start">
+                <Stack direction="row" justifyContent="flex-start" columnGap="0.2em">
                     <SvgIcon sx={{ width: '14px', color: 'primary.secondary', strokeWidth: 3 }}>
                         {icon ?? <MenuBook></MenuBook>}
                     </SvgIcon>
@@ -53,40 +92,83 @@ const MyStoryPage = () => {
                 </Stack>
             </>
         }
+
+        if (isLoading)
+            return (
+                <Card
+                    sx={{
+                        display: 'flex',
+                        width: '100%',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '14em',
+                    }}>
+                    <CircularProgress />
+                </Card>
+            );
         return (
             <>
-                <Card onClick={() => { router.push(`my-works/${story.id}`) }} aria-describedby="alo" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Card aria-describedby="alo" sx={{ display: 'flex', width: "100%", height: "14em", }}>
                     <CardMedia
+                        onClick={() => { router.push(`my-works/${story.id}`) }}
                         component="img"
-                        sx={{ width: 1 / 3 }}
-                        image={story.cover_url !== '' ? story.cover_url : "https://imgv3.fotor.com/images/gallery/Fiction-Book-Covers.jpg"}
+                        sx={{ width: "18em", height: "14em", objectFit: "inherit" }}
+                        src={story.cover_url !== '' ? story.cover_url : "https://imgv3.fotor.com/images/gallery/Fiction-Book-Covers.jpg"}
                         alt="Live from space album cover"
                     />
-
-                    <CardContent sx={{ display: 'flex', flexDirection: 'column', width: 2 / 3 }}>
-                        <Stack direction="column"  >
-                            <Stack direction="row" justifyContent="flex-end">
-                                <Box sx={{}}>
-                                    <IconButton onClick={myStoryPopover.handleOpen}
-                                        ref={myStoryPopover.anchorRef} aria-label="previous">
-                                        <MoreVert></MoreVert>
+                    <CardContent sx={{ boxSizing: "border-box", display: 'flex', flexDirection: 'column', width: "100%", alignItems: "stretch", padding: 1, }}>
+                        <Stack direction="column" justifyContent="space-around" >
+                            <Stack direction="row" justifyContent="space-between">
+                                <Typography onClick={() => { router.push(`my-works/${story.id}`) }} component="div" variant="h6">
+                                    {story.title}
+                                </Typography>
+                                <Box >
+                                    <IconButton color='inherit' aria-describedby={id} variant="text" onClick={handleClick}>
+                                        <MoreVert />
                                     </IconButton>
+                                    <Popover
+                                        id={id}
+                                        open={open}
+                                        anchorEl={anchorEl}
+                                        onClose={handleClose}
+                                        anchorOrigin={{
+                                            vertical: 'bottom',
+                                            horizontal: 'left',
+                                        }}
+                                    >
+                                        <Grid container direction="column">
+                                            {story.is_draft === false && story.is_paywalled === false ? <Button variant="text" color="primary"> Gỡ đăng tải </Button> : <></>}
+                                            {story.is_paywalled ? <></> : <Button variant="text" color='secondary' onClick={handleDialogOpen}>
+                                                Xóa truyện
+                                            </Button>}
+                                            <ConfirmDialog
+                                                title={`Xác nhận xóa truyện ${story.title}`}
+                                                actionBgColor='secondary'
+                                                isReverse={true}
+                                                content={<Grid container direction="column" >
+                                                    <Typography>Tất cả <strong>lượt đoc</strong> , nội dung sẽ bị <strong>xóa</strong></Typography>
+                                                    <Typography>Tất cả <strong>bình luận</strong> , nội dung sẽ bị <strong>xóa</strong></Typography>
+                                                    <Typography>Tất cả <strong>bình luận</strong> , nội dung sẽ bị <strong>xóa</strong></Typography>
+                                                </Grid>}
+                                                isOpen={isOpen}
+                                                handleClose={() => { handleDialogClose(true, story.id) }}
+                                                actionContent='Xác nhận xóa'
+                                                cancelContent='Hủy thao tác'
+                                            />
+                                        </Grid>
+                                    </Popover>
                                 </Box>
+
                             </Stack>
 
-                            <Typography component="div" variant="h5">
-                                {story.title}
+                            <Typography component="div" variant="subtitle1" color="sky.dark">
+                                ({story.is_draft === false ? story.is_paywalled ? 'Đã đăng tải, truyện trả phí' : 'Đã đăng tải' : "Bản nháp"})
                             </Typography>
-                            <Typography component="div" variant="body1">
-                                ({story.is_draft === false ? 'Đã đăng tải' : "Bản nháp"})
-                            </Typography>
-
                             <Box
                                 sx={{
                                     display: 'grid',
-                                    gap: 1,
+                                    rowGap: '0.1em',
                                     gridTemplateColumns: 'repeat(2, 1fr)',
-
                                 }}
                             >
                                 <DetailInfo icon={<EyeIcon strokeWidth={3}></EyeIcon>} content={`${story.read_count ?? 0} lượt đọc`} />
@@ -96,34 +178,28 @@ const MyStoryPage = () => {
                                 <DetailInfo icon={<FavoriteBorder strokeWidth={3}></FavoriteBorder>} content={`${story.vote_count ?? 0} lượt`} />
 
                             </Box>
-
                             <Box sx={{
                                 display: 'flex',
                                 justifyContent: "space-between",
                                 alignItems: "end"
 
                             }} >
-                                <Typography component="div" variant="caption">
-                                    Cập nhật 13 ngày trước
+                                <Typography component="div" variant="subtitle1" color="sky.base">
+                                    Cập nhật vào {countDiffenceFromNow(story.updated_date)}
                                 </Typography>
                                 <Button sx={{
                                     borderRadius: 35,
                                     backgroundColor: (theme) => theme.palette.ink.main,
                                     padding: '0.5em 2em'
 
-                                }} size="medium" variant='contained'>
+                                }} size="medium" variant='contained' onClick={() => { router.push(`my-works/${story.id}`) }} >
                                     Viết tiếp
                                 </Button>
                             </Box>
                         </Stack>
                     </CardContent>
                 </Card>
-                <MyStoryPopover
-                    id="1"
-                    anchorEl={myStoryPopover.anchorRef.current}
-                    open={myStoryPopover.open}
-                    onClose={myStoryPopover.handleClose}
-                />
+
             </>
 
         );
@@ -146,15 +222,15 @@ const MyStoryPage = () => {
                     }}>
                     <Container maxWidth="xl" xs={{ display: "flex", justifyContent: "center", }}>
                         <Stack spacing={3}>
-                            <Stack direction="row" justifyContent="center" spacing={4}   >
-                                <Stack spacing={1}>
+                            <Stack direction="row" justifyContent="center"  >
+                                <Stack sx={{ marginY: '2em' }}>
                                     <Typography variant="h3">Sáng tác của tôi</Typography>
                                 </Stack>
                             </Stack>
 
                             <Stack spacing={4}>
                                 <Grid container direction="row" alignItems="center" xs={{ height: "20px" }}>
-                                    <Grid xs={8}>
+                                    <Grid xs={10}>
                                         <TextField
                                             fullWidth
                                             id="outlined-controlled"
@@ -165,37 +241,24 @@ const MyStoryPage = () => {
                                             }}
                                         />
                                     </Grid>
-                                    <Grid xs={4} container direction="row" justifyContent="end" columnGap={1}>
+                                    <Grid xs={2} container direction="row" justifyContent="end" columnGap={1}>
                                         <Button style={{
-                                            borderRadius: 35,
                                             backgroundColor: (theme) => theme.palette.ink.main,
-                                            padding: "0.5em 2em",
-                                            height: "36px"
+                                            fontSize: "1.2em"
 
-                                        }} size="small" variant='outlined'>
-                                            Xem thống kê
-                                        </Button>
-                                        <Button style={{
-                                            borderRadius: 35,
-                                            backgroundColor: (theme) => theme.palette.ink.main,
-                                            padding: "0.5em 2em",
-                                            height: "36px"
-
-                                        }} size="small" variant='contained' onClick={() => router.push('/my-works/new-story', { scroll: false })
+                                        }} size="medium" variant='contained' onClick={() => router.push('/my-works/create', { scroll: false })
                                         }>
                                             Thêm truyện
                                         </Button>
                                     </Grid>
                                 </Grid>
 
-                                <Grid container rowSpacing={1} columnSpacing={2}>
-
-                                    {myStories.map((story) => (
-                                        <Grid lg={6} xs={12} key={story.id}>
+                                <Grid container rowSpacing={2} >
+                                    {myStories?.map((story, index) => (
+                                        <Grid item lg={6} xs={12} key={story.id} sx={{ paddingRight: index % 2 === 0 ? '0.5em' : '0em', paddingLeft: index % 2 !== 0 ? '0.5em' : '0em' }}>
                                             <StoryOverViewCard story={story}></StoryOverViewCard>
                                         </Grid>
                                     ))}
-
 
                                 </Grid>
 
