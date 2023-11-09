@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types';
-import { format } from 'date-fns';
 import {
   Avatar,
   Box,
@@ -14,8 +12,11 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import { format } from 'date-fns';
+import PropTypes from 'prop-types';
 import { Scrollbar } from 'src/components/scrollbar';
-import { formatPrice } from '../../utils/formatters';
+
+import { formatPrice } from '@/utils/formatters';
 
 export const OrderTable = (props) => {
   const {

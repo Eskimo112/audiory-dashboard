@@ -1,3 +1,4 @@
+// eslint-disable-next-line simple-import-sort/imports
 import { useMemo } from 'react';
 
 import Head from 'next/head';
@@ -20,13 +21,14 @@ import {
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
-import { SHARED_PAGE_SX } from '../../constants/page_sx';
-import { SHARED_TABLE_PROPS } from '../../constants/table';
-import StoryService from '../../services/story';
+import { SHARED_PAGE_SX, TABLE_ACTION_BUTTON_SX } from '@/constants/page_sx';
+import { SHARED_TABLE_PROPS } from '@/constants/table';
+import StoryService from '@/services/story';
+import { Edit, Visibility } from '@mui/icons-material';
 
 const StoryPage = () => {
   const { data: stories, isLoading } = useQuery(
-    ['story'],
+    ['stories'],
     async () => await StoryService.getAll(),
   );
 
@@ -68,6 +70,7 @@ const StoryPage = () => {
               alignItems="center"
               direction="row"
               spacing={1}
+              sx={{ cursor: 'pointer' }}
               onClick={() => {
                 router.push(`/users/${author.id}`);
               }}>
@@ -137,8 +140,8 @@ const StoryPage = () => {
         accessorFn: (row) => (row.is_completed ? 'Hoàn thành' : 'Đang ra'),
         filterFn: 'equals',
         filterSelectOptions: [
-          { text: 'Đang ra', value: 'Hoàn thành' },
-          { text: 'Hoàn thành', value: 'Đang ra' },
+          { text: 'Đang ra', value: 'Đang ra' },
+          { text: 'Hoàn thành', value: 'Hoàn thành' },
         ],
         filterVariant: 'select',
         Cell: ({ cell }) => (
@@ -265,16 +268,56 @@ const StoryPage = () => {
                   onClick={() => {
                     router.push(`/stories/${row.original.id}`);
                   }}>
+                  <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+                    <Visibility />
+                  </SvgIcon>
                   Chỉnh sửa
                 </MenuItem>,
                 <MenuItem key="delete" onClick={() => console.info('Delete')}>
                   Vô hiệu hóa
                 </MenuItem>,
               ]}
+              {...SHARED_TABLE_PROPS}
+              // renderRowActions={({ row }) => {
+              //   return (
+              //     <Stack direction="row" gap="8px">
+              //       <Button
+              //         sx={{ ...TABLE_ACTION_BUTTON_SX }}
+              //         startIcon={
+              //           <SvgIcon
+              //             fontSize="small"
+              //             sx={{ width: '12px', mr: '0px' }}>
+              //             <Visibility />
+              //           </SvgIcon>
+              //         }
+              //         variant="outlined"
+              //         color="success"
+              //         onClick={() => {
+              //           router.push(`/reports/${row.original.id}`);
+              //         }}>
+              //         Xem
+              //       </Button>
+              //       <Button
+              //         sx={{ ...TABLE_ACTION_BUTTON_SX }}
+              //         startIcon={
+              //           <SvgIcon
+              //             fontSize="small"
+              //             sx={{ width: '12px', mr: '0px' }}>
+              //             <Edit />
+              //           </SvgIcon>
+              //         }
+              //         variant="outlined"
+              //         onClick={() => {
+              //           router.push(`/reports/${row.original.id}`);
+              //         }}>
+              //         Chỉnh sửa
+              //       </Button>
+              //     </Stack>
+              //   );
+              // }}
               columns={columns}
               data={stories}
               initialState={initialState}
-              {...SHARED_TABLE_PROPS}
             />
           </Stack>
         </Container>

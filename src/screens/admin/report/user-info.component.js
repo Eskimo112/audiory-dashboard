@@ -5,8 +5,8 @@ import { useRouter } from 'next/router';
 import { Avatar, CircularProgress, Stack, Typography } from '@mui/material';
 import { useQuery } from 'react-query';
 
-import { useRequestHeader } from '../../hooks/use-request-header';
-import UserService from '../../services/user';
+import { useRequestHeader } from '@/hooks/use-request-header';
+import UserService from '@/services/user';
 
 const UserInfo = ({ userId, isReversed }) => {
   const requestHeader = useRequestHeader();

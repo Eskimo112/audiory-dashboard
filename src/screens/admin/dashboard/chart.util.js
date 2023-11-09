@@ -1,4 +1,4 @@
-import { formatNumber } from '../../utils/formatters';
+import { formatNumber } from '@/utils/formatters';
 
 export const getLineChartCommonOptions = (theme, category, series) => {
   return {

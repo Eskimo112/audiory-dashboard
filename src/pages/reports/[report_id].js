@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
-import ReportDetailPage from '../../screens/report/report-detail.page';
+import ReportDetailPage from '@/screens/admin/report/report-detail.page';
 
 const Page = ({ params }) => {
   const router = useRouter();

@@ -8,8 +8,9 @@ import {
   Unstable_Grid2 as Grid,
 } from '@mui/material';
 
-import AppBreadCrumbs from '../../components/app-bread-crumbs';
-import { SHARED_PAGE_SX } from '../../constants/page_sx';
+import AppBreadCrumbs from '@/components/app-bread-crumbs';
+import { SHARED_PAGE_SX } from '@/constants/page_sx';
+
 import { AuthorRevenueChart } from './author-revenue-chart';
 import AuthorStatCards from './author-stat-card';
 import ReaderRankingTable from './reader-ranking-table';

@@ -1,6 +1,6 @@
 import { Layout as AuthorLayout } from 'src/layouts/author/layout';
 
-import AuthorDashboardPage from '../../screens/author-dashboard/author-dashboard.page';
+import AuthorDashboardPage from '@/screens/author-dashboard/author-dashboard.page';
 
 const Page = () => <AuthorDashboardPage />;
 

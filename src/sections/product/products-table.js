@@ -1,21 +1,18 @@
-import PropTypes from 'prop-types';
-import { format } from 'date-fns';
 import {
-  Avatar,
   Box,
   Card,
   Checkbox,
-  Stack,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TablePagination,
   TableRow,
-  Typography,
 } from '@mui/material';
+import PropTypes from 'prop-types';
 import { Scrollbar } from 'src/components/scrollbar';
-import { formatPrice } from '../../utils/formatters';
+
+import { formatPrice } from '@/utils/formatters';
 
 export const ProductsTable = (props) => {
   const {

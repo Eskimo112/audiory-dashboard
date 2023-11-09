@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import CurrencyDollarIcon from '@heroicons/react/24/solid/CurrencyDollarIcon';
 import {
   Avatar,
@@ -8,9 +7,11 @@ import {
   SvgIcon,
   Typography,
 } from '@mui/material';
-import { useQuery } from 'react-query';
 import axios from 'axios';
-import { formatPrice } from '../../utils/formatters';
+import PropTypes from 'prop-types';
+import { useQuery } from 'react-query';
+
+import { formatPrice } from '@/utils/formatters';
 
 export const OverviewTotalProfit = (props) => {
   const { sx } = props;

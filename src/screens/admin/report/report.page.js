@@ -18,12 +18,13 @@ import {
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
-import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '../../constants/chip_colors';
-import { SHARED_PAGE_SX } from '../../constants/page_sx';
-import { SHARED_TABLE_PROPS } from '../../constants/table';
-import { useRequestHeader } from '../../hooks/use-request-header';
-import ReportService from '../../services/report';
-import { formatDate } from '../../utils/formatters';
+import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '@/constants/chip_colors';
+import { SHARED_PAGE_SX } from '@/constants/page_sx';
+import { SHARED_TABLE_PROPS } from '@/constants/table';
+import { useRequestHeader } from '@/hooks/use-request-header';
+import ReportService from '@/services/report';
+import { formatDate } from '@/utils/formatters';
+
 import ChapterInfo from './chapter-info.component';
 import StoryInfo from './story-info.component';
 import UserInfo from './user-info.component';

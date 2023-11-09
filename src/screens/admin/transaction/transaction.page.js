@@ -19,15 +19,16 @@ import {
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
-import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '../../constants/chip_colors';
-import { SHARED_PAGE_SX } from '../../constants/page_sx';
+import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '@/constants/chip_colors';
+import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import {
   TRANSACTION_STATUS_MAP,
   TRANSACTION_TYPE_MAP,
-} from '../../constants/status_map';
-import { SHARED_TABLE_PROPS } from '../../constants/table';
-import TransactionService from '../../services/transaction';
-import { formatDate } from '../../utils/formatters';
+} from '@/constants/status_map';
+import { SHARED_TABLE_PROPS } from '@/constants/table';
+import TransactionService from '@/services/transaction';
+import { formatDate } from '@/utils/formatters';
+
 import UserInfo from '../report/user-info.component';
 
 const TransactionPage = () => {

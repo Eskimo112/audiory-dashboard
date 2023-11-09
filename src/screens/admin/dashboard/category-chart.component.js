@@ -16,9 +16,10 @@ import { useTheme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { useQuery } from 'react-query';
 
-import AppChart from '../../components/app-chart';
-import DashboardService from '../../services/dashboard';
-import { getRecentDates } from '../../utils/get-recent-dates';
+import AppChart from '@/components/app-chart';
+import DashboardService from '@/services/dashboard';
+import { getRecentDates } from '@/utils/get-recent-dates';
+
 import { getBarChartCommonOptions } from './chart.util';
 import { SHARED_SELECT_PROPS, TIME_OPTIONS } from './constant';
 

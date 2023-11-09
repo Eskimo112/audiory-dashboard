@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import PropTypes from 'prop-types';
 
-import { formatNumber } from '../../utils/formatters';
+import { formatNumber } from '@/utils/formatters';
 
 export const StatCard = (props) => {
   const { difference, sx, value, title, icon, isLoading, isError } = props;

@@ -1,6 +1,6 @@
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
-import CategoryPage from '../../screens/category/category.page';
+import CategoryPage from '@/screens/admin/category/category.page';
 
 const Page = () => <CategoryPage />;
 

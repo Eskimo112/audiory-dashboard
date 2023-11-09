@@ -33,7 +33,7 @@ export const AppImageUpload = (props) => {
   return (
     <Box
       width="100%"
-      height="fit-content%"
+      height="100%"
       sx={{
         border: '1px solid',
         borderColor: 'ink.alpha20',

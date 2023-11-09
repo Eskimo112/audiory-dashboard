@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 
-import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
 import {
   Button,
   Card,
@@ -10,49 +9,43 @@ import {
   Select,
   Skeleton,
   Stack,
-  SvgIcon,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { useQuery } from 'react-query';
 
-import AppChart from '../../components/app-chart';
-import DashboardService from '../../services/dashboard';
-import { getRecentDates } from '../../utils/get-recent-dates';
-import { getLineChartCommonOptions } from './chart.util';
+import AppChart from '@/components/app-chart';
+import DashboardService from '@/services/dashboard';
+import { getRecentDates } from '@/utils/get-recent-dates';
+
+import { getPieChartCommonOptions } from './chart.util';
 import { SHARED_SELECT_PROPS, TIME_OPTIONS } from './constant';
 
-export const RevenueChart = (props) => {
+export const PaidRateChart = (props) => {
   const { sx } = props;
   const theme = useTheme();
   const [option, setOption] = useState('7_recent_days');
   const [dates, setDates] = useState(getRecentDates(7));
   const { data, isLoading, isFetching, refetch } = useQuery(
-    ['dashboard', 'revenue', dates[0], dates[1]],
-    () => DashboardService.getRevenue(dates[0], dates[1]),
+    ['dashboard', 'paid', dates[0], dates[1]],
+    () => DashboardService.getPaidRatio(dates[0], dates[1]),
     { enabled: Boolean(dates[0]) && Boolean(dates[1]) },
   );
 
   const chartOptions = useMemo(() => {
     if (!data) return null;
-    const analytics = data.analytics;
-    if (!analytics) return null;
-    const categories = Object.keys(analytics[0].values);
-    const formattedSeries = analytics.map((series) => ({
-      name: series.metric,
-      data: Object.values(series.values),
+    const formattedSeries = Object.entries(data).map(([key, value]) => ({
+      name: key,
+      value,
     }));
-    const result = getLineChartCommonOptions(
-      theme,
-      categories,
-      formattedSeries,
-    );
+
+    const result = getPieChartCommonOptions(theme, formattedSeries);
     return result;
   }, [data, theme]);
 
-  const handleRefresh = async () => {
-    await refetch();
-  };
+  // const handleRefresh = async () => {
+  //   await refetch();
+  // };
 
   const handleChange = (event) => {
     switch (event.target.value) {
@@ -81,7 +74,7 @@ export const RevenueChart = (props) => {
       <CardHeader
         action={
           <Stack direction="row" gap="8px">
-            <Button
+            {/* <Button
               color="inherit"
               size="small"
               onClick={handleRefresh}
@@ -91,10 +84,11 @@ export const RevenueChart = (props) => {
                 </SvgIcon>
               }>
               Làm mới
-            </Button>
+            </Button> */}
             <Button color="inherit" size="small" sx={{ padding: 0 }}>
               <Select
                 {...SHARED_SELECT_PROPS}
+                sx={{ padding: 0 }}
                 value={option}
                 label="Thời gian"
                 onChange={handleChange}>
@@ -107,7 +101,7 @@ export const RevenueChart = (props) => {
             </Button>
           </Stack>
         }
-        title="Tổng doanh thu"
+        title="Người dùng theo cấp"
       />
       <CardContent>
         {isLoading || isFetching ? (
@@ -116,7 +110,7 @@ export const RevenueChart = (props) => {
           <AppChart
             renderMode={'canvas'}
             option={chartOptions}
-            height="380px"
+            height="320px"
             settings={{ notMerge: true }}
           />
         )}
@@ -125,6 +119,6 @@ export const RevenueChart = (props) => {
   );
 };
 
-RevenueChart.protoTypes = {
+PaidRateChart.protoTypes = {
   sx: PropTypes.object,
 };

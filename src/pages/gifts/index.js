@@ -1,6 +1,6 @@
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
-import GiftPage from '../../screens/gift/gift.page';
+import GiftPage from '@/screens/admin/gift/gift.page';
 
 const Page = () => <GiftPage />;
 

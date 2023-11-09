@@ -1,6 +1,6 @@
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
-import ReportPage from '../../screens/report/report.page';
+import ReportPage from '@/screens/admin/report/report.page';
 
 const Page = () => <ReportPage />;
 

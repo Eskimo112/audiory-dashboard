@@ -39,4 +39,16 @@ export default class UserService {
     if (!response.data) return [];
     return response.data;
   }
+
+  async getTransactionsByUserId(userId) {
+    const url = `users/${userId}/transactions`;
+
+    const response = await request({
+      url,
+      method: 'get',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return [];
+    return response.data;
+  }
 }

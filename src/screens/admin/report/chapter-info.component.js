@@ -5,8 +5,8 @@ import { useRouter } from 'next/router';
 import { Avatar, CircularProgress, Stack, Typography } from '@mui/material';
 import { useQuery } from 'react-query';
 
-import ChapterService from '../../services/chapter';
-import StoryService from '../../services/story';
+import ChapterService from '@/services/chapter';
+import StoryService from '@/services/story';
 
 const ChapterInfo = ({ chapterId }) => {
   const { data: chapter, isLoading: chapterLoading } = useQuery(

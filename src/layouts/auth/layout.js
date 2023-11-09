@@ -3,7 +3,7 @@ import NextLink from 'next/link';
 import { Box, Unstable_Grid2 as Grid } from '@mui/material';
 import PropTypes from 'prop-types';
 
-import AppIcon from '../../components/app-icon';
+import AppIcon from '@/components/app-icon';
 
 // TODO: Change subtitle text
 

@@ -4,7 +4,8 @@ import { Box, Drawer, Stack, useMediaQuery } from '@mui/material';
 import PropTypes from 'prop-types';
 import { Scrollbar } from 'src/components/scrollbar';
 
-import AppIcon from '../../components/app-icon';
+import AppIcon from '@/components/app-icon';
+
 import { items } from './config';
 import { SideNavItem } from './side-nav-item';
 

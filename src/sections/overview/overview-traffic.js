@@ -10,7 +10,7 @@ import {
 import PropTypes from 'prop-types';
 import { Chart } from 'src/components/chart';
 
-import { formatPrice } from '../../utils/formatters';
+import { formatPrice } from '@/utils/formatters';
 
 const useChartOptions = (labels) => {
   const theme = useTheme();

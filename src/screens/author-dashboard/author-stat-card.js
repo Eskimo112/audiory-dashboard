@@ -15,10 +15,11 @@ import {
 } from '@mui/material';
 import { useQuery } from 'react-query';
 
-import { useRequestHeader } from '../../hooks/use-request-header';
-import AuthorDashboardService from '../../services/author-dashboard';
-import { getPastDates, getRecentDates } from '../../utils/get-recent-dates';
-import { toastError } from '../../utils/notification';
+import { useRequestHeader } from '@/hooks/use-request-header';
+import AuthorDashboardService from '@/services/author-dashboard';
+import { getPastDates, getRecentDates } from '@/utils/get-recent-dates';
+import { toastError } from '@/utils/notification';
+
 import { SHARED_SELECT_PROPS, TIME_OPTIONS } from '../dashboard/constant';
 import { StatCard } from '../dashboard/stat-card.component';
 

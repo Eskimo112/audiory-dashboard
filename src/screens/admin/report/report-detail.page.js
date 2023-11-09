@@ -27,16 +27,17 @@ import { useFormik } from 'formik';
 import { useQuery } from 'react-query';
 import * as Yup from 'yup';
 
-import AppBreadCrumbs from '../../components/app-bread-crumbs';
-import AppImage from '../../components/app-image';
-import { AppImageUpload } from '../../components/app-image-upload';
-import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '../../constants/chip_colors';
-import { SHARED_PAGE_SX } from '../../constants/page_sx';
-import { useAuth } from '../../hooks/use-auth';
-import { useRequestHeader } from '../../hooks/use-request-header';
-import ReportService from '../../services/report';
-import { formatDate } from '../../utils/formatters';
-import { toastError, toastSuccess } from '../../utils/notification';
+import AppBreadCrumbs from '@/components/app-bread-crumbs';
+import AppImage from '@/components/app-image';
+import { AppImageUpload } from '@/components/app-image-upload';
+import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '@/constants/chip_colors';
+import { SHARED_PAGE_SX } from '@/constants/page_sx';
+import { useAuth } from '@/hooks/use-auth';
+import { useRequestHeader } from '@/hooks/use-request-header';
+import ReportService from '@/services/report';
+import { formatDate } from '@/utils/formatters';
+import { toastError, toastSuccess } from '@/utils/notification';
+
 import ChapterInfo from './chapter-info.component';
 import { REPORT_STATUS_MAP, REPORT_TYPE_MAP } from './report.page';
 import StoryInfo from './story-info.component';

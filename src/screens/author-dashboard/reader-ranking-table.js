@@ -14,9 +14,9 @@ import {
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
-import { SHARED_TABLE_PROPS } from '../../constants/table';
-import { useRequestHeader } from '../../hooks/use-request-header';
-import AuthorDashboardService from '../../services/author-dashboard';
+import { SHARED_TABLE_PROPS } from '@/constants/table';
+import { useRequestHeader } from '@/hooks/use-request-header';
+import AuthorDashboardService from '@/services/author-dashboard';
 
 const ReaderRankingTable = () => {
   const requestHeader = useRequestHeader();

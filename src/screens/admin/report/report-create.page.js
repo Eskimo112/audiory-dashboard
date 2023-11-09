@@ -18,15 +18,15 @@ import {
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
-import AppBreadCrumbs from '../../components/app-bread-crumbs';
-import { SHARED_PAGE_SX } from '../../constants/page_sx';
-import { useRequestHeader } from '../../hooks/use-request-header';
-import ReportService from '../../services/report';
+import AppBreadCrumbs from '@/components/app-bread-crumbs';
+import { SHARED_PAGE_SX } from '@/constants/page_sx';
+import { useRequestHeader } from '@/hooks/use-request-header';
+import ReportService from '@/services/report';
 import { useState } from 'react';
 import { useMutation } from 'react-query';
-import { AppImageUpload } from '../../components/app-image-upload';
+import { AppImageUpload } from '@/components/app-image-upload';
 import { SHARED_SELECT_PROPS } from '../dashboard/constant';
-import { toastError, toastSuccess } from '../../utils/notification';
+import { toastError, toastSuccess } from '@/utils/notification';
 
 const REPORT_TYPE_OPTIONS = [
   {

@@ -1,20 +1,10 @@
-import PropTypes from 'prop-types';
 import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
-import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Divider,
-  SvgIcon,
-} from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
-import { Chart } from 'src/components/chart';
-import { formatPrice } from '../../utils/formatters';
-import { useQuery } from 'react-query';
+import { Button, Card, CardContent, CardHeader, SvgIcon } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
+import PropTypes from 'prop-types';
+import { useQuery } from 'react-query';
+import { Chart } from 'src/components/chart';
 
 const useChartOptions = (weeklyData) => {
   const theme = useTheme();

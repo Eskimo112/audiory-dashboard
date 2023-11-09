@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import { useQuery } from 'react-query';
 
-import StoryService from '../../services/story';
+import StoryService from '@/services/story';
 
 const StoryInfo = ({ storyId, isReversed }) => {
   const { data: story, isLoading } = useQuery(['story', storyId], () =>

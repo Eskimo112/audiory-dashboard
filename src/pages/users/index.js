@@ -1,6 +1,6 @@
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
-import UserPage from '../../screens/user/user.page';
+import UserPage from '@/screens/admin/user/user.page';
 
 const Page = () => (
   <>

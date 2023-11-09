@@ -8,6 +8,7 @@ import {
   Box,
   Button,
   Card,
+  Chip,
   CircularProgress,
   Container,
   MenuItem,
@@ -18,15 +19,16 @@ import {
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
-import { SHARED_PAGE_SX } from '../../constants/page_sx';
-import { SHARED_TABLE_PROPS } from '../../constants/table';
-import SystemConfigService from '../../services/system-config';
-import { formatDate } from '../../utils/formatters';
+import { SHARED_PAGE_SX } from '@/constants/page_sx';
+import { STATUS_MAP } from '@/constants/status_map';
+import { SHARED_TABLE_PROPS } from '@/constants/table';
+import CategoryService from '@/services/category';
+import { formatDate } from '@/utils/formatters';
 
-const SystemConfigPage = () => {
-  const { data: configs, isLoading } = useQuery(
-    ['system-config'],
-    async () => await SystemConfigService.getAll(),
+const CategoryPage = () => {
+  const { data: categories, isLoading } = useQuery(
+    ['category'],
+    async () => await CategoryService.getAll(),
   );
 
   const router = useRouter();
@@ -39,27 +41,65 @@ const SystemConfigPage = () => {
         size: 150,
       },
       {
-        accessorKey: 'key',
-        header: 'Key',
+        accessorKey: 'name',
+        header: 'Tên',
+        size: 120,
       },
       {
-        accessorKey: 'value',
-        header: 'Giá trị',
-      },
-      {
-        accessorKey: 'effective_date',
-        header: 'Ngày hiệu lực',
-        accessorFn: (row) => formatDate(row.effective_date),
+        accessorKey: 'image_url',
+        header: 'Ảnh',
+        Cell: ({ cell }) => {
+          return (
+            <Box display="flex" alignItems="center">
+              <Box
+                component="img"
+                src={cell.getValue()}
+                alt={cell.getValue()}
+                width={90}
+                height={40}></Box>
+            </Box>
+          );
+        },
       },
       {
         accessorKey: 'created_date',
         header: 'Ngày tạo',
-        accessorFn: (row) => formatDate(row.effective_date),
+        size: 75,
+        accessorFn: (row) => formatDate(row.created_date),
       },
       {
         accessorKey: 'updated_date',
         header: 'Ngày cập nhật',
-        accessorFn: (row) => formatDate(row.effective_date),
+        size: 75,
+        accessorFn: (row) => formatDate(row.created_date),
+      },
+      {
+        accessorKey: 'is_enabled',
+        header: 'Trạng thái',
+        size: 80,
+        accessorFn: (row) => {
+          if (!row.is_enabled) return 'Không xác định';
+          return STATUS_MAP[row.is_enabled];
+        },
+        filterFn: 'equals',
+        filterSelectOptions: Object.values(STATUS_MAP).map((value) => ({
+          text: value,
+          value,
+        })),
+        filterVariant: 'select',
+        Cell: ({ cell }) => {
+          if (!cell.getValue()) return <></>;
+          const bgColor = ['success.alpha20', 'error.alpha20'];
+          const idx = Object.values(STATUS_MAP).indexOf(cell.getValue());
+          return (
+            <Chip
+              label={cell.getValue()}
+              sx={{
+                backgroundColor: bgColor[idx],
+              }}
+            />
+          );
+        },
       },
     ],
     [],
@@ -89,14 +129,14 @@ const SystemConfigPage = () => {
   return (
     <>
       <Head>
-        <title>Hệ thống | Audiory</title>
+        <title>Thể loại | Audiory</title>
       </Head>
       <Box component="main" sx={SHARED_PAGE_SX}>
         <Container maxWidth="xl">
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
-                <Typography variant="h4">Thông số hệ thống</Typography>
+                <Typography variant="h4">Quản lý thể loại</Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
               <div>
@@ -107,7 +147,7 @@ const SystemConfigPage = () => {
                     </SvgIcon>
                   }
                   variant="contained">
-                  Thêm thông số
+                  Thêm thể loại
                 </Button>
               </div>
             </Stack>
@@ -117,7 +157,7 @@ const SystemConfigPage = () => {
                 <MenuItem
                   key="edit"
                   onClick={() => {
-                    router.push(`/tranactions/${row.original.id}`);
+                    router.push(`/categories/${row.original.id}`);
                   }}>
                   Chỉnh sửa
                 </MenuItem>,
@@ -126,7 +166,7 @@ const SystemConfigPage = () => {
                 </MenuItem>,
               ]}
               columns={columns}
-              data={configs}
+              data={categories}
               initialState={initialState}
               {...SHARED_TABLE_PROPS}
             />
@@ -137,4 +177,4 @@ const SystemConfigPage = () => {
   );
 };
 
-export default SystemConfigPage;
+export default CategoryPage;

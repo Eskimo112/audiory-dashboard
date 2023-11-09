@@ -1,6 +1,6 @@
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
-import TransactionPage from '../../screens/transaction/transaction.page';
+import TransactionPage from '@/screens/admin/transaction/transaction.page';
 
 const Page = () => <TransactionPage />;
 

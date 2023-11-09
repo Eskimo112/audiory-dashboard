@@ -18,15 +18,15 @@ import {
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
-import { SHARED_PAGE_SX } from '../../constants/page_sx';
-import { SHARED_TABLE_PROPS } from '../../constants/table';
-import GiftService from '../../services/gift';
-import { formatDate } from '../../utils/formatters';
+import { SHARED_PAGE_SX } from '@/constants/page_sx';
+import { SHARED_TABLE_PROPS } from '@/constants/table';
+import CoinPackService from '@/services/coinpack';
+import { formatDate, formatNumber } from '@/utils/formatters';
 
-const GiftPage = () => {
-  const { data: gifts, isLoading } = useQuery(
-    ['gift'],
-    async () => await GiftService.getAll(),
+const CoinPackPage = () => {
+  const { data: coinpacks, isLoading } = useQuery(
+    ['coinpacks'],
+    async () => await CoinPackService.getAll(),
   );
 
   const router = useRouter();
@@ -43,27 +43,35 @@ const GiftPage = () => {
         accessorKey: 'name',
         header: 'Tên',
       },
-
+      {
+        accessorKey: 'coin_amount',
+        header: 'Số xu',
+      },
       {
         accessorKey: 'price',
         header: 'Giá',
+        accessorFn: (row) => formatNumber(row.price),
+      },
+      {
+        accessorKey: 'coin_id',
+        header: 'Id xu',
       },
       {
         accessorKey: 'image_url',
         header: 'Ảnh',
-        //   Cell: ({ cell }) => {
-        //     if (!cell.getValue()) return;
-        //     return (
-        //       <Box display="flex" alignItems="center">
-        //         <Box
-        //           component="img"
-        //           src={cell.getValue()}
-        //           alt={cell.getValue()}
-        //           width={40}
-        //           height={40}></Box>
-        //       </Box>
-        //     );
-        //   },
+        Cell: ({ cell }) => {
+          if (!cell.getValue()) return;
+          return (
+            <Box display="flex" alignItems="center">
+              <Box
+                component="img"
+                src={cell.getValue()}
+                alt={cell.getValue()}
+                width={40}
+                height={40}></Box>
+            </Box>
+          );
+        },
       },
       {
         accessorKey: 'created_date',
@@ -135,14 +143,14 @@ const GiftPage = () => {
   return (
     <>
       <Head>
-        <title>Quà | Audiory</title>
+        <title>Gói xu | Audiory</title>
       </Head>
       <Box component="main" sx={SHARED_PAGE_SX}>
         <Container maxWidth="xl">
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
-                <Typography variant="h4">Quản lý quà</Typography>
+                <Typography variant="h4">Quản lý gói xu</Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
               <div>
@@ -153,7 +161,7 @@ const GiftPage = () => {
                     </SvgIcon>
                   }
                   variant="contained">
-                  Thêm quà
+                  Thêm gói xu
                 </Button>
               </div>
             </Stack>
@@ -163,7 +171,7 @@ const GiftPage = () => {
                 <MenuItem
                   key="edit"
                   onClick={() => {
-                    router.push(`/gifts/${row.original.id}`);
+                    router.push(`/coinpacks/${row.original.id}`);
                   }}>
                   Chỉnh sửa
                 </MenuItem>,
@@ -172,7 +180,7 @@ const GiftPage = () => {
                 </MenuItem>,
               ]}
               columns={columns}
-              data={gifts}
+              data={coinpacks}
               initialState={initialState}
               {...SHARED_TABLE_PROPS}
             />
@@ -183,4 +191,4 @@ const GiftPage = () => {
   );
 };
 
-export default GiftPage;
+export default CoinPackPage;

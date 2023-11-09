@@ -7,8 +7,9 @@ import UserGroupIcon from '@heroicons/react/24/outline/UserGroupIcon';
 import { Box, Container, Unstable_Grid2 as Grid } from '@mui/material';
 import { useQuery } from 'react-query';
 
-import { SHARED_PAGE_SX } from '../../constants/page_sx';
-import DashboardService from '../../services/dashboard';
+import { SHARED_PAGE_SX } from '@/constants/page_sx';
+import DashboardService from '@/services/dashboard';
+
 import { CategoryChart } from './category-chart.component';
 import { PaidRateChart } from './paid-chart.component';
 import { RevenueChart } from './revenue-chart.component';

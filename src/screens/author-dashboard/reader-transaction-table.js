@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 
 import {
-  Box,
   Card,
   CardContent,
   CardHeader,
@@ -11,15 +10,16 @@ import {
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
-import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '../../constants/chip_colors';
+import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '@/constants/chip_colors';
 import {
   TRANSACTION_STATUS_MAP,
   TRANSACTION_TYPE_MAP,
-} from '../../constants/status_map';
-import { SHARED_TABLE_PROPS } from '../../constants/table';
-import { useRequestHeader } from '../../hooks/use-request-header';
-import AuthorDashboardService from '../../services/author-dashboard';
-import { formatDate } from '../../utils/formatters';
+} from '@/constants/status_map';
+import { SHARED_TABLE_PROPS } from '@/constants/table';
+import { useRequestHeader } from '@/hooks/use-request-header';
+import AuthorDashboardService from '@/services/author-dashboard';
+import { formatDate } from '@/utils/formatters';
+
 import UserInfo from '../report/user-info.component';
 
 const ReaderTransactionsTable = () => {
@@ -77,23 +77,23 @@ const ReaderTransactionsTable = () => {
           );
         },
       },
-      {
-        accessorKey: 'coin.image_url',
-        header: 'Loại xu',
-        size: 80,
-        Cell: ({ cell }) => {
-          return (
-            <Box display="flex" alignItems="center">
-              <Box
-                component="img"
-                src={cell.getValue()}
-                alt={cell.getValue()}
-                width={30}
-                height={30}></Box>
-            </Box>
-          );
-        },
-      },
+      // {
+      //   accessorKey: 'coin.image_url',
+      //   header: 'Loại xu',
+      //   size: 80,
+      //   Cell: ({ cell }) => {
+      //     return (
+      //       <Box display="flex" alignItems="center">
+      //         <Box
+      //           component="img"
+      //           src={cell.getValue()}
+      //           alt={cell.getValue()}
+      //           width={30}
+      //           height={30}></Box>
+      //       </Box>
+      //     );
+      //   },
+      // },
       {
         accessorKey: 'coin.value',
         header: 'Số lượng',

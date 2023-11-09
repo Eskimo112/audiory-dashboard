@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
-import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
   Avatar,
   Box,
@@ -13,21 +12,20 @@ import {
   CircularProgress,
   Container,
   Stack,
-  SvgIcon,
   Typography,
 } from '@mui/material';
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
-import { SHARED_PAGE_SX } from '../../constants/page_sx';
-import { SHARED_TABLE_PROPS } from '../../constants/table';
-import { useRequestHeader } from '../../hooks/use-request-header';
-import UserService from '../../services/user';
-import { formatDate } from '../../utils/formatters';
+import { SHARED_PAGE_SX } from '@/constants/page_sx';
+import { SHARED_TABLE_PROPS } from '@/constants/table';
+import { useRequestHeader } from '@/hooks/use-request-header';
+import UserService from '@/services/user';
+import { formatDate } from '@/utils/formatters';
 
 const ROLE_ID_MAP = {
-  'b794308e-4b3a-11ee-9d9d-00155d78bd44': 'Người dùng',
-  'b341e067-4b3a-11ee-9d9d-00155d78bd44': 'Quản trị viên',
+  1: 'Người dùng',
+  2: 'Quản trị viên',
 };
 
 const UserPage = () => {
@@ -176,7 +174,7 @@ const UserPage = () => {
                 <Typography variant="h4">Người dùng</Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
-              <Button
+              {/* <Button
                 startIcon={
                   <SvgIcon fontSize="small">
                     <PlusIcon />
@@ -184,7 +182,7 @@ const UserPage = () => {
                 }
                 variant="contained">
                 Thêm người dùng
-              </Button>
+              </Button> */}
             </Stack>
             <MaterialReactTable
               // renderRowActionMenuItems={({ closeMenu, row, table }) => [

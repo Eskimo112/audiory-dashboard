@@ -1,6 +1,6 @@
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
-import StoryPage from '../../screens/story/story.page';
+import StoryPage from '@/screens/admin/story/story.page';
 
 const Page = () => <StoryPage />;
 

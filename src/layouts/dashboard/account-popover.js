@@ -1,10 +1,17 @@
-import { useCallback } from "react";
+import { useCallback } from 'react';
 
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
 
-import { Box, Divider, MenuItem, MenuList, Popover, Typography } from "@mui/material";
-import PropTypes from "prop-types";
-import { useAuth } from "src/hooks/use-auth";
+import {
+  Box,
+  Divider,
+  MenuItem,
+  MenuList,
+  Popover,
+  Typography,
+} from '@mui/material';
+import PropTypes from 'prop-types';
+import { useAuth } from 'src/hooks/use-auth';
 
 export const AccountPopover = (props) => {
   const { anchorEl, onClose, open } = props;
@@ -14,26 +21,26 @@ export const AccountPopover = (props) => {
   const handleSignOut = useCallback(() => {
     onClose?.();
     auth.signOut();
-    router.push("/auth/login");
+    router.push('/auth/login');
   }, [onClose, auth, router]);
+
+  if (!auth.user) return;
 
   return (
     <Popover
       anchorEl={anchorEl}
       anchorOrigin={{
-        horizontal: "left",
-        vertical: "bottom",
+        horizontal: 'left',
+        vertical: 'bottom',
       }}
       onClose={onClose}
       open={open}
-      PaperProps={{ sx: { width: 200 } }}
-    >
+      PaperProps={{ sx: { width: 200 } }}>
       <Box
         sx={{
           py: 1.5,
           px: 2,
-        }}
-      >
+        }}>
         <Typography variant="overline">Tài khoản</Typography>
         <Typography color="text.secondary" variant="body2">
           {auth.user.username}
@@ -44,12 +51,11 @@ export const AccountPopover = (props) => {
         disablePadding
         dense
         sx={{
-          p: "8px",
-          "& > *": {
+          p: '8px',
+          '& > *': {
             borderRadius: 1,
           },
-        }}
-      >
+        }}>
         <MenuItem onClick={handleSignOut}>Đăng xuất</MenuItem>
       </MenuList>
     </Popover>

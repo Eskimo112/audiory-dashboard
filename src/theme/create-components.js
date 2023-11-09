@@ -233,6 +233,7 @@ export function createComponents(config) {
         root: {
           fontSize: 14,
           fontWeight: 500,
+          color: palette.ink.darker,
           lineHeight: '1.6em',
           [`&.${inputLabelClasses.filled}`]: {
             transform: 'translate(12px, 18px) scale(1)',
