@@ -31,7 +31,7 @@ const SystemConfigDetailPage = ({ configId }) => {
     ['system-configs', configId],
     async () => await new SystemConfigService(requestHeader).getById(configId),
   );
-  const [value, setValue] = useState();
+  const [value, setValue] = useState('');
   const { data: configHistory = [], isLoading } = useQuery(
     ['system-configs', 'next-effective', configId],
     async () =>
@@ -144,6 +144,8 @@ const SystemConfigDetailPage = ({ configId }) => {
               <Grid xs={12} lg={12}>
                 <Stack direction="row" gap="16px" alignItems="center">
                   <TextField
+                    placeholder="giá trị"
+                    type="number"
                     fullWidth
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
@@ -159,7 +161,8 @@ const SystemConfigDetailPage = ({ configId }) => {
                     fullWidth
                     placeholder="Ngày hiệu lực"
                     height="100%"
-                    style={{ flex: 1 }}
+                    sx={{ borderRadius: '16px' }}
+                    style={{ flex: 1, borderRadius: '16px' }}
                   />
                   <DatePicker
                     style={{ flex: 1 }}
