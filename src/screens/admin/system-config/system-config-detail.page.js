@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { DatePicker } from '@mantine/dates';
 import {
   Box,
+  Button,
   Chip,
   CircularProgress,
   Container,
@@ -141,13 +142,32 @@ const SystemConfigDetailPage = ({ configId }) => {
             </Stack>
             <Grid container spacing={3}>
               <Grid xs={12} lg={12}>
-                <Stack>
+                <Stack direction="row" gap="16px" alignItems="center">
                   <TextField
+                    fullWidth
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
+                    sx={{
+                      p: 0,
+                      input: {
+                        p: '6px',
+                      },
+                      flex: 1,
+                    }}
                   />
-                  <DatePicker />
-                  <DatePicker />
+                  <DatePicker
+                    fullWidth
+                    placeholder="Ngày hiệu lực"
+                    height="100%"
+                    style={{ flex: 1 }}
+                  />
+                  <DatePicker
+                    style={{ flex: 1 }}
+                    fullWidth
+                    placeholder="Ngày hết hạn"
+                    height="100%"
+                  />
+                  <Button variant="contained">Thêm giá trị</Button>
                 </Stack>
               </Grid>
               <Grid xs={12} lg={12}>
