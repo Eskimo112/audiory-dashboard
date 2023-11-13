@@ -94,7 +94,7 @@ export const items = [
   },
   {
     title: 'Hồ sơ bản thân',
-    path: '/admin/me',
+    path: '/admin/my-profile',
     icon: (
       <SvgIcon fontSize="small">
         <UserCircleIcon />

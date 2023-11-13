@@ -233,6 +233,8 @@ export const getBarChartCommonOptions = (theme, category, series) => ({
         moveOnMouseWheel: true,
         moveOnMouseMove: true,
         preventDefaultMouseMove: false,
+        maxValueSpan: 6,
+
         // zoomLock: true,
       },
     ],

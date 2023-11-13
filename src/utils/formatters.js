@@ -3,19 +3,30 @@ export const formatNumber = (value) => {
   return `${formattedValue}`;
 };
 
+export const formatStatistic = (value) => {
+  if (value === null || value === undefined) return '';
+  if (value < 1000) {
+    return value.toLocaleString();
+  } else if (value >= 1000 && value < 1000000) {
+    return (value / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+  } else if (value >= 1000000 && value < 1000000000) {
+    return (value / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+  } else {
+    return (value / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+  }
+};
+
 export function countDiffenceFromNow(dateString) {
   const date = new Date(dateString);
   const now = Date.now();
-  const diffTime = Math.abs(now - date);//milliseconds
-  const diffInSecs = Math.ceil(diffTime / ((1000)));
-  const diffInMinutes = Math.ceil(diffTime / ((1000 * 60)));
-  const diffInHours = Math.ceil(diffTime / ((1000 * 60 * 60)));
+  const diffTime = Math.abs(now - date);
+  const diffInMinutes = Math.ceil(diffTime / (1000 * 60));
+  const diffInHours = Math.ceil(diffTime / (1000 * 60 * 60));
   if (diffInMinutes < 1) {
     return diffInMinutes + ' giây trước';
   } else if (diffInHours < 1) {
-    return diffInHours + ' phút trước'
-  } else if (diffInHours <= 23)
-    return diffInHours + ' giờ trước';
+    return diffInHours + ' phút trước';
+  } else if (diffInHours <= 23) return diffInHours + ' giờ trước';
   return formatDate(dateString).split(' ')[0];
 }
 

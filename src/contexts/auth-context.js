@@ -6,7 +6,6 @@ import {
   useRef,
 } from 'react';
 
-import { jwtDecode } from 'jwt-decode';
 import PropTypes from 'prop-types';
 
 import { signInWithGooglePopup } from '@/Firebase';
@@ -85,25 +84,24 @@ export const AuthProvider = (props) => {
 
     let isAuthenticated = false;
     let token = null;
+    let user = null;
 
     try {
       isAuthenticated =
         window.sessionStorage.getItem('authenticated') === 'true';
       token = window.sessionStorage.getItem('token');
-    } catch (err) {
-      console.error(err);
-    }
-    if (isAuthenticated && token) {
       const requestHeader = {
         Authorization: `Bearer ${token}`,
       };
-
       const userInfo = await new UserService(requestHeader).getById('me');
-      const user = {
+      user = {
         ...userInfo,
         token,
       };
-
+    } catch (err) {
+      console.error(err);
+    }
+    if (isAuthenticated && token && user) {
       dispatch({
         type: HANDLERS.INITIALIZE,
         payload: user,

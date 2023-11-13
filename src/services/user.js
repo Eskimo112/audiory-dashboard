@@ -28,6 +28,30 @@ export default class UserService {
     return response.data;
   }
 
+  async deactivateById(userId) {
+    const url = `users/${userId}/deactivate`;
+
+    const response = await request({
+      url,
+      method: 'post',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return null;
+    return response.data;
+  }
+
+  async activateById(userId) {
+    const url = `users/${userId}/activate`;
+
+    const response = await request({
+      url,
+      method: 'post',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return null;
+    return response.data;
+  }
+
   async getStoriesByUserId(userId) {
     const url = `users/${userId}/stories`;
 

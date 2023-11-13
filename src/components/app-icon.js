@@ -2,7 +2,7 @@ import NextLink from 'next/link';
 
 import { Typography } from '@mui/material';
 
-export default function AppIcon({ size = 32 }) {
+export default function AppIcon({ size = 32, sx }) {
   return (
     <Typography
       href="/"
@@ -15,6 +15,7 @@ export default function AppIcon({ size = 32 }) {
         textDecoration: 'none',
         fontWeight: 700,
         fontSize: size,
+        ...sx,
         // color: theme.palette.primary.main,
       }}>
       Audiory

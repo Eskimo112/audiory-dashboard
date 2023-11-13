@@ -7,7 +7,7 @@ export default class StoryService {
     this.requestHeader = requestHeader ?? undefined;
   }
 
-  static async getAll() {
+  async getAll() {
     const url = 'stories';
 
     const response = await request({
@@ -23,7 +23,7 @@ export default class StoryService {
     return response.data;
   }
 
-  static async getById(storyId) {
+  async getById(storyId) {
     const url = `stories/${storyId}`;
 
     const response = await request({
@@ -35,7 +35,31 @@ export default class StoryService {
     return response.data;
   }
 
-  static async getMyStories() {
+  async deactivateById(storyId) {
+    const url = `stories/${storyId}/deactivate`;
+
+    const response = await request({
+      url,
+      method: 'post',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return null;
+    return response.data;
+  }
+
+  async activateById(storyId) {
+    const url = `stories/${storyId}/activate`;
+
+    const response = await request({
+      url,
+      method: 'post',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return null;
+    return response.data;
+  }
+
+  async getMyStories() {
     const url = 'users/me/stories';
 
     const response = await request({
@@ -47,7 +71,7 @@ export default class StoryService {
     return response.data;
   }
 
-  static async edit({ body, storyId }) {
+  async edit({ body, storyId }) {
     const url = `stories/${storyId}`;
     const requestHeaders = {
       'Content-Type': 'multipart/form-data',

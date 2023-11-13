@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import NextLink from 'next/link';
 
 import { Box, Unstable_Grid2 as Grid } from '@mui/material';
@@ -18,6 +19,18 @@ export const Layout = (props) => {
         flex: '1 1 auto',
       }}>
       <Grid container sx={{ flex: '1 1 auto' }}>
+        <Grid xs={12} lg={6}>
+          <Box sx={{ p: 12 }}>
+            <Image
+              src={'/assets/images/login_cover.png'}
+              alt={'girl reading book under a tree'}
+              width={0}
+              height={0}
+              style={{ width: '100%', height: 'auto' }}
+              unoptimized
+            />
+          </Box>
+        </Grid>
         <Grid
           xs={12}
           lg={6}
@@ -50,41 +63,6 @@ export const Layout = (props) => {
           </Box>
           {children}
         </Grid>
-        {/* <Grid
-          xs={12}
-          lg={6}
-          sx={{
-            alignItems: 'center',
-            background:
-              'radial-gradient(50% 50% at 50% 50%, #122647 0%, #090E23 100%)',
-            color: 'white',
-            display: 'flex',
-            justifyContent: 'center',
-            '& img': {
-              maxWidth: '100%',
-            },
-          }}>
-          <Box sx={{ p: 3 }}>
-            <Typography
-              align="center"
-              color="inherit"
-              sx={{
-                fontSize: '24px',
-                lineHeight: '32px',
-                mb: 1,
-              }}
-              variant="h1">
-              Welcome to{' '}
-              <Box component="a" sx={{ color: '#d3a02e' }} target="_blank">
-                Pricible Dashboard
-              </Box>
-            </Typography>
-            <Typography align="center" sx={{ mb: 3 }} variant="subtitle1">
-              Access statistics and control app management.
-            </Typography>
-            <img alt="" src="/assets/auth-illustration.svg" />
-          </Box>
-        </Grid> */}
       </Grid>
     </Box>
   );

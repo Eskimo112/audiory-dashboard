@@ -10,17 +10,21 @@ import { useQuery } from 'react-query';
 import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import DashboardService from '@/services/dashboard';
 
+import { useRequestHeader } from '../../../hooks/use-request-header';
 import { CategoryChart } from './category-chart.component';
 import { PaidRateChart } from './paid-chart.component';
 import { RevenueChart } from './revenue-chart.component';
 import { StatCard } from './stat-card.component';
 
 const DashboardPage = () => {
+  const requestHeader = useRequestHeader();
   const {
     data: stats = {},
     isLoading,
     isError,
-  } = useQuery(['dashboard', 'stat'], () => DashboardService.getStat());
+  } = useQuery(['dashboard', 'stat'], () =>
+    new DashboardService(requestHeader).getStat(),
+  );
 
   return (
     <>

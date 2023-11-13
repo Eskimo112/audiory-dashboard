@@ -9,6 +9,10 @@ import {
   CardHeader,
   CircularProgress,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormLabel,
   Stack,
   Switch,
@@ -26,6 +30,7 @@ import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import UserService from '@/services/user';
 
+import { toastError, toastSuccess } from '../../../utils/notification';
 import UserStoriesTable from './user-stories-table';
 import UserTransactionsTable from './user-transaction-table';
 
@@ -36,6 +41,8 @@ const UserDetaiPage = ({ userId }) => {
     async () => await new UserService(requestHeader).getById(userId),
   );
   const [selectedFile, setSelectedFile] = useState();
+  const [openDialog, setOpenDialog] = useState();
+
   const formik = useFormik({
     initialValues: {
       email: user?.email ?? '',
@@ -63,6 +70,21 @@ const UserDetaiPage = ({ userId }) => {
       //   }
     },
   });
+
+  const handleDeactivate = async () => {
+    try {
+      if (user?.deleted_date) {
+        await new UserService(requestHeader).activateById(userId);
+        toastSuccess('Đã kích hdw oạt thành công');
+      } else {
+        await new UserService(requestHeader).deactivateById(userId);
+        toastSuccess('Đã vô hiệu hóa thành công');
+      }
+    } catch (e) {
+      toastError('Đã có lỗi xảy ra, thử lại sau.');
+    }
+    setOpenDialog(false);
+  };
 
   const canSaveChanges = useMemo(() => {
     if (selectedFile) return true;
@@ -101,15 +123,43 @@ const UserDetaiPage = ({ userId }) => {
               <Stack direction="row" gap="16px" height="fit-content">
                 <Button
                   variant="outlined"
-                  color="error"
-                  onClick={() =>
-                    formik.setFieldValue(
-                      'is_enabled',
-                      !formik.values.is_enabled,
-                    )
-                  }>
-                  {formik.values.is_enabled ? 'Vô hiệu hóa' : 'Kích hoạt'}
+                  color={!user?.deleted_date ? 'error' : 'success'}
+                  onClick={() => setOpenDialog(true)}>
+                  {!user?.deleted_date ? 'Vô hiệu hóa' : 'Kích hoạt'}
                 </Button>
+                <Dialog
+                  open={openDialog}
+                  onClose={() => setOpenDialog(false)}
+                  PaperProps={{
+                    sx: {
+                      p: 1,
+                      width: '400px',
+                    },
+                  }}>
+                  <DialogTitle>
+                    Bạn có chắc chắn
+                    {!user?.deleted_date ? ' vô hiệu hóa' : 'kích hoạt'} người ?
+                  </DialogTitle>
+                  <DialogContent>
+                    {/* <DialogContentText>
+                      Điều này sẽ làm truyện bị ẩn khỏi tất cả người dùng, bao
+                      gồm cả tác giả
+                    </DialogContentText> */}
+                  </DialogContent>
+                  <DialogActions>
+                    <Button
+                      variant="outlined"
+                      onClick={() => setOpenDialog(false)}>
+                      Hủy bỏ
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={handleDeactivate}
+                      autoFocus>
+                      Xác nhận
+                    </Button>
+                  </DialogActions>
+                </Dialog>
                 <Button disabled={!canSaveChanges} variant="contained">
                   Lưu thay đổi
                 </Button>

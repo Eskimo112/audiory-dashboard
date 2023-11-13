@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
+import { Edit, VisibilityOff } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -23,10 +24,14 @@ import { SHARED_TABLE_PROPS } from '@/constants/table';
 import GiftService from '@/services/gift';
 import { formatDate } from '@/utils/formatters';
 
+import { useRequestHeader } from '../../../hooks/use-request-header';
+
 const GiftPage = () => {
+  const requestHeader = useRequestHeader();
+
   const { data: gifts, isLoading } = useQuery(
     ['gift'],
-    async () => await GiftService.getAll(),
+    async () => await new GiftService(requestHeader).getAll(),
   );
 
   const router = useRouter();
@@ -163,11 +168,22 @@ const GiftPage = () => {
                 <MenuItem
                   key="edit"
                   onClick={() => {
-                    router.push(`/gifts/${row.original.id}`);
+                    router.push(`/admin/gifts/${row.original.id}`);
                   }}>
+                  <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+                    <Edit />
+                  </SvgIcon>
                   Chỉnh sửa
                 </MenuItem>,
-                <MenuItem key="delete" onClick={() => console.info('Delete')}>
+                <MenuItem
+                  key="deactiviate"
+                  sx={{ color: 'error.main' }}
+                  onClick={() => {
+                    router.push(`/admin/gifts/${row.original.id}`);
+                  }}>
+                  <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+                    <VisibilityOff />
+                  </SvgIcon>
                   Vô hiệu hóa
                 </MenuItem>,
               ]}

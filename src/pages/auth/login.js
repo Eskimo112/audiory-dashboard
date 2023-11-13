@@ -14,7 +14,6 @@ import { toastError } from '@/utils/notification';
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
-  const [method, setMethod] = useState('email');
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -38,7 +37,6 @@ const Page = () => {
         helpers.setErrors({ submit: err.message });
         helpers.setSubmitting(false);
         toastError('Đăng nhập không thành công');
-
       }
     },
   });
@@ -69,82 +67,81 @@ const Page = () => {
           sx={{
             maxWidth: 550,
             px: 3,
-            py: '100px',
             width: '100%',
           }}>
-          <div>
-            <Stack spacing={1} sx={{ mb: 3 }}>
-              <Typography variant="h4">Đăng nhập</Typography>
-            </Stack>
-            {method === 'email' && (
-              <form noValidate onSubmit={formik.handleSubmit}>
-                <Stack spacing={3}>
-                  <TextField
-                    variant="outlined"
-                    error={!!(formik.touched.email && formik.errors.email)}
-                    fullWidth
-                    helperText={formik.touched.email && formik.errors.email}
-                    label="Email"
-                    name="email"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    type="email"
-                    value={formik.values.email}
-                  />
-                  <TextField
-                    variant="outlined"
-                    error={
-                      !!(formik.touched.password && formik.errors.password)
-                    }
-                    fullWidth
-                    helperText={
-                      formik.touched.password && formik.errors.password
-                    }
-                    label="Mật khẩu"
-                    name="password"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    type="password"
-                    value={formik.values.password}
-                  />
-                </Stack>
-                {formik.errors.submit && (
-                  <Typography color="error" sx={{ mt: 3 }} variant="body2">
-                    {formik.errors.submit}
-                  </Typography>
-                )}
-                <Button
-                  fullWidth
-                  size="large"
-                  sx={{ mt: 3 }}
-                  type="submit"
-                  variant="contained"
-                  disabled={!formik.isValid}>
-                  Đăng nhập
-                </Button>
+          <Stack
+            spacing={1}
+            sx={{ mb: 3, justifyContent: 'center', alignItems: 'center' }}>
+            <Typography variant="h4">Đăng nhập</Typography>
+            <Typography variant="body1" color="ink.lighter" textAlign="center">
+              Nơi bạn thỏa sức khám phá và tưởng tượng, đọc, viết và nghe hàng
+              triệu câu chuyện hấp dẫn!
+            </Typography>
+          </Stack>
 
-                {/* <Button fullWidth size="large" sx={{ mt: 3 }} onClick={handleSkip}>
+          <form noValidate onSubmit={formik.handleSubmit}>
+            <Stack spacing={3}>
+              <TextField
+                variant="outlined"
+                error={!!(formik.touched.email && formik.errors.email)}
+                fullWidth
+                helperText={formik.touched.email && formik.errors.email}
+                label="Email"
+                name="email"
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+                type="email"
+                value={formik.values.email}
+              />
+              <TextField
+                variant="outlined"
+                error={!!(formik.touched.password && formik.errors.password)}
+                fullWidth
+                helperText={formik.touched.password && formik.errors.password}
+                label="Mật khẩu"
+                name="password"
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+                type="password"
+                value={formik.values.password}
+              />
+            </Stack>
+            {formik.errors.submit && (
+              <Typography color="error" sx={{ mt: 3 }} variant="body2">
+                {formik.errors.submit}
+              </Typography>
+            )}
+            <Button
+              fullWidth
+              size="large"
+              sx={{ mt: 3, mb: 2 }}
+              type="submit"
+              variant="contained"
+              disabled={!formik.isValid}>
+              Đăng nhập
+            </Button>
+
+            {/* <Button fullWidth size="large" sx={{ mt: 3 }} onClick={handleSkip}>
                   Skip authentication
                 </Button> */}
-                {/* <Alert color="primary" severity="info" sx={{ mt: 3 }}>
+            {/* <Alert color="primary" severity="info" sx={{ mt: 3 }}>
                   <div>
                     You can use <b>demo@devias.io</b> and password <b>Password123!</b>
                   </div>
                 </Alert> */}
-              </form>
+          </form>
 
-
-            )}
-
-            <Button
-              fullWidth
-              size="large"
-              sx={{ mt: 3 }}
-              variant="outlined"
-              onClick={handleSignInGoogle}>
-              Đăng nhập với google
-            </Button>
-          </div>
+          <Typography variant="body1" color="ink.lighter" textAlign="center">
+            Hoặc
+          </Typography>
+          <Button
+            fullWidth
+            size="large"
+            sx={{ mt: 2 }}
+            variant="outlined"
+            onClick={handleSignInGoogle}>
+            Đăng nhập với google
+          </Button>
         </Box>
       </Box>
     </>

@@ -7,6 +7,7 @@ export const SHARED_TABLE_PROPS = {
   displayColumnDefOptions: {
     'mrt-row-actions': { header: 'Hành động', size: 100 },
   },
+  enableDensityToggle: false,
   enableRowActions: true,
   enableGlobalFilterModes: true,
   positionGlobalFilter: 'left',

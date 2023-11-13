@@ -4,14 +4,15 @@ import { useRouter } from 'next/router';
 
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
-import StoryEditPage from '@/screens/admin/story/story-edit.page';
+import StoryChapterPage from '@/screens/admin/story/chapters.page';
 
 const Page = ({ params }) => {
   const router = useRouter();
   const { story_id } = router.query;
+  console.log(story_id);
   if (!story_id) throw PageNotFoundError;
 
-  return <StoryEditPage userId={story_id} />;
+  return <StoryChapterPage storyId={story_id} />;
 };
 
 Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;

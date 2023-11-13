@@ -10,7 +10,7 @@ import UserService from '@/services/user';
 
 const UserInfo = ({ userId, isReversed }) => {
   const requestHeader = useRequestHeader();
-  const { data: user, isLoading } = useQuery(['user', userId], () =>
+  const { data: user = {}, isLoading } = useQuery(['user', userId], () =>
     new UserService(requestHeader).getById(userId),
   );
   const router = useRouter();
@@ -22,9 +22,11 @@ const UserInfo = ({ userId, isReversed }) => {
       spacing={1}
       sx={{ cursor: 'pointer' }}
       onClick={() => {
-        router.push(`/users/${userId}`);
+        router.push(`/admin/users/${userId}`);
       }}>
-      <Avatar src={user.avatar_url} width={50} height={50}></Avatar>
+      <Avatar
+        src={user.avatar_url}
+        sx={{ width: '40px', height: '40px' }}></Avatar>
       <Stack alignItems="start">
         <Typography variant="subtitle2">
           {user.full_name ?? 'Không có tên'}

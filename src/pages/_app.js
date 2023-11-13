@@ -5,6 +5,7 @@ import Head from 'next/head';
 import 'simplebar-react/dist/simplebar.min.css';
 
 import { CacheProvider } from '@emotion/react';
+import { MantineProvider } from '@mantine/core';
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -47,20 +48,22 @@ const App = (props) => {
             Components={{ custom: AppSnackBar }}
             autoHideDuration={3000}
             preventDuplicate>
-            <AuthProvider>
-              <ThemeProvider theme={theme}>
-                <CssBaseline />
-                <AuthConsumer>
-                  {(auth) =>
-                    auth.isLoading ? (
-                      <SplashScreen />
-                    ) : (
-                      getLayout(<Component {...pageProps} />)
-                    )
-                  }
-                </AuthConsumer>
-              </ThemeProvider>
-            </AuthProvider>
+            <MantineProvider>
+              <AuthProvider>
+                <ThemeProvider theme={theme}>
+                  <CssBaseline />
+                  <AuthConsumer>
+                    {(auth) =>
+                      auth.isLoading ? (
+                        <SplashScreen />
+                      ) : (
+                        getLayout(<Component {...pageProps} />)
+                      )
+                    }
+                  </AuthConsumer>
+                </ThemeProvider>
+              </AuthProvider>
+            </MantineProvider>
           </SnackbarProvider>
         </LocalizationProvider>
       </QueryClientProvider>
