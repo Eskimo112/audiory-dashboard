@@ -21,7 +21,7 @@ import { useRequestHeader } from '@/hooks/use-request-header';
 import AuthorDashboardService from '@/services/author-dashboard';
 import { getRecentDates } from '@/utils/get-recent-dates';
 
-import { SHARED_SELECT_PROPS, TIME_OPTIONS } from '../dashboard/constant';
+import { SHARED_SELECT_PROPS, TIME_OPTIONS } from '../admin/dashboard/constant';
 import { getAuthorChartCommonOptions } from './chart.utils';
 
 export const AuthorRevenueChart = (props) => {

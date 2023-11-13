@@ -20,7 +20,7 @@ import { useRequestHeader } from '@/hooks/use-request-header';
 import AuthorDashboardService from '@/services/author-dashboard';
 import { formatDate } from '@/utils/formatters';
 
-import UserInfo from '../report/user-info.component';
+import UserInfo from '../admin/report/user-info.component';
 
 const ReaderTransactionsTable = () => {
   const requestHeader = useRequestHeader();
