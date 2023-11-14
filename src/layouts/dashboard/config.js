@@ -1,8 +1,8 @@
-import BankNotesIcon from '@heroicons/react/24/outline/BankNotesIcon';
 import BookOpenIcon from '@heroicons/react/24/outline/BookOpenIcon';
 import ChartBarIcon from '@heroicons/react/24/outline/ChartBarIcon';
 import CircleStackIcon from '@heroicons/react/24/outline/CircleStackIcon';
 import Cog8ToothIcon from '@heroicons/react/24/outline/Cog8ToothIcon';
+import CurrencyDollarIcon from '@heroicons/react/24/outline/CurrencyDollarIcon';
 import FlagIcon from '@heroicons/react/24/outline/FlagIcon';
 import GiftIcon from '@heroicons/react/24/outline/GiftIcon';
 import RectangleStackIcon from '@heroicons/react/24/outline/RectangleStackIcon';
@@ -79,7 +79,7 @@ export const items = [
     path: '/admin/transactions',
     icon: (
       <SvgIcon fontSize="small">
-        <BankNotesIcon />
+        <CurrencyDollarIcon />
       </SvgIcon>
     ),
   },
