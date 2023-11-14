@@ -5,7 +5,6 @@ export const getLineChartCommonOptions = (theme, category, series) => {
     grid: {
       containLabel: true,
       left: 15,
-      top: 10,
       right: 10,
       bottom: 15,
     },
@@ -255,6 +254,55 @@ export const getBarChartCommonOptions = (theme, category, series) => ({
     },
     barWidth: 25,
   })),
+
+  dataZoom:
+    category.length > 8
+      ? [
+          {
+            inverse: true,
+
+            yAxisIndex: 0,
+            orient: 'vertical',
+            width: 8,
+            maxValueSpan: 6,
+            right: 0,
+            type: 'slider',
+            zoomLock: true,
+            showDetail: false,
+            showDataShadow: false,
+            brushSelect: false,
+            handleSize: '300%',
+            handleIcon:
+              'path://M 5 10 C 5 5 9 0 15 0 L 54 0 C 60 0 64 5 64 10 M 64 10 C 64 16 60 20 55 20 L 15 20 C 9 20 5 16 5 10',
+            handleStyle: {
+              color: 'grey',
+              borderColor: 'transparent',
+              opacity: 1,
+            },
+            fillerColor: 'grey',
+            borderColor: 'transparent',
+
+            moveHandleStyle: {
+              opacity: 0,
+            },
+
+            emphasis: {
+              handleStyle: {
+                borderWidth: 0,
+              },
+            },
+          },
+          {
+            type: 'inside',
+            zoomOnMouseWheel: false,
+            moveOnMouseWheel: true,
+            moveOnMouseMove: true,
+            preventDefaultMouseMove: false,
+            yAxisIndex: 0,
+            // zoomLock: true,
+          },
+        ]
+      : undefined,
 });
 
 export const getPieChartCommonOptions = (theme, series) => {

@@ -20,12 +20,11 @@ import * as Yup from 'yup';
 import AppBreadCrumbs from '@/components/app-bread-crumbs';
 import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { useRequestHeader } from '@/hooks/use-request-header';
-import { useMemo, useState } from 'react';
-import { useMutation, useQuery } from 'react-query';
+import { useState } from 'react';
+import { useMutation } from 'react-query';
 import { AppImageUpload } from '@/components/app-image-upload';
 import { toastError, toastSuccess } from '@/utils/notification';
 import CoinPackService from '../../../services/coinpack';
-import SystemConfigService from '../../../services/system-config';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 
 const CoinPackCreatePage = () => {
@@ -45,22 +44,11 @@ const CoinPackCreatePage = () => {
     },
   );
 
-  const { data: configs, isLoading: configLoading } = useQuery(
-    ['system-config'],
-    async () => await new SystemConfigService(requestHeader).getAll(),
-  );
-
-  const coinValue = useMemo(() => {
-    if (!configs) return 0;
-    return Number(
-      configs?.find((config) => config.key === 'coin_value_in_vnd').value,
-    );
-  }, [configs]);
-
   const formik = useFormik({
     initialValues: {
       name: '',
       coin_amount: null,
+      price: null,
     },
     enableReinitialize: true,
     validationSchema: Yup.object({
@@ -69,12 +57,16 @@ const CoinPackCreatePage = () => {
         .min(1, 'Vui lòng nhập số > 0')
         .max(10000, 'Không quá 10000 coin')
         .required('Không được để trống'),
+      price: Yup.number()
+        .min(1000, 'Vui lòng nhập số >= 1000')
+        .required('Không được để trống'),
     }),
     onSubmit: async (values, helpers) => {
       await mutate({
         body: {
           name: values.name,
           coin_amount: values.coin_amount,
+          price: values.price,
           form_file: formFile,
         },
       });
@@ -97,7 +89,7 @@ const CoinPackCreatePage = () => {
               </Stack>
               <div>
                 <Button
-                  disabled={isLoading || configLoading}
+                  disabled={isLoading}
                   onClick={() => formik.handleSubmit()}
                   startIcon={
                     <SvgIcon fontSize="small">
@@ -156,10 +148,18 @@ const CoinPackCreatePage = () => {
                         <FormLabel>Giá tiền</FormLabel>
                         <TextField
                           fullWidth
-                          disabled
+                          error={
+                            !!(formik.touched.price && formik.errors.price)
+                          }
+                          helperText={
+                            formik.touched.price && formik.errors.price
+                          }
                           variant="outlined"
+                          name="price"
+                          onBlur={formik.handleBlur}
+                          onChange={formik.handleChange}
                           type="number"
-                          value={formik.values.coin_amount * coinValue}
+                          value={formik.values.price}
                         />
                       </Stack>
                     </Stack>

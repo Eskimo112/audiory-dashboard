@@ -11,7 +11,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   FormLabel,
   Stack,
@@ -28,7 +27,7 @@ import { AppImageUpload } from '@/components/app-image-upload';
 import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import CategoryService from '@/services/category';
-import { toastSuccess } from '@/utils/notification';
+import { toastError, toastSuccess } from '@/utils/notification';
 
 const CategoryEditPage = ({ categoryId }) => {
   const requestHeader = useRequestHeader();
@@ -75,7 +74,18 @@ const CategoryEditPage = ({ categoryId }) => {
     return false;
   }, [formik.values, category, selectedFile]);
 
-  const handleDeactivate = () => {
+  const handleDeactivate = async () => {
+    try {
+      if (category?.deleted_date) {
+        await new CategoryService(requestHeader).activateById(categoryId);
+        toastSuccess('Đã kích hoạt thành công');
+      } else {
+        await new CategoryService(requestHeader).deactivateById(categoryId);
+        toastSuccess('Đã vô hiệu hóa thành công');
+      }
+    } catch (e) {
+      toastError('Đã có lỗi xảy ra, thử lại sau.');
+    }
     setOpenDialog(false);
   };
 
@@ -111,9 +121,9 @@ const CategoryEditPage = ({ categoryId }) => {
               <Stack direction="row" gap="16px" height="fit-content">
                 <Button
                   variant="outlined"
-                  color={category?.is_enabled ? 'error' : 'success'}
+                  color={!category?.deleted_date ? 'error' : 'success'}
                   onClick={() => setOpenDialog(true)}>
-                  {category?.is_enabled ? 'Vô hiệu hóa' : 'Kích hoạt'}
+                  {!category?.deleted_date ? 'Vô hiệu hóa' : 'Kích hoạt'}
                 </Button>
                 <Dialog
                   open={openDialog}
@@ -125,13 +135,15 @@ const CategoryEditPage = ({ categoryId }) => {
                     },
                   }}>
                   <DialogTitle>
-                    Bạn có chắc chắn vô hiệu hóa thể loại này?
+                    Bạn có chắc chắn
+                    {!category?.deleted_date ? ' vô hiệu hóa' : 'kích hoạt'} thể
+                    loại này?
                   </DialogTitle>
                   <DialogContent>
-                    <DialogContentText>
+                    {/* <DialogContentText>
                       Điều này sẽ làm truyện bị ẩn khỏi tất cả người dùng, bao
                       gồm cả tác giả
-                    </DialogContentText>
+                    </DialogContentText> */}
                   </DialogContent>
                   <DialogActions>
                     <Button

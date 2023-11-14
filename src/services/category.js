@@ -32,6 +32,30 @@ export default class CategoryService {
     return response.data;
   }
 
+  async deactivateById(categoryId) {
+    const url = `categories/${categoryId}/deactivate`;
+
+    const response = await request({
+      url,
+      method: 'post',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return null;
+    return response.data;
+  }
+
+  async activateById(categoryId) {
+    const url = `categories/${categoryId}/activate`;
+
+    const response = await request({
+      url,
+      method: 'post',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return null;
+    return response.data;
+  }
+
   async update({ body, categoryId }) {
     const url = `categories/${categoryId}`;
     const requestHeaders = {
