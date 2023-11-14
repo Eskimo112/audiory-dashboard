@@ -52,10 +52,10 @@ export const AuthGuard = (props) => {
   // authenticated / authorized.
   if (!user) return null;
 
-  // if (user.role_id === 1 && router.asPath.includes('admin')) {
-  //   router.replace('/my-works');
-  //   return null;
-  // }
+  if (user.role_id === 1 && router.asPath.includes('admin')) {
+    router.replace('/my-works');
+    return null;
+  }
   if (user.role_id === 2 && !router.asPath.includes('admin')) {
     router.replace('/admin');
     return null;
