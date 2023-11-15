@@ -2,7 +2,7 @@ import React from "react";
 
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
-const ConfirmDialog = ({ title, content, isOpen, handleClose, actionContent = 'Xác nhận', cancelContent = 'Hủy', isReverse = false, actionBgColor = 'primary', width = "25%" }) => {
+const ConfirmDialog = ({ title, content, isOpen, handleClose, actionContent = 'Xác nhận', cancelContent = 'Hủy', isReverse = false, actionBgColor = 'primary', width = "30%" }) => {
     return (
         <React.Fragment>
             <Dialog

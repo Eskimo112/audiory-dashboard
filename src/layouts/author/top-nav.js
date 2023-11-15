@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { BarChart, ChatBubbleOutline, Edit, NotificationsNone, Search } from '@mui/icons-material';
-import SendIcon from '@mui/icons-material/Send';
 import { Avatar, Box, Button, Grid, IconButton, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import PropTypes from 'prop-types';
@@ -32,9 +31,9 @@ export const TopNav = (props) => {
                 xs={{ flexGrow: 1 }}
                 sx={{
                     px: 2,
-                    backdropFilter: 'blur(6px)',
+                    // backdropFilter: 'blur(6px)',
                     backgroundColor: (theme) =>
-                        alpha(theme.palette.sky.lightest, 0.2),
+                        alpha(theme.palette.sky.lightest, 0.5),
                     position: 'sticky',
                     top: 0,
                     borderBottom: 0.5,
@@ -59,19 +58,12 @@ export const TopNav = (props) => {
                             Sáng tác
                         </Button>
                     </Grid>
-                    <Grid item xs={3} container alignItems="center" >
-                        <Grid item xs>
-                            <IconButton aria-label="delete" size="medium" >
-                                <Search fontSize="inherit" />
-                            </IconButton></Grid>
-                        <Grid item xs>
-                            <IconButton aria-label="delete" size="medium" >
+                    <Grid item xs={3} container alignItems="center" justifyContent="end">
+                        <Grid item xs={2}>
+                            <IconButton aria-label="delete" size="medium" color='inherit' >
                                 <NotificationsNone fontSize="inherit" />
                             </IconButton></Grid>
-                        <Grid item xs>
-                            <IconButton aria-label="delete" size="medium" >
-                                <ChatBubbleOutline fontSize="inherit" />
-                            </IconButton></Grid>
+
                         <Grid item xs={6} container direction="row" alignItems="center">
                             <Grid item xs={3}><Avatar
                                 onClick={accountPopover.handleOpen}
@@ -97,7 +89,7 @@ export const TopNav = (props) => {
                     </Grid>
                 </Grid>
 
-            </Box >
+            </Box>
             <AccountPopover
                 anchorEl={accountPopover.anchorRef.current}
                 open={accountPopover.open}

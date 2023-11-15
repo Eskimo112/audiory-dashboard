@@ -3,17 +3,20 @@ import React, { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Clear, DeleteOutline, HelpOutline, Remove } from '@mui/icons-material';
+import { Clear, HelpOutline, Remove } from '@mui/icons-material';
 import { Box, Button, Card, CircularProgress, Container, Grid, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material';
-import { FieldArray, useFormik } from 'formik';
+import { useFormik } from 'formik';
 import { useQuery } from 'react-query';
 import * as Yup from 'yup';
 
 import { AppImageUpload } from '@/components/app-image-upload';
+import { COPYRIGHTS_LIST, MATURE_OPTIONS } from '@/constants/story_options';
 import { useAuth } from '@/hooks/use-auth';
 import CategoryService from '@/services/category';
 import StoryService from '@/services/story';
 import { toastError } from '@/utils/notification';
+
+
 
 const StoryForm = () => {
     const router = useRouter();
@@ -39,7 +42,7 @@ const StoryForm = () => {
             tags: [],
             category: selectedCategory ?? '',
             isMature: false,
-            isCopyright: false,
+            isCopyright: true,
             formFile: '',
             submit: null,
         },
@@ -130,16 +133,16 @@ const StoryForm = () => {
     }
     if (isLoading)
         return (
-            <Card
+            <Grid
                 sx={{
                     display: 'flex',
                     width: '100%',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    height: '500px',
+                    height: "100vh"
                 }}>
                 <CircularProgress />
-            </Card>
+            </Grid>
         );
 
     return (
@@ -226,52 +229,73 @@ const StoryForm = () => {
                                     ))}
                                 </Grid>
 
+                                <Grid container spacing={0}>
+                                    <Grid
+                                        container
+                                        direction="row"
+                                        justifyContent="space-between"
+                                        alignItems="center"
+                                        alignContent="stretch"
+                                        wrap="wrap"
 
-                                <Grid
-                                    container
-                                    direction="row"
-                                    justifyContent="space-between"
-                                    alignItems="flex-start"
-                                    alignContent="stretch"
-                                    wrap="wrap"
+                                    >
+                                        <Grid xs={8}>
+                                            <TextFieldLabel label='Gắn mác truyện trưởng thành' isRequired={true} />
+                                        </Grid>
+                                        <Grid xs={1}>
+                                            <Switch
+                                                name='isMature'
+                                                checked={formik.values.isMature}
+                                                value={formik.values.isMature}
+                                                onChange={formik.handleChange}
+                                                inputProps={{ "aria-label": '' }}
+                                            />
+                                        </Grid>
 
-                                >
-                                    <Grid xs={8}>
-                                        <TextFieldLabel label='Gắn mác truyện trưởng thành' isRequired={true} />
                                     </Grid>
-                                    <Grid xs={1}>
-                                        <Switch
-                                            name='isMature'
-                                            checked={formik.values.isMature}
-                                            value={formik.values.isMature}
-                                            onChange={formik.handleChange}
-                                            inputProps={{ "aria-label": '' }}
-                                        />
-                                    </Grid>
+                                    <Typography sx={{ backgroundColor: "secondary" }} variant="subtitle2" color="ink.main">
+                                        {MATURE_OPTIONS.find((e) => e.value === formik.values.isMature)?.content}
+                                    </Typography>
 
                                 </Grid>
+
                                 <Grid
                                     container
-                                    direction="row"
+                                    direction="column"
                                     justifyContent="space-between"
                                     alignItems="flex-start"
                                     alignContent="stretch"
                                     wrap="wrap"
                                 >
-                                    <Grid xs={8}>
+                                    <Grid >
                                         <TextFieldLabel label='Bản quyền' isRequired={true} />
                                     </Grid>
-                                    <Grid xs={1}>
-                                        <Switch
-                                            name='isCopyright'
-                                            value={formik.values.isCopyright}
-                                            checked={formik.values.isCopyright}
-                                            onChange={formik.handleChange}
-                                            inputProps={{ "aria-label": '' }}
-                                        />
-                                    </Grid>
-
                                 </Grid>
+                                <Grid container spacing={0}>
+                                    <TextField
+                                        fullWidth
+                                        variant="outlined"
+                                        select
+                                        name="isCopyright"
+                                        onBlur={formik.handleBlur}
+                                        onChange={formik.handleChange}
+                                        type="text"
+                                        size="small"
+                                        value={formik.values.isCopyright}
+
+                                    >
+                                        {COPYRIGHTS_LIST.map((item) => (
+                                            <MenuItem key={item.value} value={item.value}>
+                                                {item.title}
+                                            </MenuItem>
+                                        ))}
+
+
+                                    </TextField>
+                                </Grid>
+                                <Typography sx={{ marginTop: 1, backgroundColor: "secondary" }} variant="subtitle2" color="secondary">
+                                    {COPYRIGHTS_LIST.find((e) => e.value === formik.values.isCopyright)?.content}
+                                </Typography>
                             </Grid>
                             <Grid xs={4} spacing={0}>
                                 <Container maxWidth="lg" >
@@ -304,7 +328,7 @@ const StoryForm = () => {
 
                 </form>
 
-            </div>
+            </div >
         </>
     )
 

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 
 import 'react-quill/dist/quill.snow.css';
 
-import { Box, Card, CircularProgress, Container, Divider, MenuItem, Popover, Skeleton, Stack, TextField, Typography } from '@mui/material';
+import { Box, Card, CircularProgress, Container, Divider, IconButton, MenuItem, Popover, Skeleton, Stack, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import { useFormik } from 'formik';
@@ -20,6 +20,7 @@ import AuthorBreadcrum from '@/layouts/author/bread-crum';
 import AuthorBreadCrumbs from '@/components/author-bread-crumbs';
 import { CheckBoxSharp, CheckCircle } from '@mui/icons-material';
 import { formatDate } from '@/utils/formatters';
+import { useRequestHeader } from '@/hooks/use-request-header';
 
 const toolbarOptions = [
     ['bold', 'italic', 'underline'],        // toggled buttons
@@ -39,6 +40,7 @@ const toolbarOptions = [
 const MIN_WORDS = 5;
 const NewChapterPage = () => {
     const router = useRouter();
+    const requestHeader = useRequestHeader();
 
     const storyId = router.query.id;
     const chapterId = router.query['chapter-id'];
@@ -48,12 +50,12 @@ const NewChapterPage = () => {
 
     const { data: chapterData = {}, isLoading, isSuccess, refetch, isRefetching } = useQuery(
         ['chapter'],
-        async () => await ChapterService.getById({ chapterId, jwt }),
+        async () => await new ChapterService(requestHeader).getById({ chapterId }),
     );
 
     const { data: chapterVersionsData = [], isSucces2, refetch: refetch2 } = useQuery(
         ['chapterVersionList'],
-        async () => await ChapterVersionService.getAll({ chapterId, jwt }),
+        async () => await new ChapterVersionService(requestHeader).getAll({ chapterId, jwt }),
 
     );
 
@@ -83,18 +85,19 @@ const NewChapterPage = () => {
         refetch();
         refetch2();
     }, [router])
-    console.log('chapterData');
-    console.log('chapterVersionData')
+
 
     const ReactQuill = typeof window === 'object' ? require('react-quill') : () => false;
     const formik = useFormik({
         initialValues: {
             chapter_id: chapterId,
+            images: {},
             content: chapterData?.current_chapter_version?.content ?? '',
             rich_text: chapterData?.current_chapter_version?.rich_text === "" || chapterData?.current_chapter_version?.rich_text === undefined ? '{}' : chapterData?.current_chapter_version?.rich_text,
             title: chapterData?.current_chapter_version?.title ?? '',
             version_name: '',
             form_file: '',
+
             isSubmit: null
         },
         enableReinitialize: true,
@@ -114,18 +117,35 @@ const NewChapterPage = () => {
     })
 
     const onEditorChange = (content, delta, source, editor) => {
-        console.log('size', new Blob(editor.getContents()))
-        console.log('EDITor', editor.getContents().ops); // rich_text
-        console.log('EDITor', JSON.stringify(editor.getContents().ops)); // rich_text
-        console.log('Text', editor.getText()); // content
-        console.log('content ', content);
-        console.log('richtext', formik.values.rich_text);
-        console.log('CHARACTERS COUNT', editor.getLength())
-        console.log('IMAGES', editor.getContents().ops?.filter(ele => ele.insert.image !== undefined)?.map((image) => image?.insert?.image));// get base 64 array for image moderation
+
+        // console.log('size', Blob(editor.getContents()))
+        // console.log('EDITor', editor.getContents().ops); // rich_text
+        // console.log('EDITor', JSON.stringify(editor.getContents().ops)); // rich_text
+        // console.log('Text', editor.getText()); // content
+        // console.log('content ', content);
+        // console.log('richtext', formik.values.rich_text);
+        // console.log('CHARACTERS COUNT', editor.getLength())
 
         setValue(editor.getText().trim())
         formik.setFieldValue('rich_text', JSON.stringify(editor.getContents()));
+        formik.setFieldValue('images', JSON.stringify(editor.getContents().ops?.filter(ele => ele.insert.image !== undefined)?.map((image) => image?.insert?.image)));
         formik.setFieldValue('content', editor.getText())
+    }
+
+    const handleCreateChapter = async () => {
+        const body = {
+            position: storyData.chapters.length + 1, story_id: storyId
+        };
+        try {
+            await new ChapterService(requestHeader).create(body).then(res => {
+                toastSuccess("Tạo chương mới thành công")
+            })
+
+
+        } catch (error) {
+            toastError('Tạo chương không thành công')
+
+        }
     }
 
     const renderCustomToolbar = () => {
@@ -138,31 +158,7 @@ const NewChapterPage = () => {
         )
     }
 
-    const onPublishChapter = () => {
-        console.log(value.split(' ').length)
-        if (value.split(' ').length < MIN_WORDS) {
-            toastError('Quá ngắn để lưu bản thảo')
-        } else {
-            // onSaveDraftChapter();
-            // if (formik.values.content.replace('\n') === '') {
-            //     toastError('Nội dung quá ngắn');
 
-            // } else {
-            try {
-                ChapterService.publish(chapterId).then(res => {
-                    if (res.code === 200) {
-                        toastSuccess('Đăng tải thành công')
-                    } else {
-                        toastError(res.message);
-                    }
-                })
-
-            } catch (error) {
-                toastError('Đăng tải không thành công')
-            }
-            // }
-        }
-    }
 
     const onSaveDraftChapter = async (isPreview, isPublish) => {
         if (value.split(' ').length < MIN_WORDS) {
@@ -174,8 +170,9 @@ const NewChapterPage = () => {
             Object.keys(values).forEach(key => formData.append(key, values[key]));
             console.log('body', formData)
             try {
-                await ChapterVersionService.create({ body: formData, jwt }).then(res => {
+                await new ChapterVersionService(requestHeader).create({ body: formData }).then(res => {
                     if (res.code === 200) {
+                        console.log('res for create ', res)
                         if (isPreview) {
                             console.log('pre');
                             refetch2().then(res => {
@@ -185,23 +182,21 @@ const NewChapterPage = () => {
                             });
 
                         } else if (isPublish) {
-                            try {
-                                ChapterService.publish(chapterId).then(res => {
-                                    if (res.code === 200) {
-                                        toastSuccess('Đăng tải thành công')
-                                    } else {
-                                        toastError(res.message);
-                                    }
-                                })
-                            } catch (error) {
-                                toastError('Đăng tải không thành công')
-                            }
+                            console.log('pub')
+
+                            new ChapterService().publish(chapterId).then(res => {
+                                console.log('res', res)
+                                if (res.code === 200) {
+                                    toastSuccess('Đăng tải thành công')
+                                } else {
+                                    toastError(res.message);
+                                }
+                            })
+
                         } else {
                             toastSuccess('Lưu bản thảo thành công');
                             refetch2();
                         }
-
-
 
                     } else {
                         toastError(res.message);
@@ -255,7 +250,7 @@ const NewChapterPage = () => {
                     >
                         <Grid container direction="column" >
                             {storyData && storyData?.chapters?.map((chapter, index) => (
-                                <Button key={chapter?.id} spacing={0} sx={{ minWidth: "30em", maxWidth: "25em", display: 'flex', direction: "row", border: "none", borderBottom: "0.5px solid #F1EFEF", padding: "0.6em 1.2em" }} onClick={(e) => {
+                                <Button key={chapter?.id} variant='text' spacing={0} sx={{ minWidth: "30em", maxWidth: "25em", display: 'flex', direction: "row", border: "none", borderBottom: "0.5px solid #F1EFEF", padding: "0.6em 1.2em", borderRadius: "0px" }} onClick={(e) => {
                                     console.log(`/my-works/${storyId}/write/${chapterId}`);
                                     router.push(`/my-works/${storyData?.id}/write/${chapter?.id}`);
 
@@ -275,6 +270,9 @@ const NewChapterPage = () => {
                                     </Grid>
                                 </Button>
                             ))}
+                            <Grid xs={12} container spacing={0} >
+                                <Button fullWidth variant='contained' sx={{ margin: "1em 2em" }} onClick={handleCreateChapter}>Thêm chương mới</Button>
+                            </Grid>
                         </Grid>
                     </Popover>
                 </Grid></Stack>
@@ -334,7 +332,9 @@ const NewChapterPage = () => {
 
                     <Grid maxWidth="lg">
                         <form noValidate onSubmit={formik.handleSubmit}>
-                            {isRefetching ? <Skeleton /> : <AppImageUpload defaultUrl={currentChapterVersion?.banner_url} onChange={(file) => { formik.setFieldValue('form_file', file) }} />}
+                            {isRefetching ? <Skeleton /> : <Box height="300px">
+                                <AppImageUpload defaultUrl={currentChapterVersion?.banner_url} onChange={(file) => { formik.setFieldValue('form_file', file) }} />
+                            </Box>}
                             <TextField
                                 variant="standard"
                                 placeholder='Đặt tên cho chương'

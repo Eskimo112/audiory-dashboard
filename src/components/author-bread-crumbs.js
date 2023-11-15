@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -9,28 +9,9 @@ import { styled } from '@mui/material/styles';
 import { emphasize } from '@mui/system';
 import { useQuery } from 'react-query';
 
-import { useAuth } from '@/hooks/use-auth';
+import { useRequestHeader } from '@/hooks/use-request-header';
 import StoryService from '@/services/story';
 
-const StyledBreadcrumb = styled(Chip)(({ theme }) => {
-    const backgroundColor =
-        theme.palette.mode === 'light'
-            ? theme.palette.grey[100]
-            : theme.palette.grey[800];
-    return {
-        backgroundColor,
-        height: theme.spacing(3),
-        color: theme.palette.text.primary,
-        fontWeight: theme.typography.fontWeightRegular,
-        '&:hover, &:focus': {
-            backgroundColor: emphasize(backgroundColor, 0.06),
-        },
-        '&:active': {
-            boxShadow: theme.shadows[1],
-            backgroundColor: emphasize(backgroundColor, 0.12),
-        },
-    };
-});
 
 const renderRouteName = (routeName) => {
     return routeName;
@@ -39,8 +20,7 @@ const renderRouteName = (routeName) => {
 const AuthorBreadCrumbs = ({ storyTitle, storyGenerator, chapterTitle, handleOpen }) => {
 
     const router = useRouter();
-    const auth = useAuth();
-    const jwt = auth.user.token;
+    const requestHeader = useRequestHeader();
     const paths = router.asPath.slice(1).split('/');
     const routes = router.route.slice(1).split('/');
     const [title, setTitle] = React.useState(storyTitle);
@@ -48,13 +28,12 @@ const AuthorBreadCrumbs = ({ storyTitle, storyGenerator, chapterTitle, handleOpe
 
     const { data: storyData = {}, isLoading, isSuccess } = useQuery(
         ['story', storyGenerator === true, router.isReady],
-        async () => await StoryService.getById({ storyId: router.asPath.slice(1).split('/')[1], jwt }),
+        async () => await new StoryService(requestHeader).getById(router.asPath.slice(1).split('/')[1]),
     );
     useEffect(() => {
         setTitle(storyData?.title)
     }, [storyData, isSuccess])
 
-    console.log('DATA', storyData)
     const breadcrums = useMemo(() => {
         const result = [];
         let accumulativeLink = '';
@@ -89,7 +68,8 @@ const AuthorBreadCrumbs = ({ storyTitle, storyGenerator, chapterTitle, handleOpe
                     accumulativeRoute = title;
                     break;
                 case 2:
-                    accumulativeRoute = paths.length === 3 ? cTitle ?? '' : '';
+                    console.log(paths[2])
+                    accumulativeRoute = paths.length === 3 ? cTitle ?? '' : paths[2] === 'write' ? 'Viết' : 'Xem';
                     break;
                 case 3:
                     accumulativeRoute = cTitle;

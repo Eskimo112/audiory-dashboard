@@ -1,41 +1,103 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { useRouter } from "next/router";
 
-import { DeleteOutline, HelpOutline } from "@mui/icons-material";
-import { Box, Button, Container, Grid, MenuItem, Stack, Switch, TextField, Typography } from "@mui/material";
+import { CheckBoxOutlined, CheckCircle, CheckCircleOutline, DeleteOutline, HelpOutline, RadioButtonUnchecked } from "@mui/icons-material";
+import { Box, Button, Grid, MenuItem, Skeleton, Stack, Switch, TextField, Typography } from "@mui/material";
 import { FieldArray, useFormik } from "formik";
 import { useQuery } from "react-query";
 import * as Yup from 'yup';
 
-import { useAuth } from "@/hooks/use-auth";
+import ConfirmDialog from "@/components/dialog/reuse-confirm-dialog";
+import { PaywalledContract } from "@/constants/paywalled_contract";
+import { COPYRIGHTS_LIST, MATURE_OPTIONS } from "@/constants/story_options";
+import { useRequestHeader } from "@/hooks/use-request-header";
 import CategoryService from "@/services/category";
 import StoryService from "@/services/story";
 import { toastError, toastSuccess } from "@/utils/notification";
 
-const DetailStoryTab = ({ story }) => {
-    console.log(story?.tags?.map(a => a.name))
-    const router = useRouter();
-    const auth = useAuth();
-    const jwt = auth?.user.token;
-    const userId = auth?.user.id;
-
+const DetailStoryTab = ({ story, handleRefetch }) => {
+    // console.log(story?.tags?.map(a => a.name))
+    const requestHeader = useRequestHeader();
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [tag, setTag] = useState('');
-    const [tagList, setTagList] = useState(story?.tags?.map(a => a.name) ?? [])
+    const [tagList, setTagList] = useState(story?.tags?.map(a => a.name) ?? []);
 
+    const [allCheckedCriteria, setAllCheckedCriteria] = useState(true);
+    const [count, setCount] = useState(0)
 
     const { data: categoriesData = [], isLoading } = useQuery(
         ['categories'],
         async () => await CategoryService.getAll(),
     );
 
+    const { data: criteriaData = [], isLoading: isLoadingCriteria } = useQuery(
+        ['criteriaData', story.isPaywalled === false],
+        async () => await new StoryService(requestHeader).getPaywalledCriteria(story?.id),
+    );
+
     useEffect(() => {
-        setSelectedCategory(categoriesData?.filter((cate) => cate.id === story?.catergory?.id))
+        setSelectedCategory(categoriesData?.filter((cate) => cate.id === story?.catergory?.id));
+
     }, [categoriesData])
 
+    useEffect(() => {
+        if (criteriaData !== undefined) {
+            console.log(criteriaData.message)
+            for (let index = 0; index < criteriaData.message?.length; index++) {
+                const element = criteriaData.message[index];
+                console.log(element.is_passed)
 
+                if (!element.is_passed) {
+                    setAllCheckedCriteria(false)
+                }
+            }
+
+
+        }
+
+    }, [criteriaData])
+
+
+    const [isOpen, setIsOpen] = React.useState(false)
+    const handleDialogOpen = () => {
+        setIsOpen(true);
+    }
+    const handleDialogClose = (isConfirm) => {
+        setIsOpen(false);
+        if (isConfirm) {
+            if (allCheckedCriteria) {
+                setIsContractOpen(true)
+            } else {
+                setIsOpen(false)
+            }
+        } else {
+            formik.setFieldValue('isPaywalled', false);
+
+        }
+    }
+
+    const [isContractOpen, setIsContractOpen] = React.useState(false)
+    const handleDialogContracOpen = () => {
+        setIsContractOpen(true);
+    }
+    const handleDialogContractClose = async (isConfirm) => {
+        setIsContractOpen(false);
+        // handle paywall a story
+        try {
+            await StoryService().paywall({ storyId: story?.id, price: formik.values.chapter_price }).then(res => {
+                if (res.code === 200) {
+                    toastSuccess('Bật thu phí thành công')
+                } else {
+                    toastError('Bật thu phí không thành công')
+                }
+            })
+        } catch (error) {
+
+        }
+
+    }
     const formik = useFormik({
         initialValues: {
             title: story.title,
@@ -47,6 +109,8 @@ const DetailStoryTab = ({ story }) => {
             isMature: story.is_mature ?? false,
             isCopyright: story.is_copyright ?? false,
             isComplete: story.is_complete ?? false,
+            isPaywalled: story.is_paywalled ?? false,
+            chapter_price: story?.chapter_price ?? 0,
             formFile: story.cover_url ?? null,
             submit: null,
         },
@@ -55,11 +119,13 @@ const DetailStoryTab = ({ story }) => {
             title: Yup.string()
                 .min(1)
                 .max(255),
+            chapter_price: Yup.number().min(0).max(10),
             description: Yup.string().min(5, 'Ít nhất 5 ký tự').max(1000, 'Tối đa 1000 chữ').required('Miêu tả là bắt buộc'),
         }),
         onSubmit: async (values, helpers) => {
             try {
-                handleEdit()
+                handleEdit();
+
                 // router.push(`/my-works/1/write/1`);
             } catch (err) {
                 console.log('error', err)
@@ -93,27 +159,31 @@ const DetailStoryTab = ({ story }) => {
 
         body.append('category_id', values.category);
         body.append('description', values.description);
-        body.append('tags', tagList);
+        body.append('tags', tagList.map((str, index) => ({ value: str, id: index + 1 })));
         body.append('title', values.title);
         body.append('is_mature', values.isMature);
         body.append('is_copyright', values.isCopyright);
         body.append('is_completed', values.isComplete);
         body.append('is_draft', true);
+
+        body.append('is_paywalled', values.isPaywalled);
+        if (values.isPaywalled) {
+            body.append('chapter_price', values.chapter_price)
+        }
+
         // body.append('form_file', values.formFile);
 
         try {
-            await StoryService.edit({ body, storyId: story.id }).then(
+            await new StoryService(requestHeader).edit({ body, storyId: story.id }).then(
                 res => {
-                    console.log(res)
-                    if (res.status === 200) {
-                        toastSuccess('Sửa thành công')
+                    if (res.code === 200) {
+                        toastSuccess('Sửa thành công truyện ');
+                        handleRefetch();
                     } else {
                         toastError(res.statusText)
                     }
                 }
             );
-
-
         } catch (error) {
             console.log('error', error)
         }
@@ -139,6 +209,10 @@ const DetailStoryTab = ({ story }) => {
             setTag(val);
         }
     }
+    const CheckedCirCle = ({ isChecked = true }) => {
+        return isChecked ? <CheckCircleOutline color="primary" /> : <RadioButtonUnchecked color="secondary" />
+    }
+
     return (
         <>
             <form noValidate onSubmit={formik.handleSubmit}>
@@ -215,18 +289,7 @@ const DetailStoryTab = ({ story }) => {
                             onChange={(e) => { setTag(e.currentTarget.value) }}
                             onKeyDown={(e) => handleAddTag(e)}
                         />
-                        {/* <Grid container>
-                            {formik.values.tags?.length > 0 && formik.values.tags?.map((tag, index) => (
-                                <div key={index}>
-                                    {tag.name}
-                                    <button type="button" onClick={() => {
-                                        formik.setFieldValue('tags', formik.values.tags.filter((e, idx) => index !== idx));
-                                    }}>
-                                        -
-                                    </button>
-                                </div>
-                            ))}
-                        </Grid> */}
+
                         <Grid container direction="row">
                             {tagList.length > 0 && tagList?.map((tag, index) => (
                                 <Box color="ink.main" key={index} >
@@ -240,10 +303,114 @@ const DetailStoryTab = ({ story }) => {
 
                             ))}
                         </Grid>
-
                         <Grid
                             container
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="flex-start"
+                            alignContent="stretch"
+                            wrap="wrap"
+                        >
+                            <Grid xs={8}>
+                                <TextFieldLabel label='Đánh dấu truyện hoàn thành' isRequired={false} />
+                            </Grid>
+                            <Grid xs={1} >
+                                <Switch
+                                    name='isComplete'
+                                    checked={formik.values.isComplete}
+                                    value={formik.values.isComplete}
+                                    onChange={formik.handleChange}
+                                    inputProps={{ "aria-label": '' }}
+                                />
+                            </Grid>
 
+                        </Grid>
+                        <Grid
+                            container
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="flex-start"
+                            alignContent="stretch"
+                            wrap="wrap"
+                        >
+                            <Grid xs={8}>
+                                <TextFieldLabel label='Trả phí trên truyện' isRequired={false} />
+                            </Grid>
+                            <Grid xs={1} >
+                                {/* check 5 criteria */}
+                                <Switch
+                                    name='isPaywalled'
+                                    checked={formik.values.isPaywalled}
+                                    value={formik.values.isPaywalled}
+                                    onChange={formik.handleChange}
+                                    onClick={() => {
+                                        if (formik.values.isPaywalled === false && formik.values.chapter_price === 0) {
+                                            handleDialogOpen();
+                                        }
+                                    }}
+                                    inputProps={{ "aria-label": '' }}
+                                />
+                                <ConfirmDialog
+                                    width="50%"
+                                    title={`Đánh giá tiêu chuẩn dành cho truyện trả phí`}
+                                    actionBgColor={allCheckedCriteria ? 'primary' : 'secondary'}
+                                    isReverse={true}
+                                    content={isLoadingCriteria ? <Skeleton /> : <Grid container spacing={0}>
+                                        {
+                                            criteriaData.message?.map((criteria, index) => (
+                                                <Grid key={index} container direction="column" sx={{ padding: "1em 2em" }}>
+                                                    <Grid container spacing={0} >
+                                                        <Grid xs={1}>
+                                                            <CheckedCirCle isChecked={criteria?.is_passed} /> </Grid>
+                                                        <Grid xs={11} >{
+                                                            criteria?.description
+                                                        }</Grid>
+                                                    </Grid>
+                                                </Grid>
+                                            ))
+                                        }
+                                    </Grid>}
+                                    isOpen={isOpen}
+                                    handleClose={handleDialogClose}
+                                    actionContent={allCheckedCriteria ? 'Tiếp tục' : 'Tôi đã hiểu'}
+                                    cancelContent='Hủy thao tác'
+                                />
+
+                                <ConfirmDialog
+                                    width={'50%'}
+                                    title={``}
+                                    actionBgColor='primary'
+                                    isReverse={true}
+                                    content={isLoadingCriteria ? <Skeleton /> : <Grid container direction="column" sx={{ padding: "1em 1.2em" }}>
+                                        <PaywalledContract />
+                                    </Grid>}
+                                    isOpen={isContractOpen}
+                                    handleClose={() => { handleDialogContractClose(true) }}
+                                    actionContent='Tôi đồng ý, đi tiếp'
+                                    cancelContent='Tôi không đồng ý'
+                                />
+                            </Grid>
+                        </Grid>
+                        {formik.values.isPaywalled ? <Grid
+                            container
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="flex-start"
+                            wrap="wrap"
+                        >
+                            <TextField
+                                variant="outlined"
+                                fullWidth
+                                name='chapter_price'
+                                type="number"
+                                size="small"
+                                value={formik.values.chapter_price}
+                                min="0"
+                                onChange={formik.handleChange}
+                            />
+                        </Grid> : <></>}
+                        <Grid
+                            container
                             direction="row"
                             justifyContent="space-between"
                             alignItems="flex-start"
@@ -264,6 +431,10 @@ const DetailStoryTab = ({ story }) => {
                             </Grid>
 
                         </Grid>
+                        <Typography sx={{ backgroundColor: "secondary" }} variant="subtitle2" color="ink.main">
+                            {MATURE_OPTIONS.find((e) => e.value === formik.values.isMature)?.content}
+                        </Typography>
+
                         <Grid
                             container
                             direction="row"
@@ -272,51 +443,45 @@ const DetailStoryTab = ({ story }) => {
                             alignContent="stretch"
                             wrap="wrap"
                         >
-                            <Grid xs={8}>
-                                <TextFieldLabel label='Đánh dấu truyện hoàn thành' isRequired={false} />
-                            </Grid>
-                            <Grid xs={1}>
-                                <Switch
-                                    name='isComplete'
-                                    checked={formik.values.isComplete}
-                                    value={formik.values.isComplete}
-                                    onChange={formik.handleChange}
-                                    inputProps={{ "aria-label": '' }}
-                                />
-                            </Grid>
+
+                            <TextFieldLabel label='Bản quyền' isRequired={true} />
+
 
                         </Grid>
-                        <Grid
-                            container
-                            direction="row"
-                            justifyContent="space-between"
-                            alignItems="flex-start"
-                            alignContent="stretch"
-                            wrap="wrap"
-                        >
-                            <Grid xs={8}>
-                                <TextFieldLabel label='Bản quyền' isRequired={true} />
-                            </Grid>
-                            <Grid xs={1}>
-                                <Switch
-                                    name='isCopyright'
-                                    value={formik.values.isCopyright}
-                                    checked={formik.values.isCopyright}
-                                    onChange={formik.handleChange}
-                                    inputProps={{ "aria-label": '' }}
-                                />
-                            </Grid>
-                            <Button
+                        <Grid container spacing={0}>
+                            <TextField
                                 fullWidth
-                                sx={{ mt: 3 }}
-                                type="submit"
-                                variant="contained"
-                                disabled={!formik.isValid || tagList.length < 1}
-                            >
-                                Sửa
-                            </Button>
+                                variant="outlined"
+                                select
+                                name="isCopyright"
+                                onBlur={formik.handleBlur}
+                                onChange={formik.handleChange}
+                                type="text"
+                                size="small"
+                                value={formik.values.isCopyright}
 
+                            >
+                                {COPYRIGHTS_LIST.map((item) => (
+                                    <MenuItem key={item.value} value={item.value}>
+                                        {item.title}
+                                    </MenuItem>
+                                ))}
+
+
+                            </TextField>
                         </Grid>
+                        <Typography sx={{ marginTop: 1, backgroundColor: "secondary" }} variant="subtitle2" color="secondary">
+                            {COPYRIGHTS_LIST.find((e) => e.value === formik.values.isCopyright)?.content}
+                        </Typography>
+                        <Button
+                            fullWidth
+                            sx={{ mt: 3 }}
+                            type="submit"
+                            variant="contained"
+                            disabled={!formik.isValid || tagList.length < 1}
+                        >
+                            Sửa
+                        </Button>
 
                     </Grid>
 

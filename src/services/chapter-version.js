@@ -1,40 +1,36 @@
 import { request } from './__base';
 
 export default class ChapterVersionService {
+    constructor(requestHeader) {
+        this.requestHeader = requestHeader ?? undefined;
+    }
 
-    static async getAll({ chapterId, jwt }) {
+    async getAll({ chapterId }) {
         const url = `chapters/${chapterId}/chapter-version`;
-        const requestHeaders =
-        {
-            'Authorization': "Bearer " + jwt,
-        }
-        const response = await request({ url, method: 'get', requestHeaders });
+
+        const response = await request({ url, method: 'get', requestHeaders: this.requestHeader });
         if (!response.data) return [];
         return response.data;
     }
 
-    static async getById(chapterVersionId) {
+    async getById(chapterVersionId) {
         const url = `chapter-version/${chapterVersionId}`;
-        const response = await request({ url, method: 'get' });
+        const response = await request({ url, method: 'get', requestHeaders: this.requestHeader });
         if (!response.data) return null;
         return response.data;
     }
 
 
-    static async create({ body, jwt }) {
+    async create({ body }) {
         const url = `chapter-version`;
-        const requestHeaders =
-        {
-            'Authorization': "Bearer " + jwt,
-        }
-        const response = await request({ url, method: 'post', payload: body, requestHeaders });
+        const response = await request({ url, method: 'post', payload: body, requestHeaders: this.requestHeader });
         return response;
     }
 
-    static async revert({ chapterVersionId }) {
+    async revert({ chapterVersionId }) {
         const url = `chapter-version/revert/${chapterVersionId}`;
-        const response = await request({ url, method: 'post' });
-        if (!response.data) return null;
-        return response.data;
+        const response = await request({ url, method: 'post', requestHeaders: this.requestHeader });
+
+        return response;
     }
 }

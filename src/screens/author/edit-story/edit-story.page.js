@@ -11,8 +11,10 @@ import { AppImageUpload } from '@/components/app-image-upload';
 import AuthorBreadCrumbs from '@/components/author-bread-crumbs';
 import ChapterListTab from '@/components/forms/author-form/tabs/chapter-list-tab';
 import DetailStoryTab from '@/components/forms/author-form/tabs/detail-story-tab';
-import { useAuth } from '@/hooks/use-auth';
+import { useRequestHeader } from '@/hooks/use-request-header';
+import ChapterService from '@/services/chapter';
 import StoryService from '@/services/story';
+import { toastError, toastSuccess } from '@/utils/notification';
 
 
 
@@ -51,8 +53,7 @@ const EditStoryPage = () => {
     const router = useRouter();
 
     const storyId = router.query.id;
-    const auth = useAuth();
-    const jwt = auth?.user.token;
+    const requestHeader = useRequestHeader();
     const [tabValue, setTabValue] = useState(0);
     const [imageFile, setImageFile] = useState();
 
@@ -66,10 +67,65 @@ const EditStoryPage = () => {
 
     const { data: story = {}, isLoading, refetch, isRefetching } = useQuery(
         ['story', storyId],
-        async () => await StoryService.getById({ storyId, jwt }),
+        async () => await new StoryService(requestHeader).getById(storyId),
     );
+    // chapter handler
+    const onPublishChapter = async ({ chapterId, isPublish = true }) => {
+        console.log('chapterId', chapterId);
+        console.log('isPublish', isPublish);
+        if (isPublish) {
+            await new ChapterService().publish(chapterId).then(res => {
+                console.log(res)
+                if (res.code === 200) {
+                    toastSuccess('Đăng tải thành công');
+                    refetch();
+                } else {
+                    toastError(res.message);
+                }
+            })
 
+        } else {
+            try {
+                await new ChapterService().unpublish(chapterId).then(res => {
+                    if (res.code === 200) {
+                        toastSuccess('Gỡ đăng tải thành công');
+                        refetch();
+                    } else {
+                        toastError(res.message);
+                    }
+                })
 
+            } catch (error) {
+                console.log(error)
+                toastError('Gỡ đăng tải không thành công')
+            }
+
+        }
+    }
+    const onDeleteChapter = async ({ chapterId, isLast = false }) => {
+        console.log('chapterId', chapterId);
+        console.log('isPublish', isLast);
+        await new ChapterService().delete(chapterId).then(res => {
+            console.log(res);
+            // if (res.code === 200) {
+            //     toastSuccess('Xóa thành công');
+            //     refetch();
+            // } else {
+            //     toastError(res.message);
+            // }
+        })
+        // if (isLast) {
+        //     await new ChapterService().delete(chapterId).then(res => {
+        //         console.log(res)
+        //         if (res.code === 200) {
+        //             toastSuccess('Xóa thành công');
+        //             refetch();
+        //         } else {
+        //             toastError(res.message);
+        //         }
+        //     })
+        // }
+    }
 
     if (isLoading)
         return (
@@ -115,13 +171,14 @@ const EditStoryPage = () => {
                     </Tabs>
                 </Container>
                 <CustomTabPanel value={tabValue} index={0}>
-                    <DetailStoryTab story={story} />
+                    {isRefetching ? <Skeleton /> : <DetailStoryTab story={story} handleRefetch={refetch} />}
                 </CustomTabPanel>
                 <CustomTabPanel value={tabValue} index={1}>
                     <Container maxWidth="lg" sx={{ width: 1 / 2 }}>
-                        {isLoading || isRefetching ? <>
+                        {isLoading || isRefetching ? <div>
                             {Array(10).map((e, index) => <Skeleton key={index} animation="wave" />)}
-                        </> : <ChapterListTab list={story.chapters ?? []} storyId={storyId} refetch={refetch} />}
+                        </div> : <ChapterListTab list={story.chapters ?? []} storyId={storyId} refetch={refetch} onPublish={onPublishChapter} onDelete={onDeleteChapter} />}
+
                     </Container>
                 </CustomTabPanel>
 
