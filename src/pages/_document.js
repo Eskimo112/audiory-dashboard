@@ -36,6 +36,10 @@ class CustomDocument extends Document {
     return (
       <Html lang="en">
         <Head>
+          <meta
+            httpEquiv="Content-Security-Policy"
+            content="upgrade-insecure-requests"
+          />
           <Favicon />
           <Fonts />
         </Head>
