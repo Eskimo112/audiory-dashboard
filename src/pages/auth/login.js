@@ -32,7 +32,7 @@ const Page = () => {
     onSubmit: async (values, helpers) => {
       try {
         await auth.signInWithPassword(values.email, values.password);
-        router.push('/');
+        router.push('/my-works');
       } catch (err) {
         helpers.setStatus({ success: false });
         helpers.setErrors({ submit: err.message });
@@ -46,7 +46,7 @@ const Page = () => {
   const handleSignInGoogle = async () => {
     try {
       await auth.signInWithGoogle();
-      router.push('/');
+      router.push('/my-works');
     } catch (error) {
       toastError('Đăng nhập không thành công');
     }

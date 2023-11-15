@@ -49,13 +49,14 @@ export const AuthGuard = (props) => {
   }
 
   // If got here, it means that the redirect did not occur, and that tells us that the user is
-  // authenticated / authorized.
+  // authenticated / authorized.d
   if (!user) return null;
 
-  // if (user.role_id === 1 && router.asPath.includes('admin')) {
-  //   router.replace('/my-works');
-  //   return null;
-  // }
+  if (user.role_id === 1 && router.asPath.includes('admin')) {
+    console.log(user.role_id)
+    router.replace('/my-works');
+    return null;
+  }
   if (user.role_id === 2 && !router.asPath.includes('admin')) {
     router.replace('/admin');
     return null;

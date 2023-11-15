@@ -4,8 +4,8 @@ import 'react-quill/dist/quill.snow.css';
 
 import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import { CheckCircle, FastForward, FastRewind, FavoriteBorderOutlined, FavoriteOutlined, GifBoxOutlined, Image, ListAlt, PlayArrow, Settings, SettingsOutlined } from "@mui/icons-material";
-import { Button, Card, CardContent, CardMedia, Container, Grid, IconButton, makeStyles, Popover, Skeleton, Stack, Typography } from "@mui/material";
+import { CheckCircle, FastForward, FastRewind, FavoriteBorderOutlined, GifBoxOutlined, ListAlt, PlayArrow, Settings, SettingsOutlined } from "@mui/icons-material";
+import { Button, Card, CardContent, CardMedia, Container, Grid, IconButton, Popover, Skeleton, Stack, Typography } from "@mui/material";
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import { useQuery } from "react-query";
@@ -16,6 +16,7 @@ import ChapterService from "@/services/chapter";
 import ChapterVersionService from "@/services/chapter-version";
 import { formatDate } from "@/utils/formatters";
 import { toastError, toastSuccess } from "@/utils/notification";
+import { useRequestHeader } from "@/hooks/use-request-header";
 
 
 const { useRouter } = require("next/router")
@@ -23,8 +24,7 @@ const { useRouter } = require("next/router")
 const PreviewChapterPage = () => {
     const router = useRouter();
     const storyId = router.query.id
-    const auth = useAuth();
-    const jwt = auth.user.token;
+    const requestHeader = useRequestHeader();
     const [chapter, setChapter] = useState({ title: '' });
     const [chapterId, setChapterId] = useState('');
 
@@ -35,13 +35,12 @@ const PreviewChapterPage = () => {
 
     const { data: chapterVersionData = [], isLoading, isSucces, refetch } = useQuery(
         ['chapterVersionData', router.isReady],
-        async () => await ChapterVersionService.getById(router.query['chapter-version-id']),
+        async () => await new ChapterVersionService(requestHeader).getById(router.query['chapter-version-id']),
     );
-
 
     const { data: chapterData = [], isLoading: isLoading2, isRefetching } = useQuery(
         ['chapterData', isSucces],
-        async () => await ChapterService.getById({ chapterId: chapterVersionData?.chapter_id, jwt }),
+        async () => await new ChapterService(requestHeader).getById({ chapterId: chapterVersionData?.chapter_id }),
 
     );
 
@@ -126,22 +125,26 @@ const PreviewChapterPage = () => {
             </Card>
         );
     }
-    console.log(chapterData);
-    console.log(chapterVersionData);
+
 
     const handleRevertChapterVersion = async (e) => {
         e.preventDefault();
 
-        try {
-            await ChapterVersionService.revert({ chapterVersionId: router.query['chapter-version-id'] });
-            toastSuccess('Khôi phục thành công');
+        await new ChapterVersionService().revert({ chapterVersionId: router.query['chapter-version-id'] }).then(
+            res => {
+                if (res.code === 200) {
+                    toastSuccess('Khôi phục thành công');
 
-            router.push(`/my-works/${router.query.id}/write/${chapterId}`);
+                    router.push(`/my-works/${router.query.id}/write/${chapterId}`);
+                } else {
+                    console.log(res)
+                    toastError(res.message)
+                }
+            }
+        );
 
-        } catch (error) {
-            toastError('Khôi phục không thành công')
 
-        }
+
     }
 
     return (
@@ -188,35 +191,44 @@ const PreviewChapterPage = () => {
                     </Grid>
                 </Popover>
                 <Grid container>
-                    {/* <image src={chapterVersionData?.banner_url} /> */}
                     {isLoading ? <Skeleton /> : <Card><CardMedia alt='Banner' image={chapterVersionData?.banner_url === "" ? "https://www.eclosio.ong/wp-content/uploads/2018/08/default.png" : chapterVersionData?.banner_url ?? ""} width="20em" height="10em" loading="lazy" /></Card>}
                 </Grid>
-                <Grid spacing={0} container direction="column" alignItems="center" sx={{ margin: '2em 0' }}>
+                <Grid container direction="column" alignItems="center" sx={{ margin: '2em 0' }}>
                     <Typography variant="h6" color="initial">{isLoading2 ? <Skeleton /> : `Chương ${chapterData?.position ?? 1}`}    <Typography variant="overline" color="initial">({chapterData?.is_draft ? 'Bản thảo' : 'Đă đăng tải'})</Typography></Typography>
                     <Typography variant="h6" color="initial">{isLoading2 ? <Skeleton /> : chapterData?.title ?? 'Tiêu đề'} </Typography>
+                    {/* <Button variant="contained" color="primary" sx={{ margin: "1em 0", width: 1 / 3 }}>
+                        Đọc phần tiếp theo
+                    </Button> */}
+                    <Button fullWidth variant="outlined" color="primary" onClick={handleRevertChapterVersion} sx={{ margin: "1em 0", width: 1 / 3 }}>
+                        Khôi phục
+                    </Button>
                 </Grid>
 
-                <Grid xs={8} direction="column" container >
-                    <Grid xs={2} >
+                <Grid direction="column" container alignItems="center" >
+                    {/* <Grid xs={2} >
                         <Typography variant="h5" color="initial"></Typography>
-                    </Grid>
-                    <Grid xs={8} >
-                        {isLoading ? <Skeleton /> : <MediaControlCard />}
+                    </Grid> */}
+                    <Grid xs={6} container>
+                        {/* {isLoading ? <Skeleton /> : <MediaControlCard />} */}
 
                         {isLoading ? <Skeleton sx={{ bgcolor: 'sky.light' }}
                             variant="rectangular"
                             width="100%"
                             height={118} /> : <ReactQuill
                             readOnly theme='bubble' value={JSON.parse(chapterVersionData?.rich_text === "" ? '{}' : chapterVersionData?.rich_text)} />}
-                        <Button fullWidth variant="contained" color="primary" sx={{ margin: "1em 0" }}>
-                            Đọc phần tiếp theo
-                        </Button>
-                        <Button fullWidth variant="outlined" color="primary" onClick={handleRevertChapterVersion}>
-                            Khôi phục
-                        </Button>
+
+                        <Grid xs={6} container alignItems="center" justifyContent="center">
+                            {/* <Button fullWidth variant="contained" color="primary" sx={{ margin: "1em 0" }}>
+                                Đọc phần tiếp theo
+                            </Button>
+                            <Button fullWidth variant="outlined" color="primary" onClick={handleRevertChapterVersion}>
+                                Khôi phục
+                            </Button> */}
+                        </Grid>
+
                     </Grid>
                     <Grid xs={2} spacing={0} container justifyContent="center" direction="column">
-                        <Container maxWidth="2em">
+                        {/* <Container maxWidth="2em">
                             <IconButton aria-label="" size="medium" color="sky" sx={{ backgroundColor: 'ink.base' }}>
                                 <SettingsOutlined />
                             </IconButton>
@@ -235,7 +247,7 @@ const PreviewChapterPage = () => {
                             <IconButton size="medium" color="sky" sx={{ backgroundColor: 'ink.base' }}>
                                 <GifBoxOutlined />
                             </IconButton>
-                        </Container>
+                        </Container> */}
                     </Grid>
                 </Grid>
             </Grid>

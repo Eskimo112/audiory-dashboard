@@ -24,9 +24,9 @@ import CardMedia from '@mui/material/CardMedia';
 import IconButton from '@mui/material/IconButton';
 import { useQuery } from 'react-query';
 
-import AppImage from '@/components/app-image';
 import ConfirmDialog from '@/components/dialog/reuse-confirm-dialog';
 import { useAuth } from '@/hooks/use-auth';
+import { useRequestHeader } from '@/hooks/use-request-header';
 import StoryService from '@/services/story';
 import { countDiffenceFromNow } from '@/utils/formatters';
 import { toastSuccess } from '@/utils/notification';
@@ -35,14 +35,14 @@ import { toastSuccess } from '@/utils/notification';
 const MyStoryPage = () => {
     const router = useRouter();
     const auth = useAuth();
-    const jwt = auth?.user.token;
+    const requestHeader = useRequestHeader();
+
     const [myStories, setMyStories] = useState([]);
     const { data: storiesData = [], isLoading, isSuccess, refetch, isError } = useQuery(
         ['myStories'],
-        async () => await StoryService.getMyStories(jwt),
+        async () => await new StoryService(requestHeader).getMyStories(),
     );
     useEffect(() => {
-        console.log(isError)
         setMyStories(storiesData ?? []);
     }, [storiesData]);
 
@@ -99,6 +99,7 @@ const MyStoryPage = () => {
                     sx={{
                         display: 'flex',
                         width: '100%',
+                        minWidth: "20em",
                         justifyContent: 'center',
                         alignItems: 'center',
                         height: '14em',
@@ -112,17 +113,17 @@ const MyStoryPage = () => {
                     <CardMedia
                         onClick={() => { router.push(`my-works/${story.id}`) }}
                         component="img"
-                        sx={{ width: "18em", height: "14em", objectFit: "inherit" }}
+                        sx={{ width: "16em", height: "14em", objectFit: "inherit" }}
                         src={story.cover_url !== '' ? story.cover_url : "https://imgv3.fotor.com/images/gallery/Fiction-Book-Covers.jpg"}
                         alt="Live from space album cover"
                     />
-                    <CardContent sx={{ boxSizing: "border-box", display: 'flex', flexDirection: 'column', width: "100%", alignItems: "stretch", padding: 1, }}>
-                        <Stack direction="column" justifyContent="space-around" >
+                    <CardContent sx={{ boxSizing: "border-box", display: 'flex', flexDirection: 'column', width: "100%", alignItems: "stretch", padding: 1, height: "14em" }}>
+                        <Stack direction="column" justifyContent="center" >
                             <Stack direction="row" justifyContent="space-between">
                                 <Typography onClick={() => { router.push(`my-works/${story.id}`) }} component="div" variant="h6">
                                     {story.title}
                                 </Typography>
-                                <Box >
+                                <Box>
                                     <IconButton color='inherit' aria-describedby={id} variant="text" onClick={handleClick}>
                                         <MoreVert />
                                     </IconButton>
@@ -167,7 +168,6 @@ const MyStoryPage = () => {
                             <Box
                                 sx={{
                                     display: 'grid',
-                                    rowGap: '0.1em',
                                     gridTemplateColumns: 'repeat(2, 1fr)',
                                 }}
                             >
@@ -181,7 +181,8 @@ const MyStoryPage = () => {
                             <Box sx={{
                                 display: 'flex',
                                 justifyContent: "space-between",
-                                alignItems: "end"
+                                alignItems: "end",
+                                alignContent: "end"
 
                             }} >
                                 <Typography component="div" variant="subtitle1" color="sky.base">
@@ -220,7 +221,7 @@ const MyStoryPage = () => {
                         display: 'flex',
                         justifyContent: "center",
                     }}>
-                    <Container maxWidth="xl" xs={{ display: "flex", justifyContent: "center", }}>
+                    <Container maxWidth="xl" sx={{ display: "flex", justifyContent: "center", }}>
                         <Stack spacing={3}>
                             <Stack direction="row" justifyContent="center"  >
                                 <Stack sx={{ marginY: '2em' }}>
@@ -229,7 +230,7 @@ const MyStoryPage = () => {
                             </Stack>
 
                             <Stack spacing={4}>
-                                <Grid container direction="row" alignItems="center" xs={{ height: "20px" }}>
+                                <Grid container direction="row" alignItems="center" sx={{ height: "20px" }}>
                                     <Grid xs={10}>
                                         <TextField
                                             fullWidth
