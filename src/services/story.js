@@ -1,140 +1,140 @@
 import axios, { toFormData } from 'axios';
+import { config } from 'process';
 
 import { request } from './__base';
-import { config } from 'process';
 
 export default class StoryService {
   constructor(requestHeader) {
     this.requestHeader = requestHeader ?? undefined;
   }
 
-  async getAll() {
-  async getAll() {
-      const url = 'stories';
 
-      const response = await request({
-        url,
-        method: 'get',
-        params: {
-          page: 1,
-          page_size: Number.MAX_SAFE_INTEGER,
-        },
-        requestHeaders: this.requestHeader,
-      });
-      if (!response.data) return [];
-      return response.data;
-    }
+  async getAll() {
+    const url = 'stories';
+
+    const response = await request({
+      url,
+      method: 'get',
+      params: {
+        page: 1,
+        page_size: Number.MAX_SAFE_INTEGER,
+      },
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return [];
+    return response.data;
+  }
 
   async getPaywalledCriteria(storyId) {
-      const url = `stories/${storyId}/paywalled/assessment`;
+    const url = `stories/${storyId}/paywalled/assessment`;
 
-      const response = await request({
-        url,
-        method: 'get',
-        requestHeaders: this.requestHeader,
-      });
+    const response = await request({
+      url,
+      method: 'get',
+      requestHeaders: this.requestHeader,
+    });
 
-      return response;
-    }
+    return response;
+  }
 
   async getById(storyId) {
-      const url = `stories/${storyId}`;
+    const url = `stories/${storyId}`;
 
-      const response = await request({
-        url,
-        method: 'get',
-        requestHeaders: this.requestHeader,
-      });
-      if (!response.data) return null;
-      return response.data;
-    }
+    const response = await request({
+      url,
+      method: 'get',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return null;
+    return response.data;
+  }
 
   async deactivateById(storyId) {
-      const url = `stories/${storyId}/deactivate`;
+    const url = `stories/${storyId}/deactivate`;
 
-      const response = await request({
-        url,
-        method: 'post',
-        requestHeaders: this.requestHeader,
-      });
-      if (!response.data) return null;
-      return response.data;
-    }
+    const response = await request({
+      url,
+      method: 'post',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return null;
+    return response.data;
+  }
 
   async activateById(storyId) {
-      const url = `stories/${storyId}/activate`;
+    const url = `stories/${storyId}/activate`;
 
-      const response = await request({
-        url,
-        method: 'post',
-        requestHeaders: this.requestHeader,
-      });
-      if (!response.data) return null;
-      return response.data;
-    }
+    const response = await request({
+      url,
+      method: 'post',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return null;
+    return response.data;
+  }
 
   async getMyStories() {
-      const url = 'users/me/stories';
-      const response = await request({
-        url,
-        method: 'get',
-        requestHeaders: this.requestHeader,
-      });
-      console.log(response)
-      if (!response.data) return [];
-      return response.data;
-    }
+    const url = 'users/me/stories';
+    const response = await request({
+      url,
+      method: 'get',
+      requestHeaders: this.requestHeader,
+    });
+    console.log(response)
+    if (!response.data) return [];
+    return response.data;
+  }
 
   async edit({ body, storyId }) {
-      const url = `stories/${storyId}`;
-      const requestHeaders = {
-        // 'Content-Type': 'multipart/form-data',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        ...this.requestHeader,
-      };
+    const url = `stories/${storyId}`;
+    const requestHeaders = {
+      // 'Content-Type': 'multipart/form-data',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      ...this.requestHeader,
+    };
 
-      const formData = FormData(body);
-      const response = axios.patch(`${process.env.API}${url}`, formData, { headers: requestHeaders });
-      // const response = await request({
-      //   url,
-      //   method: 'patch',
-      //   requestHeaders
-      //   payload: formData,
-      // });
+    const formData = FormData(body);
+    const response = axios.patch(`${process.env.API}${url}`, formData, { headers: requestHeaders });
+    // const response = await request({
+    //   url,
+    //   method: 'patch',
+    //   requestHeaders
+    //   payload: formData,
+    // });
 
-      return response;
-    }
+    return response;
+  }
 
   async create({ body, jwt }) {
-      const requestHeaders = {
-        'Content-Type': 'multipart/form-data',
-        Authorization: 'Bearer ' + jwt,
-      };
-      const url = `stories`;
-      const response = await request({
-        url,
-        method: 'post',
-        payload: body,
-        requestHeaders,
-      });
+    const requestHeaders = {
+      'Content-Type': 'multipart/form-data',
+      Authorization: 'Bearer ' + jwt,
+    };
+    const url = `stories`;
+    const response = await request({
+      url,
+      method: 'post',
+      payload: body,
+      requestHeaders,
+    });
 
-      if (!response.code) return response.data;
-      return response.data;
-    }
+    if (!response.code) return response.data;
+    return response.data;
+  }
 
-  async delete (storyId) {
-      const url = `stories/${storyId}`;
-      const response = await request({ url, method: 'delete' });
+  async delete(storyId) {
+    const url = `stories/${storyId}`;
+    const response = await request({ url, method: 'delete' });
 
-      if (!response.code) return response.data;
-      return response.data;
-    }
+    if (!response.code) return response.data;
+    return response.data;
+  }
 
   async paywall({ storyId, price }) {
-      const url = `stories/${storyId}/paywalled/apply`;
-      const response = await request({ url, method: 'post', payload: { 'chapter_price': price } });
+    const url = `stories/${storyId}/paywalled/apply`;
+    const response = await request({ url, method: 'post', payload: { 'chapter_price': price } });
 
-      if (!response.code) return response.data;
-      return response.data;
-    }
+    if (!response.code) return response.data;
+    return response.data;
   }
+}
