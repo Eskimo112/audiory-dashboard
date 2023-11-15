@@ -53,7 +53,6 @@ export const AuthGuard = (props) => {
   if (!user) return null;
 
   if (user.role_id === 1 && router.asPath.includes('admin')) {
-    console.log(user.role_id)
     router.replace('/my-works');
     return null;
   }

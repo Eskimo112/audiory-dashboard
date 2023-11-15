@@ -22,7 +22,7 @@ import {
   METRIC_OPTIONS,
   SHARED_SELECT_PROPS,
   TIME_OPTIONS,
-} from '../dashboard/constant';
+} from '../admin/dashboard/constant';
 import { getAuthorPieChartCommonOptions } from './chart.utils';
 
 export const TopStoriesChart = (props) => {

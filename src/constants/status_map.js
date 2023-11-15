@@ -1,6 +1,6 @@
 export const STATUS_MAP = {
-  true: 'Kích hoạt',
-  false: 'Vô hiệu hóa',
+  [true]: 'Kích hoạt',
+  [false]: 'Vô hiệu hóa',
 };
 
 export const TRANSACTION_TYPE_MAP = {

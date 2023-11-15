@@ -1,15 +1,23 @@
 import { request } from './__base';
 
 export default class DashboardService {
-  static async getStat() {
+  constructor(requestHeader) {
+    this.requestHeader = requestHeader ?? undefined;
+  }
+
+  async getStat() {
     const url = 'dashboard/stats';
 
-    const response = await request({ url, method: 'get' });
+    const response = await request({
+      url,
+      method: 'get',
+      requestHeaders: this.requestHeader,
+    });
     if (!response.data) return null;
     return response.data;
   }
 
-  static async getRevenue(startDate, endDate) {
+  async getRevenue(startDate, endDate) {
     const url = 'dashboard/revenue';
 
     const response = await request({
@@ -19,12 +27,13 @@ export default class DashboardService {
         start_date: startDate,
         end_date: endDate,
       },
+      requestHeaders: this.requestHeader,
     });
     if (!response.data) return null;
     return response.data;
   }
 
-  static async getCategoriesRevenue(startDate, endDate) {
+  async getCategoriesRevenue(startDate, endDate) {
     const url = 'dashboard/categories/revenue';
 
     const response = await request({
@@ -34,12 +43,13 @@ export default class DashboardService {
         start_date: startDate,
         end_date: endDate,
       },
+      requestHeaders: this.requestHeader,
     });
     if (!response.data) return null;
     return response.data;
   }
 
-  static async getPaidRatio(startDate, endDate) {
+  async getPaidRatio(startDate, endDate) {
     const url = 'dashboard/paid-ratio';
 
     const response = await request({
@@ -49,6 +59,7 @@ export default class DashboardService {
         start_date: startDate,
         end_date: endDate,
       },
+      requestHeaders: this.requestHeader,
     });
     if (!response.data) return null;
     return response.data;

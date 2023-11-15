@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
+import { Edit, VisibilityOff } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -22,19 +23,30 @@ import { useQuery } from 'react-query';
 import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { STATUS_MAP } from '@/constants/status_map';
 import { SHARED_TABLE_PROPS } from '@/constants/table';
+import { useRequestHeader } from '@/hooks/use-request-header';
 import CategoryService from '@/services/category';
 import { formatDate } from '@/utils/formatters';
 
 const CategoryPage = () => {
+  const requestHeader = useRequestHeader();
   const { data: categories, isLoading } = useQuery(
     ['category'],
-    async () => await CategoryService.getAll(),
+    async () => await new CategoryService(requestHeader).getAll(),
   );
 
   const router = useRouter();
 
   const columns = useMemo(
     () => [
+      {
+        accessorKey: 'order',
+        header: 'STT',
+        size: 20,
+        accessorFn: (_, index) => {
+          return index + 1;
+        },
+        enableColumnActions: false,
+      },
       {
         accessorKey: 'id',
         header: 'Id',
@@ -136,11 +148,14 @@ const CategoryPage = () => {
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
-                <Typography variant="h4">Quản lý thể loại</Typography>
+                <Typography variant="h4">Quản lý thể loại</Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
               <div>
                 <Button
+                  onClick={() => {
+                    router.push('/admin/categories/create');
+                  }}
                   startIcon={
                     <SvgIcon fontSize="small">
                       <PlusIcon />
@@ -157,11 +172,20 @@ const CategoryPage = () => {
                 <MenuItem
                   key="edit"
                   onClick={() => {
-                    router.push(`/categories/${row.original.id}`);
+                    router.push(`/admin/categories/${row.original.id}`);
                   }}>
+                  <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+                    <Edit />
+                  </SvgIcon>
                   Chỉnh sửa
                 </MenuItem>,
-                <MenuItem key="delete" onClick={() => console.info('Delete')}>
+                <MenuItem
+                  key="de-activate"
+                  sx={{ color: 'error.main' }}
+                  onClick={() => {}}>
+                  <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+                    <VisibilityOff />
+                  </SvgIcon>
                   Vô hiệu hóa
                 </MenuItem>,
               ]}

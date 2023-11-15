@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
+import { DateRangePicker } from '@mantine/dates';
 import {
   Button,
   Card,
@@ -13,10 +14,12 @@ import {
   SvgIcon,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { useQuery } from 'react-query';
 
 import AppChart from '@/components/app-chart';
+import { useRequestHeader } from '@/hooks/use-request-header';
 import DashboardService from '@/services/dashboard';
 import { getRecentDates } from '@/utils/get-recent-dates';
 
@@ -26,11 +29,13 @@ import { SHARED_SELECT_PROPS, TIME_OPTIONS } from './constant';
 export const RevenueChart = (props) => {
   const { sx } = props;
   const theme = useTheme();
+  const requestHeader = useRequestHeader();
   const [option, setOption] = useState('7_recent_days');
   const [dates, setDates] = useState(getRecentDates(7));
+  const [openMenu, setOpenMenu] = useState(false);
   const { data, isLoading, isFetching, refetch } = useQuery(
     ['dashboard', 'revenue', dates[0], dates[1]],
-    () => DashboardService.getRevenue(dates[0], dates[1]),
+    () => new DashboardService(requestHeader).getRevenue(dates[0], dates[1]),
     { enabled: Boolean(dates[0]) && Boolean(dates[1]) },
   );
 
@@ -95,15 +100,53 @@ export const RevenueChart = (props) => {
             </Button>
             <Button color="inherit" size="small" sx={{ padding: 0 }}>
               <Select
+                open={openMenu}
+                onOpen={() => setOpenMenu(true)}
                 {...SHARED_SELECT_PROPS}
                 value={option}
                 label="Thời gian"
-                onChange={handleChange}>
+                onChange={handleChange}
+                renderValue={(value) => {
+                  if (value === 'custom') return 'Tùy chọn';
+                  return TIME_OPTIONS.find((option) => option.value === value)
+                    .label;
+                }}>
                 {TIME_OPTIONS.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
+                  <MenuItem
+                    key={option.value}
+                    value={option.value}
+                    onClick={() => setOpenMenu(false)}>
                     {option.label}
                   </MenuItem>
                 ))}
+                <MenuItem
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  value="custom">
+                  <DateRangePicker
+                    inputFormat="YYYY/MM/DD"
+                    withinPortal={true}
+                    placeholder="Tùy chọn"
+                    zIndex={10000}
+                    defaultValue={
+                      option === 'custom'
+                        ? [dayjs(dates[0]).toDate(), dayjs(dates[1]).toDate()]
+                        : null
+                    }
+                    onChange={(value) => {
+                      if (value[0] && value[1]) {
+                        setDates([
+                          dayjs(value[0]).format('YYYY-MM-DD'),
+                          dayjs(value[1]).format('YYYY-MM-DD'),
+                        ]);
+                        setOption('custom');
+                        setOpenMenu(false);
+                      }
+                    }}
+                  />
+                </MenuItem>
               </Select>
             </Button>
           </Stack>

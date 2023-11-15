@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 
 import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
   Box,
   Button,
@@ -12,7 +12,6 @@ import {
   CircularProgress,
   Container,
   Stack,
-  SvgIcon,
   Typography,
 } from '@mui/material';
 import { MaterialReactTable } from 'material-react-table';
@@ -111,8 +110,21 @@ const ReportPage = () => {
               return <UserInfo userId={reportedId} />;
             case 'STORY':
               return <StoryInfo storyId={reportedId} />;
-            case 'CHAPTER':
-              return <ChapterInfo chapterId={reportedId} />;
+            case 'COMMENT':
+              return (
+                <Link href="/" style={{ textDecoration: 'none' }}>
+                  <Typography
+                    variant="body2"
+                    color="primary.main"
+                    sx={{ textDecoration: 'none' }}>
+                    Chi tiết comment
+                  </Typography>
+                </Link>
+              );
+            case 'REVENUE_COMPLAINT':
+              return <StoryInfo chapterId={reportedId} />;
+            case 'CONTENT_VIOLATION_COMPLAINT':
+              return <StoryInfo chapterId={reportedId} />;
           }
           return null;
         },
@@ -192,7 +204,7 @@ const ReportPage = () => {
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
               <div>
-                <Button
+                {/* <Button
                   startIcon={
                     <SvgIcon fontSize="small">
                       <PlusIcon />
@@ -201,7 +213,7 @@ const ReportPage = () => {
                   variant="contained"
                   onClick={() => router.push('reports/create')}>
                   Thêm báo cáo
-                </Button>
+                </Button> */}
               </div>
             </Stack>
 
@@ -219,9 +231,11 @@ const ReportPage = () => {
                     }}
                     variant="outlined"
                     onClick={() => {
-                      router.push(`/reports/${row.original.id}`);
+                      router.push(`/admin/reports/${row.original.id}`);
                     }}>
-                    Xem chi tiết
+                    {row.original.report_status === 'PROCESSING'
+                      ? `Xử lý`
+                      : `Xem chi tiết`}
                   </Button>
                 );
               }}

@@ -3,10 +3,9 @@ import { useMemo } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
-import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
+import { Edit, Visibility, VisibilityOff } from '@mui/icons-material';
 import {
   Box,
-  Button,
   Card,
   Chip,
   CircularProgress,
@@ -180,29 +179,29 @@ const TransactionPage = () => {
                 <Typography variant="h4">Quản lý giao dịch</Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
-              <div>
-                <Button
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <PlusIcon />
-                    </SvgIcon>
-                  }
-                  variant="contained">
-                  Thêm giao dịch
-                </Button>
-              </div>
+              <div></div>
             </Stack>
 
             <MaterialReactTable
               renderRowActionMenuItems={({ closeMenu, row, table }) => [
                 <MenuItem
+                  key="show"
+                  onClick={() => {
+                    router.push(`/admin/system-configs/${row.original.id}`);
+                  }}>
+                  <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+                    <Visibility />
+                  </SvgIcon>
+                  Lịch sử thay đổi
+                </MenuItem>,
+                <MenuItem
                   key="edit"
                   onClick={() => {
-                    router.push(`/tranactions/${row.original.id}`);
+                    router.push(`/admin/system-configs/${row.original.id}`);
                   }}>
-                  Chỉnh sửa
-                </MenuItem>,
-                <MenuItem key="delete" onClick={() => console.info('Delete')}>
+                  <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+                    <VisibilityOff />
+                  </SvgIcon>
                   Vô hiệu hóa
                 </MenuItem>,
               ]}
@@ -210,6 +209,7 @@ const TransactionPage = () => {
               data={transactions}
               initialState={initialState}
               {...SHARED_TABLE_PROPS}
+              enableRowActions={false}
             />
           </Stack>
         </Container>

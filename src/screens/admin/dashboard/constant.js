@@ -23,7 +23,6 @@ export const TIME_OPTIONS = [
   { label: '14 ngày gần nhất', value: '14_recent_days' },
   { label: '30 ngày gần nhất', value: '30_recent_days' },
   { label: '90 ngày gần nhất', value: '90_recent_days' },
-  { label: 'Tùy chọn', value: 'custom' },
 ];
 
 export const METRIC_OPTIONS = [

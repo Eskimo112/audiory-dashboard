@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react';
 
+import { Delete } from '@mui/icons-material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import { Box, FormLabel, Input, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  FormLabel,
+  Input,
+  Stack,
+  SvgIcon,
+  Typography,
+} from '@mui/material';
 
 export const AppImageUpload = (props) => {
   const { defaultUrl, onChange } = props;
@@ -37,10 +46,9 @@ export const AppImageUpload = (props) => {
       sx={{
         border: '1px solid',
         borderColor: 'ink.alpha20',
-        borderRadius: 2,
         position: 'relative',
         overflow: 'hidden',
-        padding: '3px',
+        padding: '6px',
         bgcolor: 'sky.lightest',
       }}>
       <FormLabel
@@ -72,30 +80,60 @@ export const AppImageUpload = (props) => {
         sx={{ display: 'none' }}
         onChange={onSelectFile}
         inputProps={{ accept: '.jpg,.jpeg,.png' }}
-
       />
       {selectedFile ? (
         <Box
           sx={{
-            borderRadius: 1.75,
+            position: 'relative',
             overflow: 'hidden',
             width: '100%',
             height: '100%',
-            display: "flex",
-            alignItems: "center"
+            display: 'flex',
+            alignItems: 'center',
           }}>
-          <Box component="img" src={preview} width="100%" height="100%" />
+          <Button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setSelectedFile(undefined);
+            }}
+            sx={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              zIndex: 101,
+              color: 'primary.lightest',
+              padding: '12px',
+              borderRadius: 4,
+              minWidth: 0,
+            }}>
+            <SvgIcon>
+              <Delete></Delete>
+            </SvgIcon>
+          </Button>
+          <Box
+            component="img"
+            src={preview}
+            width="100%"
+            height="100%"
+            sx={{ objectFit: 'cover' }}
+          />
         </Box>
       ) : (
         defaultUrl && (
           <Box
             sx={{
-              borderRadius: 1.75,
               overflow: 'hidden',
               width: '100%',
               height: '100%',
             }}>
-            <Box component="img" src={defaultUrl} width="100%" height="100%" />
+            <Box
+              component="img"
+              src={defaultUrl}
+              width="100%"
+              height="100%"
+              sx={{ objectFit: 'cover' }}
+            />
           </Box>
         )
       )}

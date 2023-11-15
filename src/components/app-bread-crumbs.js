@@ -5,16 +5,27 @@ import { useRouter } from 'next/router';
 
 import { Breadcrumbs, Typography } from '@mui/material';
 
-const ROUTE_NAME_MAP = {
-  '/': 'Tổng quan',
-  '/users': 'Người dùng',
-  '/users/[user_id]': 'Chi tiết người dùng',
-  '/reports': 'Báo cáo',
-  '/reports/[report_id]': 'Chi tiết báo cáo',
-  '/reports/create': 'Tạo báo cáo mới',
-};
+const ROUTE_NAME_MAP = (name1, name2) => ({
+  '/admin': 'Tổng quan',
+  '/admin/users': 'Người dùng',
+  '/admin/users/[user_id]': name1,
+  '/admin/reports': 'Báo cáo',
+  '/admin/reports/[report_id]': 'Chi tiết báo cáo',
+  '/admin/reports/create': 'Tạo báo cáo mới',
+  '/admin/stories': 'Truyện',
+  '/admin/stories/[story_id]': name1,
+  '/admin/stories/[story_id]/chapters': 'Danh sách chương',
+  '/admin/stories/[story_id]/chapters/[chapter_id]': name2,
+  '/admin/coin-packs/[coinpack_id]': name1,
+  '/admin/coin-packs/create': 'Tạo gói xu mới',
+  '/admin/categories/[category_id]': name1,
+  '/admin/categories/create': 'Tạo thể loại mới',
+  '/admin/gifts/[category_id]': name1,
+  '/admin/gifts/create': 'Tạo quà mới',
+  '/admin/system-configs/[config_id]': name1,
+});
 
-const AppBreadCrumbs = () => {
+const AppBreadCrumbs = ({ name1, name2 }) => {
   const router = useRouter();
   const paths = router.asPath.slice(1).split('/');
   const routes = router.route.slice(1).split('/');
@@ -40,7 +51,7 @@ const AppBreadCrumbs = () => {
                   textDecoration: 'underline',
                 },
               }}>
-              {ROUTE_NAME_MAP[accumulativeRoute]}
+              {ROUTE_NAME_MAP(name1, name2)[accumulativeRoute]}
             </Typography>
           </Link>,
         );
@@ -53,11 +64,11 @@ const AppBreadCrumbs = () => {
       <Typography
         variant="body1"
         sx={{ fontSize: '16px', color: 'ink.lighter' }}>
-        {ROUTE_NAME_MAP[accumulativeRoute]}
+        {ROUTE_NAME_MAP(name1, name2)[accumulativeRoute]}
       </Typography>,
     );
     return result;
-  }, [paths, routes]);
+  }, [name1, name2, paths, routes]);
 
   return (
     <Breadcrumbs separator="›" aria-label="breadcrumb">

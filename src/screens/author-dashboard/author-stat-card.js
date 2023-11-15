@@ -20,8 +20,8 @@ import AuthorDashboardService from '@/services/author-dashboard';
 import { getPastDates, getRecentDates } from '@/utils/get-recent-dates';
 import { toastError } from '@/utils/notification';
 
-import { SHARED_SELECT_PROPS, TIME_OPTIONS } from '../dashboard/constant';
-import { StatCard } from '../dashboard/stat-card.component';
+import { SHARED_SELECT_PROPS, TIME_OPTIONS } from '../admin/dashboard/constant';
+import { StatCard } from '../admin/dashboard/stat-card.component';
 
 const AuthorStatCards = () => {
   const requestHeader = useRequestHeader();

@@ -308,12 +308,31 @@ export function createComponents(config) {
         variant: 'filled',
       },
       styleOverrides: {
-        // root: {
-        //   [`& .${formLabelClasses.root}`]: {
-        //     background: 'red',
-        //     color: 'red',
-        //   },
-        // },
+        root: {},
+      },
+    },
+    MuiSwitch: {
+      styleOverrides: {
+        root: {
+          padding: '8px',
+          '& .MuiSwitch-track': {
+            borderRadius: '22px',
+            '&:before, &:after': {
+              content: '""',
+              position: 'absolute',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: 'px',
+              height: 'px',
+            },
+          },
+          '& .MuiSwitch-thumb': {
+            boxShadow: 'none',
+            width: '16px',
+            height: '16px',
+            margin: '2px',
+          },
+        },
       },
     },
   };

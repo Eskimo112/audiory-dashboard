@@ -4,11 +4,9 @@ import { useMemo } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
-import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
   Avatar,
   Box,
-  Button,
   Card,
   Chip,
   CircularProgress,
@@ -25,12 +23,13 @@ import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { SHARED_TABLE_PROPS } from '@/constants/table';
 import StoryService from '@/services/story';
 import { Edit, Visibility } from '@mui/icons-material';
-import { formatDate } from '../../../utils/formatters';
+import { useRequestHeader } from '../../../hooks/use-request-header';
 
 const StoryPage = () => {
+  const requestHeaders = useRequestHeader();
   const { data: stories, isLoading } = useQuery(
     ['stories'],
-    async () => await StoryService.getAll(),
+    async () => await new StoryService(requestHeaders).getAll(),
   );
 
   const router = useRouter();
@@ -82,7 +81,7 @@ const StoryPage = () => {
               spacing={1}
               sx={{ cursor: 'pointer' }}
               onClick={() => {
-                router.push(`/users/${author.id}`);
+                router.push(`/admin/users/${author.id}`);
               }}>
               <Avatar src={author.avatar_url} width={50} height={50}></Avatar>
               <Stack alignItems="start">
@@ -264,16 +263,20 @@ const StoryPage = () => {
             <MaterialReactTable
               renderRowActionMenuItems={({ closeMenu, row, table }) => [
                 <MenuItem
-                  key="edit"
+                  key="show"
                   onClick={() => {
-                    router.push(`admin/stories/${row.original.id}`);
+                    router.push(`/admin/stories/${row.original.id}`);
                   }}>
                   <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
                     <Visibility />
                   </SvgIcon>
                   Xem
                 </MenuItem>,
-                <MenuItem key="delete" onClick={() => console.info('Delete')}>
+                <MenuItem
+                  key="edit"
+                  onClick={() => {
+                    router.push(`/admin/stories/${row.original.id}`);
+                  }}>
                   <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
                     <Edit />
                   </SvgIcon>

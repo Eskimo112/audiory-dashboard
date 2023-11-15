@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -20,13 +21,15 @@ import { useQuery } from 'react-query';
 
 import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { SHARED_TABLE_PROPS } from '@/constants/table';
+import { useRequestHeader } from '@/hooks/use-request-header';
 import SystemConfigService from '@/services/system-config';
 import { formatDate } from '@/utils/formatters';
 
 const SystemConfigPage = () => {
+  const requestHeader = useRequestHeader();
   const { data: configs, isLoading } = useQuery(
     ['system-config'],
-    async () => await SystemConfigService.getAll(),
+    async () => await new SystemConfigService(requestHeader).getAll(),
   );
 
   const router = useRouter();
@@ -115,13 +118,23 @@ const SystemConfigPage = () => {
             <MaterialReactTable
               renderRowActionMenuItems={({ closeMenu, row, table }) => [
                 <MenuItem
+                  key="show"
+                  onClick={() => {
+                    router.push(`/admin/system-configs/${row.original.id}`);
+                  }}>
+                  <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+                    <Visibility />
+                  </SvgIcon>
+                  Lịch sử thay đổi
+                </MenuItem>,
+                <MenuItem
                   key="edit"
                   onClick={() => {
-                    router.push(`/tranactions/${row.original.id}`);
+                    router.push(`/admin/system-configs/${row.original.id}`);
                   }}>
-                  Chỉnh sửa
-                </MenuItem>,
-                <MenuItem key="delete" onClick={() => console.info('Delete')}>
+                  <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+                    <VisibilityOff />
+                  </SvgIcon>
                   Vô hiệu hóa
                 </MenuItem>,
               ]}

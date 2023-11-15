@@ -1,67 +1,93 @@
 import { useMemo, useState } from 'react';
 
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 
+import { Close, ListRounded } from '@mui/icons-material';
 import {
+  Avatar,
   Box,
   Button,
   Card,
-  CardHeader,
   CircularProgress,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormLabel,
+  MenuItem,
+  Select,
   Stack,
+  SvgIcon,
   Switch,
   TextField,
   Typography,
   Unstable_Grid2 as Grid,
 } from '@mui/material';
 import { useFormik } from 'formik';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import * as Yup from 'yup';
 
 import AppBreadCrumbs from '@/components/app-bread-crumbs';
 import { AppImageUpload } from '@/components/app-image-upload';
-import { SHARED_PAGE_SX } from '@/constants/page_sx';
+import { SHARED_PAGE_SX, TABLE_ACTION_BUTTON_SX } from '@/constants/page_sx';
 import { useRequestHeader } from '@/hooks/use-request-header';
+import CategoryService from '@/services/category';
+import StoryService from '@/services/story';
+import { toastError, toastSuccess } from '@/utils/notification';
 
-import StoryService from '../../../services/story';
-import UserStoriesTable from './user-stories-table';
-import UserTransactionsTable from './user-transaction-table';
+import { SHARED_SELECT_PROPS } from '../dashboard/constant';
 
 const StoryEditPage = ({ storyId }) => {
   const requestHeader = useRequestHeader();
+  const router = useRouter();
   const { data: story = {}, isLoading } = useQuery(
     ['stories', storyId],
     async () => await new StoryService(requestHeader).getById(storyId),
   );
-  console.log(story);
+  const { data: categories = [] } = useQuery(
+    ['categories'],
+    async () => await new CategoryService(requestHeader).getAll(),
+  );
+  const [openDialog, setOpenDialog] = useState();
+  const queryClient = useQueryClient();
   const [selectedFile, setSelectedFile] = useState();
+  const [tagValue, setTagValue] = useState();
   const formik = useFormik({
     initialValues: {
-      email: story?.email ?? '',
-      username: story?.username ?? '',
-      id: story?.id ?? '',
-      full_name: story?.full_name ?? '',
+      category_id: story?.category_id ?? '',
+      title: story?.title ?? '',
       description: story?.description ?? '',
-      is_enabled: story?.is_enabled ?? false,
-      can_show_mature: story?.can_show_mature ?? false,
+      is_draft: story?.is_draft ?? false,
+      is_mature: story?.is_mature ?? false,
+      is_paywalled: story?.is_paywalled ?? false,
+      is_copyright: story?.is_copyright ?? false,
+      tags: story?.tags?.map((tag) => tag.name) ?? [],
     },
     enableReinitialize: true,
     validationSchema: Yup.object({
-      email: Yup.string().email('Vui lòng nhập đúng định dạng email').max(255),
-      username: Yup.string().max(255).required('Tên người dùng là bắt buộc'),
-      full_name: Yup.string().max(255).required('Họ và tên là bắt buộc'),
+      title: Yup.string().max(255).required('Không được để trống'),
+      description: Yup.string().required('Không được để trống'),
+      tags: Yup.array().required('Không được để trống'),
     }),
     onSubmit: async (values, helpers) => {
-      //   try {
-      //     await auth.signIn(values.email, values.password);
-      //     router.push('/');
-      //   } catch (err) {
-      //     helpers.setStatus({ success: false });
-      //     helpers.setErrors({ submit: err.message });
-      //     helpers.setSubmitting(false);
-      //   }
+      await new StoryService(requestHeader).edit({
+        body: {
+          category_id: values.category_id,
+          title: values.title,
+          description: values.description,
+          is_draft: values.is_draft,
+          is_mature: values.is_draft,
+          is_paywalled: values.is_draft,
+          is_copyright: values.is_draft,
+          tags: values.tags ?? [],
+          form_file: selectedFile ?? undefined,
+        },
+        storyId,
+      });
+      toastSuccess('Chỉnh sửa thành công');
+      queryClient.invalidateQueries({ queryKey: ['stories', storyId] });
     },
   });
 
@@ -79,11 +105,35 @@ const StoryEditPage = ({ storyId }) => {
     return false;
   }, [formik.values, story, selectedFile]);
 
-  if (isLoading) return <CircularProgress />;
+  const handleDeactivate = async () => {
+    try {
+      if (story?.deleted_date) {
+        await new StoryService(requestHeader).activateById(storyId);
+        toastSuccess('Đã kích hoạt thành công');
+      } else {
+        await new StoryService(requestHeader).deactivateById(storyId);
+        toastSuccess('Đã vô hiệu hóa thành công');
+      }
+    } catch (e) {
+      toastError('Đã có lỗi xảy ra, thử lại sau.');
+    }
+    setOpenDialog(false);
+  };
+
+  if (isLoading)
+    return (
+      <Box component="main" sx={SHARED_PAGE_SX}>
+        <Container
+          maxWidth="xl"
+          sx={{ display: 'flex', justifyContent: 'center' }}>
+          <CircularProgress />
+        </Container>
+      </Box>
+    );
   return (
     <>
       <Head>
-        <title>User {story?.username} </title>
+        <title>Truyện {story?.title} </title>
       </Head>
       <Box component="main" sx={SHARED_PAGE_SX}>
         <Container maxWidth="xl">
@@ -95,117 +145,297 @@ const StoryEditPage = ({ storyId }) => {
               alignItems="flex-end"
               px="16px">
               <Stack spacing={1}>
-                <Typography variant="h4">Chỉnh sửa hồ sơ</Typography>
+                <Typography variant="h4">Chỉnh sửa truyện</Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
-                <AppBreadCrumbs />
+                <AppBreadCrumbs name1={story?.title} />
               </Stack>
               <Stack direction="row" gap="16px" height="fit-content">
                 <Button
                   variant="outlined"
-                  color="error"
-                  onClick={() =>
-                    formik.setFieldValue(
-                      'is_enabled',
-                      !formik.values.is_enabled,
-                    )
-                  }>
-                  {formik.values.is_enabled ? 'Vô hiệu hóa' : 'Kích hoạt'}
+                  color={!story?.deleted_date ? 'error' : 'success'}
+                  onClick={() => setOpenDialog(true)}>
+                  {!story?.deleted_date ? 'Vô hiệu hóa' : 'Kích hoạt'}
                 </Button>
-                <Button disabled={!canSaveChanges} variant="contained">
+                <Dialog
+                  open={openDialog}
+                  onClose={() => setOpenDialog(false)}
+                  PaperProps={{
+                    sx: {
+                      p: 1,
+                      width: '400px',
+                    },
+                  }}>
+                  <DialogTitle>
+                    Bạn có chắc chắn
+                    {!story?.deleted_date ? ' vô hiệu hóa' : 'kích hoạt'} truyện
+                    này?
+                  </DialogTitle>
+                  <DialogContent>
+                    {/* <DialogContentText>
+                      Điều này sẽ làm truyện bị ẩn khỏi tất cả người dùng, bao
+                      gồm cả tác giả
+                    </DialogContentText> */}
+                  </DialogContent>
+                  <DialogActions>
+                    <Button
+                      variant="outlined"
+                      onClick={() => setOpenDialog(false)}>
+                      Hủy bỏ
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={handleDeactivate}
+                      autoFocus>
+                      Xác nhận
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+                <Button
+                  disabled={!canSaveChanges}
+                  variant="contained"
+                  onClick={() => formik.handleSubmit()}>
                   Lưu thay đổi
                 </Button>
               </Stack>
             </Stack>
             <Grid container spacing={3}>
+              {/* Image */}
+              <Grid xs={12} lg={4}>
+                <Card sx={{ padding: 2 }}>
+                  <Stack gap="16px" alignItems="center">
+                    <Box
+                      sx={{
+                        width: '95%',
+                        marginBottom: '0px',
+                        aspectRatio: '1',
+                        height: '400px',
+                      }}>
+                      <AppImageUpload
+                        defaultUrl={story?.cover_url}
+                        onChange={(file) => setSelectedFile(file)}
+                      />
+                    </Box>
+
+                    <Stack gap="8px" width="100%">
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        spacing={1}
+                        sx={{ cursor: 'pointer' }}>
+                        <Avatar
+                          src={story.author.avatar_url}
+                          sx={{ width: '55px', height: '55px' }}></Avatar>
+                        <Stack alignItems="start" flex={1}>
+                          <Typography variant="subtitle1">
+                            {story.author.full_name ?? 'Không có tên'}
+                          </Typography>
+                          <Typography
+                            variant="subtitle2"
+                            fontStyle="italic"
+                            color="ink.lighter">
+                            {story.author.username ?? 'Không có username'}
+                          </Typography>
+                        </Stack>
+                        <Button
+                          sx={{ ...TABLE_ACTION_BUTTON_SX }}
+                          onClick={() => {
+                            router.push(`/admin/users/${story.author.id}`);
+                          }}>
+                          Chi tiết
+                        </Button>
+                      </Stack>
+                      <Stack>
+                        <Stack
+                          width="100%"
+                          direction="row"
+                          justifyContent="space-between"
+                          alignItems="center">
+                          <Typography
+                            variant="subtitle1"
+                            fontWeight={400}
+                            fontStyle="italic">
+                            Lượt đọc
+                          </Typography>
+                          <Typography variant="subtitle1">
+                            {story?.read_count ?? 0}
+                          </Typography>
+                        </Stack>
+                        <Stack
+                          width="100%"
+                          direction="row"
+                          justifyContent="space-between"
+                          alignItems="center">
+                          <Typography
+                            variant="subtitle1"
+                            fontWeight={400}
+                            fontStyle="italic">
+                            Bình chọn
+                          </Typography>
+                          <Typography variant="subtitle1">
+                            {story?.vote_count ?? 0}
+                          </Typography>
+                        </Stack>
+                        <Stack
+                          width="100%"
+                          direction="row"
+                          justifyContent="space-between"
+                          alignItems="center">
+                          <Typography
+                            variant="subtitle1"
+                            fontWeight={400}
+                            fontStyle="italic">
+                            Bình luận
+                          </Typography>
+                          <Typography variant="subtitle1">
+                            {story?.comment_count ?? 0}
+                          </Typography>
+                        </Stack>
+                      </Stack>
+                    </Stack>
+                    <Button
+                      onClick={() => {
+                        router.push(`/admin/stories/${storyId}/chapters`);
+                      }}
+                      fullWidth
+                      variant="outlined"
+                      endIcon={
+                        <SvgIcon>
+                          <ListRounded />
+                        </SvgIcon>
+                      }>
+                      Xem danh sách chương
+                    </Button>
+                  </Stack>
+                </Card>
+              </Grid>
+              {/* Input information */}
               <Grid xs={12} lg={8}>
                 <Card sx={{ padding: 2 }}>
-                  <CardHeader
-                    sx={{ padding: 0, pb: '16px' }}
-                    title={`Thông tin`}
-                  />
-                  <Grid container spacing={3}>
+                  <Grid container spacing={3} rowSpacing={2}>
                     <Grid xs={12} lg={6}>
-                      <Stack gap={2}>
-                        <Stack gap={1}>
-                          <FormLabel>Id người dùng</FormLabel>
-                          <TextField
-                            disabled
-                            fullWidth
-                            helperText={formik.touched.id && formik.errors.id}
-                            variant="outlined"
-                            name="id"
-                            onBlur={formik.handleBlur}
-                            onChange={formik.handleChange}
-                            type="text"
-                            value={formik.values.id}
-                          />
-                        </Stack>
-                        <Stack gap={1}>
-                          <FormLabel>Họ và tên</FormLabel>
-                          <TextField
-                            error={
-                              !!(
-                                formik.touched.full_name &&
-                                formik.errors.full_name
-                              )
-                            }
-                            fullWidth
-                            helperText={
-                              formik.touched.full_name &&
-                              formik.errors.full_name
-                            }
-                            variant="outlined"
-                            name="full_name"
-                            onBlur={formik.handleBlur}
-                            onChange={formik.handleChange}
-                            value={formik.values.full_name}
-                            type="text"
-                          />
-                        </Stack>
+                      <Stack gap={1}>
+                        <FormLabel>Id truyện </FormLabel>
+                        <TextField
+                          disabled
+                          fullWidth
+                          variant="outlined"
+                          type="text"
+                          value={story?.id}
+                        />
                       </Stack>
                     </Grid>
                     <Grid xs={12} lg={6}>
-                      <Stack gap={2}>
-                        <Stack gap={1}>
-                          <FormLabel>Tên người dùng</FormLabel>
-                          <TextField
-                            error={
-                              !!(
-                                formik.touched.username &&
-                                formik.errors.username
+                      <Stack gap={1}>
+                        <FormLabel>Thể loại</FormLabel>
+                        <Button
+                          fullWidth
+                          color="inherit"
+                          size="small"
+                          sx={{ padding: 0 }}>
+                          <Select
+                            {...SHARED_SELECT_PROPS}
+                            fullWidth
+                            inputProps={{
+                              sx: {
+                                padding: '14px 16px',
+                                textAlign: 'left',
+                              },
+                            }}
+                            sx={{ padding: 0 }}
+                            value={formik.values.category_id}
+                            name="category_id"
+                            onChange={formik.handleChange}>
+                            {categories.map((category) => (
+                              <MenuItem key={category.name} value={category.id}>
+                                {category.name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </Button>
+                      </Stack>
+                    </Grid>
+                    <Grid xs={12} lg={12}>
+                      <Stack gap={1}>
+                        <FormLabel>Tên truyện</FormLabel>
+                        <TextField
+                          error={
+                            !!(formik.touched.title && formik.errors.title)
+                          }
+                          fullWidth
+                          helperText={
+                            formik.touched.title && formik.errors.title
+                          }
+                          variant="outlined"
+                          name="title"
+                          onBlur={formik.handleBlur}
+                          onChange={formik.handleChange}
+                          value={formik.values.title}
+                          type="text"
+                        />
+                      </Stack>
+                    </Grid>
+
+                    <Grid xs={12} lg={12}>
+                      <Stack gap={1}>
+                        <FormLabel>Thẻ</FormLabel>
+                        <TextField
+                          value={tagValue}
+                          onChange={(e) => setTagValue(e.target.value)}
+                          fullWidth
+                          variant="outlined"
+                          name="tag"
+                          placeholder="Thêm thẻ cho truyện"
+                          onKeyDown={(e) => {
+                            if (e.keyCode === 32 || e.keyCode === 13) {
+                              setTagValue('');
+                              if (
+                                formik.values.tags.find(
+                                  (t) => t === e.target.value,
+                                )
                               )
+                                return;
+                              formik.setFieldValue('tags', [
+                                ...formik.values.tags,
+                                e.target.value,
+                              ]);
                             }
-                            fullWidth
-                            helperText={
-                              formik.touched.username && formik.errors.username
-                            }
-                            variant="outlined"
-                            name="username"
-                            onBlur={formik.handleBlur}
-                            onChange={formik.handleChange}
-                            value={formik.values.username}
-                          />
-                        </Stack>
-                        <Stack gap={1}>
-                          <FormLabel>Email</FormLabel>
-                          <TextField
-                            error={
-                              !!(formik.touched.email && formik.errors.email)
-                            }
-                            fullWidth
-                            helperText={
-                              formik.touched.email && formik.errors.email
-                            }
-                            variant="outlined"
-                            name="email"
-                            onBlur={formik.handleBlur}
-                            onChange={formik.handleChange}
-                            type="email"
-                            value={formik.values.email}
-                          />
+                          }}
+                        />
+                        <Stack direction="row" gap="6px" flexWrap="wrap">
+                          {formik.values.tags?.map((tag, index) => (
+                            <Box
+                              key={index}
+                              sx={{
+                                bgcolor: 'primary.lightest',
+                                p: '4px 8px',
+                                borderRadius: 1,
+                                fontSize: '12px',
+                                wrap: 'nowrap',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                              }}>
+                              {tag}
+                              <SvgIcon
+                                sx={{
+                                  width: '14px',
+                                  color: 'ink.lighter',
+                                  cursor: 'pointer',
+                                }}
+                                onClick={() => {
+                                  formik.setFieldValue(
+                                    'tags',
+                                    formik.values.tags.filter((t) => t !== tag),
+                                  );
+                                }}>
+                                <Close />
+                              </SvgIcon>
+                            </Box>
+                          ))}
                         </Stack>
                       </Stack>
                     </Grid>
+
                     <Grid xs={12}>
                       <Stack gap={1}>
                         <FormLabel>Giới thiệu</FormLabel>
@@ -223,87 +453,117 @@ const StoryEditPage = ({ storyId }) => {
                         />
                       </Stack>
                     </Grid>
-                  </Grid>
-                </Card>
-              </Grid>
-              <Grid xs={12} lg={4}>
-                <Card sx={{ padding: 2 }}>
-                  <CardHeader
-                    sx={{ padding: 0, pb: '16px' }}
-                    title={`Ảnh đại diện & cài đặt`}
-                  />
-                  <Stack justifyContent="center" alignItems="center" gap="12px">
-                    <Box
-                      sx={{
-                        width: '80%',
-                        marginBottom: '0px',
-                        aspectRatio: '1',
-                      }}>
-                      <AppImageUpload
-                        defaultUrl={story?.avatar_url}
-                        onChange={(file) => setSelectedFile(file)}
-                      />
-                    </Box>
-                    <Stack justifyContent="center" alignItems="center">
-                      <Typography variant="subtitle1" fontWeight={400}>
-                        Người theo dõi:{' '}
-                        <b>{story?.number_of_followers ?? 0} </b>
-                      </Typography>
-                      <Typography variant="subtitle1" fontWeight={400}>
-                        Tác giả: <b> cấp {story?.author_level_id ?? 0} </b>
-                      </Typography>
-                    </Stack>
-
-                    <Stack
-                      width="100%"
-                      direction="row"
-                      gap="4px"
-                      alignItems="center"
-                      justifyContent="space-between">
-                      <Stack>
-                        <Typography variant="subtitle1" fontWeight="600">
-                          Nội dung trưởng thành
-                        </Typography>
-                        <Typography
-                          variant="subtitle1"
-                          fontSize="12px"
-                          color="ink.lighter">
-                          Người dùng có thể thấy nội dung trưởng thành
-                        </Typography>
+                    <Grid xs={12} lg={6}>
+                      <Stack
+                        width="100%"
+                        direction="row"
+                        gap="4px"
+                        alignItems="center"
+                        justifyContent="space-between">
+                        <Stack>
+                          <Typography variant="subtitle1" fontWeight="600">
+                            Nội dung trưởng thành
+                          </Typography>
+                          <Typography
+                            variant="subtitle1"
+                            fontSize="12px"
+                            color="ink.lighter">
+                            Chỉ người dùng trưởng thành có thể thấy truyện này
+                          </Typography>
+                        </Stack>
+                        <Switch
+                          color="primary"
+                          checked={formik.values.is_mature}
+                          onChange={(e) =>
+                            formik.setFieldValue('is_mature', e.target.checked)
+                          }
+                        />
                       </Stack>
-                      <Switch
-                        color="primary"
-                        defaultChecked={formik.values.can_show_mature}
-                        onChange={(value) =>
-                          formik.setFieldValue('can_show_mature', value)
-                        }
-                      />
-                    </Stack>
-                  </Stack>
+                    </Grid>
+                    <Grid xs={12} lg={6}>
+                      <Stack
+                        width="100%"
+                        direction="row"
+                        gap="4px"
+                        alignItems="center"
+                        justifyContent="space-between">
+                        <Stack>
+                          <Typography variant="subtitle1" fontWeight="600">
+                            Đã xuất bản
+                          </Typography>
+                          <Typography
+                            variant="subtitle1"
+                            fontSize="12px"
+                            color="ink.lighter">
+                            Tắt nút này sẽ đưa truyện về bản nháp
+                          </Typography>
+                        </Stack>
+                        <Switch
+                          color="primary"
+                          name="is_draft"
+                          checked={!formik.values.is_draft}
+                          onChange={(e) => {
+                            formik.setFieldValue('is_draft', !e.target.checked);
+                          }}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid xs={12} lg={6}>
+                      <Stack
+                        width="100%"
+                        direction="row"
+                        gap="4px"
+                        alignItems="center"
+                        justifyContent="space-between">
+                        <Stack>
+                          <Typography variant="subtitle1" fontWeight="600">
+                            Truyện bản quyền
+                          </Typography>
+                          <Typography
+                            variant="subtitle1"
+                            fontSize="12px"
+                            color="ink.lighter">
+                            Không thể chỉnh sửa
+                          </Typography>
+                        </Stack>
+                        <Switch
+                          disabled
+                          color="primary"
+                          checked={formik.values.is_copyright}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid xs={12} lg={6}>
+                      <Stack
+                        width="100%"
+                        direction="row"
+                        gap="4px"
+                        alignItems="center"
+                        justifyContent="space-between">
+                        <Stack>
+                          <Typography variant="subtitle1" fontWeight="600">
+                            Truyện trả phi
+                          </Typography>
+                          <Typography
+                            variant="subtitle1"
+                            fontSize="12px"
+                            color="ink.lighter">
+                            Không thể chỉnh sửa
+                          </Typography>
+                        </Stack>
+                        <Switch
+                          disabled
+                          name="is_paywalled"
+                          color="primary"
+                          checked={formik.values.is_paywalled}
+                        />
+                      </Stack>
+                    </Grid>
+                  </Grid>
                 </Card>
               </Grid>
             </Grid>
           </Stack>
-          <Grid container spacing={2}>
-            <Grid xs={12} lg={6}>
-              <Card sx={{ padding: 2 }}>
-                <CardHeader
-                  sx={{ padding: 0, pb: '16px' }}
-                  title={`Truyện của ${story.username}`}
-                />
-                <UserStoriesTable userId={storyId} />
-              </Card>
-            </Grid>
-            <Grid xs={12} lg={6}>
-              <Card sx={{ padding: 2 }}>
-                <CardHeader
-                  sx={{ padding: 0, pb: '16px' }}
-                  title={`Giao dịch của ${story.username}`}
-                />
-                <UserTransactionsTable userId={storyId} />
-              </Card>
-            </Grid>
-          </Grid>
         </Container>
       </Box>
     </>

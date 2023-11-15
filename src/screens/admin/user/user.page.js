@@ -213,7 +213,7 @@ const UserPage = () => {
                     }}
                     variant="outlined"
                     onClick={() => {
-                      router.push(`/users/${row.original.id}`);
+                      router.push(`users/${row.original.id}`);
                     }}>
                     Xem chi tiết
                   </Button>
