@@ -18,7 +18,10 @@ export const request = async ({
   params,
   requestHeaders,
 }) => {
-  const axiosHeaders = convertHeaderToAxiosHeaders(requestHeaders);
+  const axiosHeaders = convertHeaderToAxiosHeaders({
+    ...requestHeaders,
+    'Content-Security-Policy': 'upgrade-insecure-requests',
+  });
   const baseURL = process.env.API;
   const res = await axios.request({
     url: baseURL + url,

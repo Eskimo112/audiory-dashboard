@@ -9,6 +9,7 @@ export const useRequestHeader = () => {
     if (!auth?.user.token) return undefined;
 
     const requestHeaders = {
+      'Content-Security-Policy': 'upgrade-insecure-requests',
       Authorization: `Bearer ${auth?.user.token}`,
     };
 
