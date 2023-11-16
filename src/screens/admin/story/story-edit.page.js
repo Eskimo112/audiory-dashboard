@@ -91,19 +91,19 @@ const StoryEditPage = ({ storyId }) => {
     },
   });
 
-  const canSaveChanges = useMemo(() => {
-    if (selectedFile) return true;
+  // const canSaveChanges = useMemo(() => {
+  //   if (selectedFile) return true;
 
-    if (!story) return false;
-    if (!formik.values) return false;
-    for (const key of Object.keys(formik.values)) {
-      if (!formik.values[key] && !story[key]) continue;
-      if (formik.values[key] !== story[key]) {
-        return true;
-      }
-    }
-    return false;
-  }, [formik.values, story, selectedFile]);
+  //   if (!story) return false;
+  //   if (!formik.values) return false;
+  //   for (const key of Object.keys(formik.values)) {
+  //     if (!formik.values[key] && !story[key]) continue;
+  //     if (formik.values[key] !== story[key]) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }, [formik.values, story, selectedFile]);
 
   const handleDeactivate = async () => {
     try {
@@ -190,12 +190,12 @@ const StoryEditPage = ({ storyId }) => {
                     </Button>
                   </DialogActions>
                 </Dialog>
-                <Button
+                {/* <Button
                   disabled={!canSaveChanges}
                   variant="contained"
                   onClick={() => formik.handleSubmit()}>
                   Lưu thay đổi
-                </Button>
+                </Button> */}
               </Stack>
             </Stack>
             <Grid container spacing={3}>
@@ -333,6 +333,7 @@ const StoryEditPage = ({ storyId }) => {
                           size="small"
                           sx={{ padding: 0 }}>
                           <Select
+                            disabled
                             {...SHARED_SELECT_PROPS}
                             fullWidth
                             inputProps={{
@@ -358,6 +359,7 @@ const StoryEditPage = ({ storyId }) => {
                       <Stack gap={1}>
                         <FormLabel>Tên truyện</FormLabel>
                         <TextField
+                          disabled
                           error={
                             !!(formik.touched.title && formik.errors.title)
                           }
@@ -378,7 +380,8 @@ const StoryEditPage = ({ storyId }) => {
                     <Grid xs={12} lg={12}>
                       <Stack gap={1}>
                         <FormLabel>Thẻ</FormLabel>
-                        <TextField
+                        {/* <TextField
+                          disabled
                           value={tagValue}
                           onChange={(e) => setTagValue(e.target.value)}
                           fullWidth
@@ -400,7 +403,7 @@ const StoryEditPage = ({ storyId }) => {
                               ]);
                             }
                           }}
-                        />
+                        /> */}
                         <Stack direction="row" gap="6px" flexWrap="wrap">
                           {formik.values.tags?.map((tag, index) => (
                             <Box
@@ -416,7 +419,7 @@ const StoryEditPage = ({ storyId }) => {
                                 gap: '4px',
                               }}>
                               {tag}
-                              <SvgIcon
+                              {/* <SvgIcon
                                 sx={{
                                   width: '14px',
                                   color: 'ink.lighter',
@@ -429,7 +432,7 @@ const StoryEditPage = ({ storyId }) => {
                                   );
                                 }}>
                                 <Close />
-                              </SvgIcon>
+                              </SvgIcon> */}
                             </Box>
                           ))}
                         </Stack>
@@ -440,6 +443,7 @@ const StoryEditPage = ({ storyId }) => {
                       <Stack gap={1}>
                         <FormLabel>Giới thiệu</FormLabel>
                         <TextField
+                          disabled
                           fullWidth
                           multiline
                           minRows={5}
@@ -472,6 +476,7 @@ const StoryEditPage = ({ storyId }) => {
                           </Typography>
                         </Stack>
                         <Switch
+                          disabled
                           color="primary"
                           checked={formik.values.is_mature}
                           onChange={(e) =>
@@ -491,14 +496,15 @@ const StoryEditPage = ({ storyId }) => {
                           <Typography variant="subtitle1" fontWeight="600">
                             Đã xuất bản
                           </Typography>
-                          <Typography
+                          {/* <Typography
                             variant="subtitle1"
                             fontSize="12px"
                             color="ink.lighter">
                             Tắt nút này sẽ đưa truyện về bản nháp
-                          </Typography>
+                          </Typography> */}
                         </Stack>
                         <Switch
+                          disabled
                           color="primary"
                           name="is_draft"
                           checked={!formik.values.is_draft}

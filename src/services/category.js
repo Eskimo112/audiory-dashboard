@@ -32,24 +32,12 @@ export default class CategoryService {
     return response.data;
   }
 
-  async deactivateById(categoryId) {
-    const url = `categories/${categoryId}/deactivate`;
+  async deleteById(categoryId) {
+    const url = `categories/${categoryId}`;
 
     const response = await request({
       url,
-      method: 'post',
-      requestHeaders: this.requestHeader,
-    });
-    if (!response.data) return null;
-    return response.data;
-  }
-
-  async activateById(categoryId) {
-    const url = `categories/${categoryId}/activate`;
-
-    const response = await request({
-      url,
-      method: 'post',
+      method: 'delete',
       requestHeaders: this.requestHeader,
     });
     if (!response.data) return null;

@@ -19,11 +19,10 @@ import { useQuery } from 'react-query';
 
 import AppBreadCrumbs from '@/components/app-bread-crumbs';
 import { SHARED_PAGE_SX } from '@/constants/page_sx';
+import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
-
-import { SHARED_TABLE_PROPS } from '../../../constants/table';
-import SystemConfigService from '../../../services/system-config';
-import { formatDate } from '../../../utils/formatters';
+import SystemConfigService from '@/services/system-config';
+import { formatDate } from '@/utils/formatters';
 
 const SystemConfigDetailPage = ({ configId }) => {
   const requestHeader = useRequestHeader();

@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
-import { Edit, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
   Box,
   Card,
@@ -25,15 +25,17 @@ import {
   TRANSACTION_TYPE_MAP,
 } from '@/constants/status_map';
 import { SHARED_TABLE_PROPS } from '@/constants/table';
+import { useRequestHeader } from '@/hooks/use-request-header';
 import TransactionService from '@/services/transaction';
 import { formatDate } from '@/utils/formatters';
 
 import UserInfo from '../report/user-info.component';
 
 const TransactionPage = () => {
+  const requestHeader = useRequestHeader();
   const { data: transactions, isLoading } = useQuery(
     ['transaction'],
-    async () => await TransactionService.getAll(),
+    async () => await new TransactionService(requestHeader).getAll(),
   );
 
   const router = useRouter();

@@ -99,6 +99,7 @@ const CategoryEditPage = ({ categoryId }) => {
         </Container>
       </Box>
     );
+
   return (
     <>
       <Head>

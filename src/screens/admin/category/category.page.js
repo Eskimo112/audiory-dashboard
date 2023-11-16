@@ -1,10 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { Edit, VisibilityOff } from '@mui/icons-material';
+import { DeleteOutline, Edit } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -12,6 +12,9 @@ import {
   Chip,
   CircularProgress,
   Container,
+  Dialog,
+  DialogActions,
+  DialogTitle,
   MenuItem,
   Stack,
   SvgIcon,
@@ -26,15 +29,33 @@ import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import CategoryService from '@/services/category';
 import { formatDate } from '@/utils/formatters';
+import { toastError, toastSuccess } from '@/utils/notification';
 
 const CategoryPage = () => {
   const requestHeader = useRequestHeader();
-  const { data: categories, isLoading } = useQuery(
+  const {
+    data: categories,
+    isLoading,
+    refetch,
+  } = useQuery(
     ['category'],
     async () => await new CategoryService(requestHeader).getAll(),
   );
 
   const router = useRouter();
+
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const handleDelete = async (category) => {
+    try {
+      await new CategoryService(requestHeader).deleteById(category.id);
+      toastSuccess('Xóa thành công');
+    } catch (e) {
+      toastError('Đã có lỗi xảy ra, thử lại sau.');
+    }
+    refetch();
+    setOpenDialog(false);
+  };
 
   const columns = useMemo(
     () => [
@@ -180,13 +201,43 @@ const CategoryPage = () => {
                   Chỉnh sửa
                 </MenuItem>,
                 <MenuItem
-                  key="de-activate"
-                  sx={{ color: 'error.main' }}
-                  onClick={() => {}}>
+                  key="delete"
+                  sx={{
+                    color: 'error.main',
+                  }}
+                  onClick={() => {
+                    setOpenDialog(true);
+                  }}>
+                  <Dialog
+                    open={openDialog}
+                    onClose={() => setOpenDialog(false)}
+                    PaperProps={{
+                      sx: {
+                        p: 1,
+                        width: '400px',
+                      },
+                    }}>
+                    <DialogTitle>
+                      Bạn có chắc chắn xóa thể loại này?
+                    </DialogTitle>
+                    <DialogActions>
+                      <Button
+                        variant="outlined"
+                        onClick={() => setOpenDialog(false)}>
+                        Hủy bỏ
+                      </Button>
+                      <Button
+                        variant="contained"
+                        onClick={() => handleDelete(row.original)}
+                        autoFocus>
+                        Xác nhận
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
                   <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
-                    <VisibilityOff />
+                    <DeleteOutline />
                   </SvgIcon>
-                  Vô hiệu hóa
+                  Xóa thể loại
                 </MenuItem>,
               ]}
               columns={columns}

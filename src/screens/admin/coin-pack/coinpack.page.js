@@ -1,11 +1,17 @@
 /* eslint-disable no-unused-vars */
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { Edit, Visibility, VisibilityOff } from '@mui/icons-material';
+import {
+  Edit,
+  ToggleOn,
+  ToggleOnOutlined,
+  Visibility,
+  VisibilityOff,
+} from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -13,6 +19,10 @@ import {
   Chip,
   CircularProgress,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   MenuItem,
   Stack,
   SvgIcon,
@@ -28,12 +38,19 @@ import { useRequestHeader } from '@/hooks/use-request-header';
 import CoinPackService from '@/services/coinpack';
 import { formatDate, formatNumber } from '@/utils/formatters';
 
+import { toastError, toastSuccess } from '../../../utils/notification';
+
 const CoinPackPage = () => {
   const requestHeader = useRequestHeader();
-  const { data: coinpacks, isLoading } = useQuery(
+  const {
+    data: coinpacks = [],
+    isLoading,
+    refetch,
+  } = useQuery(
     ['coinpacks'],
     async () => await new CoinPackService(requestHeader).getAll(),
   );
+  const [openDialog, setOpenDialog] = useState(false);
 
   const router = useRouter();
 
@@ -92,11 +109,11 @@ const CoinPackPage = () => {
         accessorFn: (row) => formatDate(row.created_date),
       },
       {
-        accessorKey: 'is_enabled',
+        accessorKey: 'deleted_date',
         header: 'Trạng thái',
         size: 80,
         accessorFn: (row) => {
-          return STATUS_MAP[row.is_enabled ?? true];
+          return row.deleted_date ? 'Vô hiệu hóa' : 'Kích hoạt';
         },
         filterFn: 'equals',
         filterSelectOptions: Object.values(STATUS_MAP).map((value) => ({
@@ -121,6 +138,22 @@ const CoinPackPage = () => {
     ],
     [],
   );
+
+  const handleDeactivate = async (coinpack) => {
+    try {
+      if (coinpack?.deleted_date) {
+        await new CoinPackService(requestHeader).activateById(coinpack.id);
+        toastSuccess('Đã kích hoạt thành công');
+      } else {
+        await new CoinPackService(requestHeader).deactivateById(coinpack.id);
+        toastSuccess('Đã vô hiệu hóa thành công');
+      }
+    } catch (e) {
+      toastError('Đã có lỗi xảy ra, thử lại sau.');
+    }
+    refetch();
+    setOpenDialog(false);
+  };
 
   const initialState = {
     columnVisibility: {
@@ -186,14 +219,53 @@ const CoinPackPage = () => {
                 </MenuItem>,
                 <MenuItem
                   key="deactiviate"
-                  sx={{ color: 'error.main' }}
+                  sx={{
+                    color: row.original?.deleted_date
+                      ? 'success.main'
+                      : 'error.main',
+                  }}
                   onClick={() => {
-                    router.push(`/admin/coinpacks/${row.original.id}`);
+                    setOpenDialog(true);
                   }}>
+                  <Dialog
+                    open={openDialog}
+                    onClose={() => setOpenDialog(false)}
+                    PaperProps={{
+                      sx: {
+                        p: 1,
+                        width: '400px',
+                      },
+                    }}>
+                    <DialogTitle>
+                      Bạn có chắc chắn{' '}
+                      {!row.original?.deleted_date
+                        ? ' vô hiệu hóa'
+                        : 'kích hoạt'}{' '}
+                      gói xu này?
+                    </DialogTitle>
+                    <DialogContent></DialogContent>
+                    <DialogActions>
+                      <Button
+                        variant="outlined"
+                        onClick={() => setOpenDialog(false)}>
+                        Hủy bỏ
+                      </Button>
+                      <Button
+                        variant="contained"
+                        onClick={() => handleDeactivate(row.original)}
+                        autoFocus>
+                        Xác nhận
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
                   <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
-                    <VisibilityOff />
+                    {!row.original.deleted_date ? (
+                      <VisibilityOff />
+                    ) : (
+                      <ToggleOnOutlined />
+                    )}
                   </SvgIcon>
-                  Vô hiệu hóa
+                  {!row.original.deleted_date ? 'Vô hiệu hóa' : 'Kích hoạt'}
                 </MenuItem>,
               ]}
               columns={columns}

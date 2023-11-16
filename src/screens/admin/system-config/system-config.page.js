@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   Card,
+  Chip,
   CircularProgress,
   Container,
   MenuItem,
@@ -24,6 +25,8 @@ import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import SystemConfigService from '@/services/system-config';
 import { formatDate } from '@/utils/formatters';
+
+import { STATUS_MAP } from '../../../constants/status_map';
 
 const SystemConfigPage = () => {
   const requestHeader = useRequestHeader();
@@ -54,15 +57,42 @@ const SystemConfigPage = () => {
         header: 'Ngày hiệu lực',
         accessorFn: (row) => formatDate(row.effective_date),
       },
-      {
-        accessorKey: 'created_date',
-        header: 'Ngày tạo',
-        accessorFn: (row) => formatDate(row.effective_date),
-      },
+      // {
+      //   accessorKey: 'created_date',
+      //   header: 'Ngày tạo',
+      //   accessorFn: (row) => formatDate(row.effective_date),
+      // },
       {
         accessorKey: 'updated_date',
         header: 'Ngày cập nhật',
         accessorFn: (row) => formatDate(row.effective_date),
+      },
+      {
+        accessorKey: 'deleted_date',
+        header: 'Trạng thái',
+        size: 80,
+        accessorFn: (row) => {
+          return row.deleted_date ? 'Vô hiệu hóa' : 'Kích hoạt';
+        },
+        filterFn: 'equals',
+        filterSelectOptions: Object.values(STATUS_MAP).map((value) => ({
+          text: value,
+          value,
+        })),
+        filterVariant: 'select',
+        Cell: ({ cell }) => {
+          if (!cell.getValue()) return <></>;
+          const bgColor = ['success.alpha20', 'error.alpha20'];
+          const idx = Object.values(STATUS_MAP).indexOf(cell.getValue());
+          return (
+            <Chip
+              label={cell.getValue()}
+              sx={{
+                backgroundColor: bgColor[idx],
+              }}
+            />
+          );
+        },
       },
     ],
     [],

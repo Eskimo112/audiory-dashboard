@@ -1,7 +1,11 @@
 import { request } from './__base';
 
 export default class TransactionService {
-  static async getAll() {
+  constructor(requestHeader) {
+    this.requestHeader = requestHeader ?? undefined;
+  }
+
+  async getAll() {
     const url = 'transactions';
 
     const response = await request({
@@ -11,15 +15,20 @@ export default class TransactionService {
         page: 1,
         page_size: Number.MAX_SAFE_INTEGER,
       },
+      requestHeaders: this.requestHeader,
     });
     if (!response.data) return [];
     return response.data;
   }
 
-  static async getById(transactionId) {
+  async getById(transactionId) {
     const url = `transactions/${transactionId}`;
 
-    const response = await request({ url, method: 'get' });
+    const response = await request({
+      url,
+      method: 'get',
+      requestHeaders: this.requestHeader,
+    });
     if (!response.data) return null;
     return response.data;
   }
