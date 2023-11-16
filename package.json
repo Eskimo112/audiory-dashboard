@@ -5,7 +5,7 @@
   "licence": "MIT",
   "private": false,
   "scripts": {
-    "dev": "next",
+    "dev": "NODE_TLS_REJECT_UNAUTHORIZED=0 next dev",
     "build": "next build",
     "start": "next start",
     "export": "next export",
@@ -36,6 +36,7 @@
     "echarts": "^5.4.3",
     "firebase": "^10.5.2",
     "formik": "2.2.9",
+    "https": "^1.0.0",
     "jwt-decode": "^4.0.0",
     "material-react-table": "^1.15.1",
     "next": "13.1.6",

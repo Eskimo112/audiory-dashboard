@@ -1,4 +1,5 @@
 import axios, { AxiosHeaders } from 'axios';
+import https from 'https';
 
 export function convertHeaderToAxiosHeaders(reqHeaders) {
   if (!reqHeaders) {
@@ -11,6 +12,12 @@ export function convertHeaderToAxiosHeaders(reqHeaders) {
   return axiosHeaders;
 }
 
+const axiosInstance = axios.create({
+  httpsAgent: new https.Agent({
+    rejectUnauthorized: false,
+  }),
+});
+
 export const request = async ({
   url,
   method,
@@ -20,10 +27,11 @@ export const request = async ({
 }) => {
   const axiosHeaders = convertHeaderToAxiosHeaders({
     ...requestHeaders,
-    'Content-Security-Policy': 'upgrade-insecure-requests',
+    // 'Content-Security-Policy': 'upgrade-insecure-requests',
   });
+
   const baseURL = process.env.API;
-  const res = await axios.request({
+  const res = await axiosInstance.request({
     url: baseURL + url,
     method,
     params,
