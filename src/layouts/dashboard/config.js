@@ -8,6 +8,7 @@ import GiftIcon from '@heroicons/react/24/outline/GiftIcon';
 import RectangleStackIcon from '@heroicons/react/24/outline/RectangleStackIcon';
 import UserCircleIcon from '@heroicons/react/24/outline/UserCircleIcon';
 import UsersIcon from '@heroicons/react/24/outline/UsersIcon';
+import { FilterList } from '@mui/icons-material';
 import { SvgIcon } from '@mui/material';
 
 export const items = [
@@ -71,6 +72,15 @@ export const items = [
     icon: (
       <SvgIcon fontSize="small">
         <GiftIcon />
+      </SvgIcon>
+    ),
+  },
+  {
+    title: 'Quản lý cấp',
+    path: '/admin/levels',
+    icon: (
+      <SvgIcon fontSize="small">
+        <FilterList />
       </SvgIcon>
     ),
   },

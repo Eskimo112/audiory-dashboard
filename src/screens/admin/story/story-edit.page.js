@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
-import { Close, ListRounded } from '@mui/icons-material';
+import { ListRounded } from '@mui/icons-material';
 import {
   Avatar,
   Box,
@@ -53,7 +53,7 @@ const StoryEditPage = ({ storyId }) => {
   const [openDialog, setOpenDialog] = useState();
   const queryClient = useQueryClient();
   const [selectedFile, setSelectedFile] = useState();
-  const [tagValue, setTagValue] = useState();
+  // const [tagValue, setTagValue] = useState();
   const formik = useFormik({
     initialValues: {
       category_id: story?.category_id ?? '',

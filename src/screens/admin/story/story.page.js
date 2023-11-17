@@ -27,7 +27,6 @@ import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { SHARED_TABLE_PROPS } from '@/constants/table';
 import StoryService from '@/services/story';
 import {
-  Edit,
   ToggleOnOutlined,
   Visibility,
   VisibilityOff,
@@ -331,18 +330,18 @@ const StoryPage = () => {
                   <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
                     <Visibility />
                   </SvgIcon>
-                  Xem
+                  Xem chi tiết
                 </MenuItem>,
-                <MenuItem
-                  key="edit"
-                  onClick={() => {
-                    router.push(`/admin/stories/${row.original.id}`);
-                  }}>
-                  <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
-                    <Edit />
-                  </SvgIcon>
-                  Chỉnh sửa
-                </MenuItem>,
+                // <MenuItem
+                //   key="edit"
+                //   onClick={() => {
+                //     router.push(`/admin/stories/${row.original.id}`);
+                //   }}>
+                //   <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+                //     <Edit />
+                //   </SvgIcon>
+                //   Chỉnh sửa
+                // </MenuItem>,
                 <MenuItem
                   key="deactiviate"
                   sx={{

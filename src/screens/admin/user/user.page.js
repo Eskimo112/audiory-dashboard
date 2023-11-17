@@ -1,8 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
+import {
+  ToggleOnOutlined,
+  Visibility,
+  VisibilityOff,
+} from '@mui/icons-material';
 import {
   Avatar,
   Box,
@@ -11,7 +16,12 @@ import {
   Chip,
   CircularProgress,
   Container,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  MenuItem,
   Stack,
+  SvgIcon,
   Typography,
 } from '@mui/material';
 import { MaterialReactTable } from 'material-react-table';
@@ -22,6 +32,9 @@ import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import UserService from '@/services/user';
 import { formatDate } from '@/utils/formatters';
+import { toastError, toastSuccess } from '@/utils/notification';
+
+import { STATUS_MAP } from '../../../constants/status_map';
 
 const ROLE_ID_MAP = {
   1: 'Người dùng',
@@ -35,7 +48,22 @@ const UserPage = () => {
     async () => await new UserService(requestHeader).getAll(),
   );
 
-  // const filteredUsers = (users ?? []).filter((user) => !!user.role_id);
+  const [openDialog, setOpenDialog] = useState();
+
+  const handleDeactivate = async (user) => {
+    try {
+      if (user?.deleted_date) {
+        await new UserService(requestHeader).activateById(user.id);
+        toastSuccess('Đã kích hdw oạt thành công');
+      } else {
+        await new UserService(requestHeader).deactivateById(user.id);
+        toastSuccess('Đã vô hiệu hóa thành công');
+      }
+    } catch (e) {
+      toastError('Đã có lỗi xảy ra, thử lại sau.');
+    }
+    setOpenDialog(false);
+  };
 
   const router = useRouter();
 
@@ -134,6 +162,33 @@ const UserPage = () => {
           />
         ),
       },
+      {
+        accessorKey: 'deleted_date',
+        header: 'Trạng thái',
+        size: 80,
+        accessorFn: (row) => {
+          return row.deleted_date ? 'Vô hiệu hóa' : 'Kích hoạt';
+        },
+        filterFn: 'equals',
+        filterSelectOptions: Object.values(STATUS_MAP).map((value) => ({
+          text: value,
+          value,
+        })),
+        filterVariant: 'select',
+        Cell: ({ cell }) => {
+          if (!cell.getValue()) return <></>;
+          const bgColor = ['success.alpha20', 'error.alpha20'];
+          const idx = Object.values(STATUS_MAP).indexOf(cell.getValue());
+          return (
+            <Chip
+              label={cell.getValue()}
+              sx={{
+                backgroundColor: bgColor[idx],
+              }}
+            />
+          );
+        },
+      },
     ],
     [],
   );
@@ -164,7 +219,7 @@ const UserPage = () => {
   return (
     <>
       <Head>
-        <title>Users | Audiory</title>
+        <title>Người dùng | Audiory</title>
       </Head>
       <Box component="main" sx={SHARED_PAGE_SX}>
         <Container maxWidth="xl">
@@ -185,40 +240,81 @@ const UserPage = () => {
               </Button> */}
             </Stack>
             <MaterialReactTable
-              // renderRowActionMenuItems={({ closeMenu, row, table }) => [
-              //   <MenuItem
-              //     key="edit"
-              //     onClick={() => {
-              //       router.push(`/users/${row.original.id}`);
-              //     }}>
-              //     Chỉnh sửa
-              //   </MenuItem>,
-              //   <MenuItem key="delete" onClick={() => console.info('Delete')}>
-              //     Vô hiệu hóa
-              //   </MenuItem>,
-              // ]}
               columns={columns}
               data={users}
               initialState={initialState}
               {...SHARED_TABLE_PROPS}
-              displayColumnDefOptions={{
-                'mrt-row-actions': { header: '', size: 150 },
-              }}
-              renderRowActions={({ row }) => {
-                return (
-                  <Button
-                    sx={{
-                      borderRadius: 4,
-                      padding: '5px 12px',
-                    }}
-                    variant="outlined"
-                    onClick={() => {
-                      router.push(`users/${row.original.id}`);
+              renderRowActionMenuItems={({ closeMenu, row, table }) => [
+                <MenuItem
+                  key="show"
+                  onClick={() => {
+                    router.push(`/admin/users/${row.original.id}`);
+                  }}>
+                  <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+                    <Visibility />
+                  </SvgIcon>
+                  Xem chi tiết
+                </MenuItem>,
+                // <MenuItem
+                //   key="edit"
+                //   onClick={() => {
+                //     router.push(`/admin/stories/${row.original.id}`);
+                //   }}>
+                //   <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+                //     <Edit />
+                //   </SvgIcon>
+                //   Chỉnh sửa
+                // </MenuItem>,
+                <MenuItem
+                  key="deactiviate"
+                  sx={{
+                    color: row.original?.deleted_date
+                      ? 'success.main'
+                      : 'error.main',
+                  }}
+                  onClick={() => {
+                    setOpenDialog(true);
+                  }}>
+                  <Dialog
+                    open={openDialog}
+                    onClose={() => setOpenDialog(false)}
+                    PaperProps={{
+                      sx: {
+                        p: 1,
+                        width: '400px',
+                      },
                     }}>
-                    Xem chi tiết
-                  </Button>
-                );
-              }}
+                    <DialogTitle>
+                      Bạn có chắc chắn{' '}
+                      {!row.original?.deleted_date
+                        ? ' vô hiệu hóa'
+                        : 'kích hoạt'}{' '}
+                      người dùng này?
+                    </DialogTitle>
+                    <DialogActions>
+                      <Button
+                        variant="outlined"
+                        onClick={() => setOpenDialog(false)}>
+                        Hủy bỏ
+                      </Button>
+                      <Button
+                        variant="contained"
+                        onClick={() => handleDeactivate(row.original)}
+                        autoFocus>
+                        Xác nhận
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                  <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+                    {!row.original.deleted_date ? (
+                      <VisibilityOff />
+                    ) : (
+                      <ToggleOnOutlined />
+                    )}
+                  </SvgIcon>
+                  {!row.original.deleted_date ? 'Vô hiệu hóa' : 'Kích hoạt'}
+                </MenuItem>,
+              ]}
             />
           </Stack>
         </Container>

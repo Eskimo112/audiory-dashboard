@@ -144,7 +144,7 @@ export const PaidRateChart = (props) => {
             </Button>
           </Stack>
         }
-        title="Người dùng theo cấp"
+        title="Người dùng trả phí"
       />
       <CardContent>
         {isLoading || isFetching ? (

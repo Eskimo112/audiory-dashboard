@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import Head from 'next/head';
 
@@ -15,7 +15,6 @@ import {
   DialogTitle,
   FormLabel,
   Stack,
-  Switch,
   TextField,
   Typography,
   Unstable_Grid2 as Grid,
@@ -86,19 +85,19 @@ const UserDetaiPage = ({ userId }) => {
     setOpenDialog(false);
   };
 
-  const canSaveChanges = useMemo(() => {
-    if (selectedFile) return true;
+  // const canSaveChanges = useMemo(() => {
+  //   if (selectedFile) return true;
 
-    if (!user) return false;
-    if (!formik.values) return false;
-    for (const key of Object.keys(formik.values)) {
-      if (!formik.values[key] && !user[key]) continue;
-      if (formik.values[key] !== user[key]) {
-        return true;
-      }
-    }
-    return false;
-  }, [formik.values, user, selectedFile]);
+  //   if (!user) return false;
+  //   if (!formik.values) return false;
+  //   for (const key of Object.keys(formik.values)) {
+  //     if (!formik.values[key] && !user[key]) continue;
+  //     if (formik.values[key] !== user[key]) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }, [formik.values, user, selectedFile]);
 
   if (isLoading) return <CircularProgress />;
   return (
@@ -118,7 +117,7 @@ const UserDetaiPage = ({ userId }) => {
               <Stack spacing={1}>
                 <Typography variant="h4">Chỉnh sửa hồ sơ</Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
-                <AppBreadCrumbs />
+                <AppBreadCrumbs name1={user?.username} />
               </Stack>
               <Stack direction="row" gap="16px" height="fit-content">
                 <Button
@@ -138,7 +137,8 @@ const UserDetaiPage = ({ userId }) => {
                   }}>
                   <DialogTitle>
                     Bạn có chắc chắn
-                    {!user?.deleted_date ? ' vô hiệu hóa' : 'kích hoạt'} người ?
+                    {!user?.deleted_date ? ' vô hiệu hóa' : 'kích hoạt'} người
+                    dùng này?
                   </DialogTitle>
                   <DialogContent>
                     {/* <DialogContentText>
@@ -160,9 +160,9 @@ const UserDetaiPage = ({ userId }) => {
                     </Button>
                   </DialogActions>
                 </Dialog>
-                <Button disabled={!canSaveChanges} variant="contained">
+                {/* <Button disabled={!canSaveChanges} variant="contained">
                   Lưu thay đổi
-                </Button>
+                </Button> */}
               </Stack>
             </Stack>
             <Grid container spacing={3}>
@@ -192,6 +192,7 @@ const UserDetaiPage = ({ userId }) => {
                         <Stack gap={1}>
                           <FormLabel>Họ và tên</FormLabel>
                           <TextField
+                            disabled
                             error={
                               !!(
                                 formik.touched.full_name &&
@@ -218,6 +219,7 @@ const UserDetaiPage = ({ userId }) => {
                         <Stack gap={1}>
                           <FormLabel>Tên người dùng</FormLabel>
                           <TextField
+                            disabled
                             error={
                               !!(
                                 formik.touched.username &&
@@ -238,6 +240,7 @@ const UserDetaiPage = ({ userId }) => {
                         <Stack gap={1}>
                           <FormLabel>Email</FormLabel>
                           <TextField
+                            disabled
                             error={
                               !!(formik.touched.email && formik.errors.email)
                             }
@@ -259,6 +262,7 @@ const UserDetaiPage = ({ userId }) => {
                       <Stack gap={1}>
                         <FormLabel>Giới thiệu</FormLabel>
                         <TextField
+                          disabled
                           fullWidth
                           multiline
                           minRows={5}
@@ -302,7 +306,7 @@ const UserDetaiPage = ({ userId }) => {
                       </Typography>
                     </Stack>
 
-                    <Stack
+                    {/* <Stack
                       width="100%"
                       direction="row"
                       gap="4px"
@@ -326,7 +330,7 @@ const UserDetaiPage = ({ userId }) => {
                           formik.setFieldValue('can_show_mature', value)
                         }
                       />
-                    </Stack>
+                    </Stack> */}
                   </Stack>
                 </Card>
               </Grid>

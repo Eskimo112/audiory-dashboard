@@ -2,31 +2,23 @@ import { useMemo } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Box, Button, Chip, CircularProgress, Typography } from '@mui/material';
+import { Box, Button, Chip, CircularProgress } from '@mui/material';
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
-import { SHARED_TABLE_PROPS } from '@/constants/table';
-import { useRequestHeader } from '@/hooks/use-request-header';
-import UserService from '@/services/user';
-
-import {
-  CHIP_BG_COLORS,
-  CHIP_FONT_COLORS,
-} from '../../../constants/chip_colors';
+import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '@/constants/chip_colors';
 import {
   TRANSACTION_STATUS_MAP,
   TRANSACTION_TYPE_MAP,
-} from '../../../constants/status_map';
-import { formatDate } from '../../../utils/formatters';
+} from '@/constants/status_map';
+import { SHARED_TABLE_PROPS } from '@/constants/table';
+import { useRequestHeader } from '@/hooks/use-request-header';
+import UserService from '@/services/user';
+import { formatDate } from '@/utils/formatters';
 
 const UserTransactionsTable = ({ userId }) => {
   const requestHeader = useRequestHeader();
-  const {
-    data: transactions = [],
-    isLoading,
-    isError,
-  } = useQuery(
+  const { data: transactions = [], isLoading } = useQuery(
     ['user', userId, 'transactions'],
     async () =>
       await new UserService(requestHeader).getTransactionsByUserId(userId),
@@ -177,25 +169,26 @@ const UserTransactionsTable = ({ userId }) => {
             display: 'none',
           },
         }}
-        displayColumnDefOptions={{
-          'mrt-row-actions': { header: '', size: 150 },
-        }}
-        renderRowActions={({ row }) => {
-          return (
-            <Button
-              sx={{
-                borderRadius: 4,
-                padding: '4px 8px',
-                fontSize: '12px',
-              }}
-              variant="outlined"
-              onClick={() => {
-                router.push(`/transaction/${row.original.id}`);
-              }}>
-              Xem chi tiết
-            </Button>
-          );
-        }}
+        enableRowActions={false}
+        // displayColumnDefOptions={{
+        //   'mrt-row-actions': { header: '', size: 150 },
+        // }}
+        // renderRowActions={({ row }) => {
+        //   return (
+        //     <Button
+        //       sx={{
+        //         borderRadius: 4,
+        //         padding: '4px 8px',
+        //         fontSize: '12px',
+        //       }}
+        //       variant="outlined"
+        //       onClick={() => {
+        //         router.push(`/transaction/${row.original.id}`);
+        //       }}>
+        //       Xem chi tiết
+        //     </Button>
+        //   );
+        // }}
       />
     </>
   );
