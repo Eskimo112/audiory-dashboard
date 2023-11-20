@@ -23,14 +23,14 @@ import {
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
 
+import { AppLottie } from '@/components/app-lottie';
 import { SHARED_PAGE_SX } from '@/constants/page_sx';
+import { STATUS_MAP } from '@/constants/status_map';
 import { SHARED_TABLE_PROPS } from '@/constants/table';
+import { useRequestHeader } from '@/hooks/use-request-header';
 import GiftService from '@/services/gift';
 import { formatDate } from '@/utils/formatters';
-
-import { STATUS_MAP } from '../../../constants/status_map';
-import { useRequestHeader } from '../../../hooks/use-request-header';
-import { toastError, toastSuccess } from '../../../utils/notification';
+import { toastError, toastSuccess } from '@/utils/notification';
 
 const GiftPage = () => {
   const requestHeader = useRequestHeader();
@@ -83,19 +83,17 @@ const GiftPage = () => {
       {
         accessorKey: 'image_url',
         header: 'Ảnh',
-        //   Cell: ({ cell }) => {
-        //     if (!cell.getValue()) return;
-        //     return (
-        //       <Box display="flex" alignItems="center">
-        //         <Box
-        //           component="img"
-        //           src={cell.getValue()}
-        //           alt={cell.getValue()}
-        //           width={40}
-        //           height={40}></Box>
-        //       </Box>
-        //     );
-        //   },
+        Cell: ({ cell }) => {
+          if (!cell.getValue()) return;
+          return (
+            <Box display="flex" alignItems="center">
+              <AppLottie
+                url={cell.getValue()}
+                width={50}
+                height={50}></AppLottie>
+            </Box>
+          );
+        },
       },
       {
         accessorKey: 'created_date',

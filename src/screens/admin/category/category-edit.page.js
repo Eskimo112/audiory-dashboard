@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 
 import {
   Box,
@@ -35,6 +36,7 @@ const CategoryEditPage = ({ categoryId }) => {
     ['category', categoryId],
     async () => await new CategoryService(requestHeader).getById(categoryId),
   );
+  const router = useRouter();
 
   const [openDialog, setOpenDialog] = useState();
   const queryClient = useQueryClient();
@@ -74,15 +76,11 @@ const CategoryEditPage = ({ categoryId }) => {
     return false;
   }, [formik.values, category, selectedFile]);
 
-  const handleDeactivate = async () => {
+  const handleDelete = async () => {
     try {
-      if (category?.deleted_date) {
-        await new CategoryService(requestHeader).activateById(categoryId);
-        toastSuccess('Đã kích hoạt thành công');
-      } else {
-        await new CategoryService(requestHeader).deactivateById(categoryId);
-        toastSuccess('Đã vô hiệu hóa thành công');
-      }
+      await new CategoryService(requestHeader).deleteById(categoryId);
+      router.push('/admin/categories');
+      toastSuccess('Đã xóa thành công');
     } catch (e) {
       toastError('Đã có lỗi xảy ra, thử lại sau.');
     }
@@ -122,9 +120,9 @@ const CategoryEditPage = ({ categoryId }) => {
               <Stack direction="row" gap="16px" height="fit-content">
                 <Button
                   variant="outlined"
-                  color={!category?.deleted_date ? 'error' : 'success'}
+                  color={'error'}
                   onClick={() => setOpenDialog(true)}>
-                  {!category?.deleted_date ? 'Vô hiệu hóa' : 'Kích hoạt'}
+                  Xóa
                 </Button>
                 <Dialog
                   open={openDialog}
@@ -135,11 +133,7 @@ const CategoryEditPage = ({ categoryId }) => {
                       width: '400px',
                     },
                   }}>
-                  <DialogTitle>
-                    Bạn có chắc chắn
-                    {!category?.deleted_date ? ' vô hiệu hóa' : 'kích hoạt'} thể
-                    loại này?
-                  </DialogTitle>
+                  <DialogTitle>Bạn có chắc chắn xóa thể loại này?</DialogTitle>
                   <DialogContent>
                     {/* <DialogContentText>
                       Điều này sẽ làm truyện bị ẩn khỏi tất cả người dùng, bao
@@ -154,7 +148,7 @@ const CategoryEditPage = ({ categoryId }) => {
                     </Button>
                     <Button
                       variant="contained"
-                      onClick={handleDeactivate}
+                      onClick={handleDelete}
                       autoFocus>
                       Xác nhận
                     </Button>

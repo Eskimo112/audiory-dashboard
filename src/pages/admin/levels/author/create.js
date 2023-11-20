@@ -1,8 +1,8 @@
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
-import LevelPage from '@/screens/admin/level/level.page';
+import AuthorLevelCreatePage from '@/screens/admin/level/author-level-create.page';
 
-const Page = () => <LevelPage />;
+const Page = () => <AuthorLevelCreatePage />;
 
 Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 

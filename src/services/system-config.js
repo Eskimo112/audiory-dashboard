@@ -1,3 +1,5 @@
+import { toFormData } from 'axios';
+
 import { request } from './__base';
 
 export default class SystemConfigService {
@@ -38,6 +40,24 @@ export default class SystemConfigService {
       requestHeaders: this.requestHeader,
     });
     if (!response.data) return [];
+    return response.data;
+  }
+
+  async create({ body }) {
+    const url = `system-configs`;
+    const requestHeaders = {
+      ...this.requestHeader,
+      'Content-Type': 'multipart/form-data',
+    };
+
+    const formData = toFormData(body);
+    const response = await request({
+      url,
+      method: 'post',
+      requestHeaders,
+      payload: formData,
+    });
+    if (!response.data) return null;
     return response.data;
   }
 }
