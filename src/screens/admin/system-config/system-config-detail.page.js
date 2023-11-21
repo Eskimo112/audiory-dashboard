@@ -3,13 +3,20 @@ import { useMemo, useState } from 'react';
 import Head from 'next/head';
 
 import { DatePicker } from '@mantine/dates';
+import { Delete } from '@mui/icons-material';
 import {
   Box,
   Button,
+  Card,
   Chip,
   CircularProgress,
   Container,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  MenuItem,
   Stack,
+  SvgIcon,
   TextField,
   Typography,
   Unstable_Grid2 as Grid,
@@ -39,82 +46,50 @@ const SystemConfigDetailPage = ({ configId }) => {
     isLoading,
     refetch,
   } = useQuery(
-    ['system-configs', 'next-effective', configId],
+    ['system-configs', 'next-effective', config?.key],
     async () =>
-      await new SystemConfigService(requestHeader).getNextEffectiveById(
-        configId,
+      await new SystemConfigService(requestHeader).getNextEffectiveByKey(
+        config?.key,
       ),
+    { enabled: Boolean(config?.key) },
   );
   const [value, setValue] = useState(null);
   const [effectiveDate, setEffectiveDate] = useState(null);
 
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const handleDelete = async (config) => {
+    try {
+      await new SystemConfigService(requestHeader).deleteById(config.id);
+      refetch();
+      toastSuccess('Xóa thành công');
+    } catch (e) {
+      toastError('Đã có lỗi xảy ra, thử lại sau.');
+    }
+    setOpenDialog(false);
+  };
+
   const columns = useMemo(
     () => [
       {
-        accessorKey: 'id',
-        header: 'Id',
+        accessorKey: 'key',
+        header: 'Key',
       },
       {
-        accessorKey: 'position',
-        header: 'Thứ tự',
-        size: 10,
-        enableColumnActions: false,
+        accessorKey: 'value',
+        header: 'Giá trị',
       },
       {
-        accessorKey: 'title',
-        header: 'Tiêu đề',
-        size: 250,
+        accessorKey: 'effective_date',
+        header: 'Ngày hiệu lực',
+        accessorFn: (row) => formatDate(row.effective_date),
       },
-      {
-        accessorKey: 'is_draft',
-        header: 'Trạng thái',
-        accessorFn: (row) => (row.is_draft ? 'Viết nháp' : 'Đã xuất bản'),
-        filterFn: 'equals',
-        filterSelectOptions: [
-          { text: 'Đã xuất bản', value: 'Đã xuất bản' },
-          { text: 'Viết nháp', value: 'Viết nháp' },
-        ],
-        filterVariant: 'select',
-        Cell: ({ cell }) => (
-          <Chip
-            label={cell.getValue()}
-            sx={{
-              backgroundColor:
-                cell.getValue() === 'Viết nháp'
-                  ? 'success.alpha20'
-                  : 'error.alpha20',
-            }}
-          />
-        ),
-      },
-      {
-        accessorKey: 'is_paywalled',
-        header: 'Tính phí',
-        accessorFn: (row) => (row.is_paywalled ? 'Tính phí' : 'Miễn phí'),
 
-        filterFn: 'equals',
-        filterSelectOptions: [
-          { text: 'Tính phí', value: 'Tính phí' },
-          { text: 'Miễn phí', value: 'Miễn phí' },
-        ],
-        filterVariant: 'select',
-        Cell: ({ cell }) => (
-          <Chip
-            label={cell.getValue()}
-            sx={{
-              backgroundColor:
-                cell.getValue() === 'Miễn phí'
-                  ? 'error.alpha20'
-                  : 'success.alpha20',
-            }}
-          />
-        ),
-      },
-      {
-        accessorKey: 'updated_date',
-        header: 'Ngày cập nhật',
-        accessorFn: (row) => formatDate(row.updated_date).slice(0, 10),
-      },
+      // {
+      //   accessorKey: 'updated_date',
+      //   header: 'Ngày cập nhật',
+      //   accessorFn: (row) => formatDate(row.effective_date),
+      // },
     ],
     [],
   );
@@ -143,7 +118,19 @@ const SystemConfigDetailPage = ({ configId }) => {
     }
   };
 
-  if (isLoading) return <CircularProgress />;
+  if (configLoading || isLoading)
+    return (
+      <Card
+        sx={{
+          display: 'flex',
+          width: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '500px',
+        }}>
+        <CircularProgress />
+      </Card>
+    );
   return (
     <>
       <Head>
@@ -212,6 +199,45 @@ const SystemConfigDetailPage = ({ configId }) => {
               <Grid xs={12} lg={12}>
                 <MaterialReactTable
                   {...SHARED_TABLE_PROPS}
+                  renderRowActionMenuItems={({ closeMenu, row, table }) => [
+                    <MenuItem
+                      key="edit"
+                      sx={{ color: 'error.main' }}
+                      onClick={() => {
+                        setOpenDialog(true);
+                      }}>
+                      <SvgIcon
+                        fontSize="small"
+                        sx={{ width: '16px', mr: '8px' }}>
+                        <Delete />
+                      </SvgIcon>
+                      Xóa
+                      <Dialog
+                        open={openDialog}
+                        onClose={() => setOpenDialog(false)}
+                        PaperProps={{
+                          sx: {
+                            p: 1,
+                            width: '400px',
+                          },
+                        }}>
+                        <DialogTitle>Bạn có chắc chắn muốn xóa?</DialogTitle>
+                        <DialogActions>
+                          <Button
+                            variant="outlined"
+                            onClick={() => setOpenDialog(false)}>
+                            Hủy bỏ
+                          </Button>
+                          <Button
+                            variant="contained"
+                            onClick={() => handleDelete(row.original)}
+                            autoFocus>
+                            Xác nhận
+                          </Button>
+                        </DialogActions>
+                      </Dialog>
+                    </MenuItem>,
+                  ]}
                   columns={columns}
                   data={configHistory}
                   initialState={initialState}

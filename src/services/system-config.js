@@ -1,5 +1,3 @@
-import { toFormData } from 'axios';
-
 import { request } from './__base';
 
 export default class SystemConfigService {
@@ -31,8 +29,20 @@ export default class SystemConfigService {
     return response.data;
   }
 
-  async getNextEffectiveById(configId) {
-    const url = `system-configs/next-effective/${configId}`;
+  async deleteById(configId) {
+    const url = `system-configs/${configId}`;
+
+    const response = await request({
+      url,
+      method: 'delete',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return null;
+    return response.data;
+  }
+
+  async getNextEffectiveByKey(key) {
+    const url = `system-configs/next-effective/${key}`;
 
     const response = await request({
       url,
@@ -47,16 +57,13 @@ export default class SystemConfigService {
     const url = `system-configs`;
     const requestHeaders = {
       ...this.requestHeader,
-      'Content-Type': 'multipart/form-data',
     };
 
-    const formData = toFormData(body);
-    console.log(formData);
     const response = await request({
       url,
       method: 'post',
       requestHeaders,
-      payload: formData,
+      payload: body,
     });
     if (!response.data) return null;
     return response.data;
