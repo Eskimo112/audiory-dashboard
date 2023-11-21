@@ -28,7 +28,7 @@ import ConfirmDialog from '@/components/dialog/reuse-confirm-dialog';
 import { useAuth } from '@/hooks/use-auth';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import StoryService from '@/services/story';
-import { countDiffenceFromNow } from '@/utils/formatters';
+import { countDiffenceFromNow, formatStatistic } from '@/utils/formatters';
 import { toastSuccess } from '@/utils/notification';
 
 
@@ -171,11 +171,11 @@ const MyStoryPage = () => {
                                     gridTemplateColumns: 'repeat(2, 1fr)',
                                 }}
                             >
-                                <DetailInfo icon={<EyeIcon strokeWidth={3}></EyeIcon>} content={`${story.read_count ?? 0} lượt đọc`} />
+                                <DetailInfo icon={<EyeIcon strokeWidth={3}></EyeIcon>} content={`${formatStatistic(story.read_count ?? 0)} lượt đọc`} />
                                 <DetailInfo icon={<Menu strokeWidth={3}></Menu>} content={`${story.published_count ?? 0} chương`} />
-                                <DetailInfo icon={<Comment strokeWidth={3}></Comment>} content={`${story.comment_count ?? 0} bình luận`} />
+                                <DetailInfo icon={<Comment strokeWidth={3}></Comment>} content={`${formatStatistic(story.comment_count ?? 0)} bình luận`} />
                                 <DetailInfo icon={<Menu strokeWidth={3}></Menu>} content={`${story.draft_count ?? 0} bản thảo`} />
-                                <DetailInfo icon={<FavoriteBorder strokeWidth={3}></FavoriteBorder>} content={`${story.vote_count ?? 0} lượt`} />
+                                <DetailInfo icon={<FavoriteBorder strokeWidth={3}></FavoriteBorder>} content={`${formatStatistic(story.vote_count ?? 0)} lượt`} />
 
                             </Box>
                             <Box sx={{

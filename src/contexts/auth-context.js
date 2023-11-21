@@ -6,6 +6,7 @@ import {
   useRef,
 } from 'react';
 
+import Cookies from 'js-cookie';
 import PropTypes from 'prop-types';
 
 import { signInWithGooglePopup } from '@/Firebase';
@@ -34,13 +35,13 @@ const handlers = {
       ...// if payload (user) is provided, then is authenticated
       (user
         ? {
-            isAuthenticated: true,
-            isLoading: false,
-            user,
-          }
+          isAuthenticated: true,
+          isLoading: false,
+          user,
+        }
         : {
-            isLoading: false,
-          }),
+          isLoading: false,
+        }),
     };
   },
   [HANDLERS.SIGN_IN]: (state, action) => {
@@ -88,8 +89,14 @@ export const AuthProvider = (props) => {
 
     try {
       isAuthenticated =
-        window.sessionStorage.getItem('authenticated') === 'true';
-      token = window.sessionStorage.getItem('token');
+        Cookies.get('authenticated') === 'true';
+
+      token = Cookies.get('token');
+
+      // isAuthenticated =
+      //   window.sessionStorage.getItem('authenticated') === 'true';
+
+      // token = window.sessionStorage.getItem('token');
       const requestHeader = {
         Authorization: `Bearer ${token}`,
       };
@@ -156,8 +163,11 @@ export const AuthProvider = (props) => {
 
     const userInfo = await new UserService(requestHeader).getById('me');
     try {
-      window.sessionStorage.setItem('authenticated', 'true');
-      window.sessionStorage.setItem('token', response);
+      Cookies.set('authenticated', 'true');
+      Cookies.set('token', response)
+
+      // window.sessionStorage.setItem('authenticated', 'true');
+      // window.sessionStorage.setItem('token', response);
     } catch (err) {
       console.error(err);
     }
@@ -187,8 +197,8 @@ export const AuthProvider = (props) => {
 
     const userInfo = await new UserService(requestHeader).getById('me');
     try {
-      window.sessionStorage.setItem('authenticated', 'true');
-      window.sessionStorage.setItem('token', response);
+      Cookies.set('authenticated', 'true');
+      Cookies.set('token', response)
     } catch (err) {
       console.error(err);
     }
@@ -210,8 +220,9 @@ export const AuthProvider = (props) => {
   };
 
   const signOut = () => {
-    window.sessionStorage.removeItem('token');
-    window.sessionStorage.removeItem('authenticated');
+    Cookies.remove('token');
+    Cookies.remove('authenticated');
+
 
     dispatch({
       type: HANDLERS.SIGN_OUT,

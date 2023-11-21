@@ -11,6 +11,7 @@ import { AppImageUpload } from '@/components/app-image-upload';
 import AuthorBreadCrumbs from '@/components/author-bread-crumbs';
 import ChapterListTab from '@/components/forms/author-form/tabs/chapter-list-tab';
 import DetailStoryTab from '@/components/forms/author-form/tabs/detail-story-tab';
+import PaywalledStoryTab from '@/components/forms/author-form/tabs/paywalled-story-tab';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import ChapterService from '@/services/chapter';
 import StoryService from '@/services/story';
@@ -144,44 +145,61 @@ const EditStoryPage = () => {
     return (
         <>
             <div>
-
-                <Container maxWidth="lg">
+                <Grid container sx={{ padding: "0em 1em" }}>
                     <AuthorBreadCrumbs storyTitle={story.title} />
-                    <Box
-                        container
-                        justifyContent="center"
-                        direction="row"
-                        alignItems="center"
-                        alignContent="center"
-                        wrap="wrap"
-                    >
-                        <Container sx={{
-                            width: "18em",
-                        }} >
-                            <AppImageUpload defaultUrl={story.cover_url ?? ''} onChange={(file) => setImageFile(file)} />
-                        </Container>
-                    </Box>
-                </Container>
 
-                <Container sx={{ borderBottom: 1, borderColor: 'divider', display: "flex", justifyContent: "center" }}>
+                </Grid>
 
-                    <Tabs value={tabValue} onChange={handleChangeTab} aria-label="basic tabs example">
-                        <Tab label="Chi tiết truyện" {...a11yProps(0)} />
-                        <Tab label="Mục lục" {...a11yProps(1)} />
-                    </Tabs>
-                </Container>
-                <CustomTabPanel value={tabValue} index={0}>
-                    {isRefetching ? <Skeleton /> : <DetailStoryTab story={story} handleRefetch={refetch} />}
-                </CustomTabPanel>
-                <CustomTabPanel value={tabValue} index={1}>
-                    <Container maxWidth="lg" sx={{ width: 1 / 2 }}>
-                        {isLoading || isRefetching ? <div>
-                            {Array(10).map((e, index) => <Skeleton key={index} animation="wave" />)}
-                        </div> : <ChapterListTab list={story.chapters ?? []} storyId={storyId} refetch={refetch} onPublish={onPublishChapter} onDelete={onDeleteChapter} />}
+                <Grid container spacing={0} justifyContent="center">
+                    <Grid container spacing={0} width={4 / 6} sx={{ margin: "1em 0" }}>
+                        <Grid item xs={4}>
+                            <Container maxWidth="lg" >
+                                <Box
+                                    container
+                                    justifyContent="center"
+                                    direction="row"
+                                    alignItems="center"
+                                    alignContent="center"
+                                    wrap="wrap"
+                                >
+                                    <Container sx={{
+                                        width: "100%",
+                                    }} >
+                                        <AppImageUpload defaultUrl={story.cover_url ?? ''} onChange={(file) => setImageFile(file)} />
+                                    </Container>
+                                </Box>
+                            </Container>
 
-                    </Container>
-                </CustomTabPanel>
+                        </Grid>
+                        <Grid item xs={8} container justifyContent="start">
+                            <Container sx={{ borderBottom: 1, borderColor: 'divider', }}>
+                                <Tabs value={tabValue} onChange={handleChangeTab} aria-label="basic tabs example" >
+                                    <Tab label="Chi tiết truyện" {...a11yProps(0)} sx={{ padding: 1 }} />
+                                    <Tab label="Mục lục" {...a11yProps(1)} sx={{ padding: 1 }} />
+                                    <Tab label="Thương mại hóa" {...a11yProps(2)} sx={{ padding: 1 }} />
+                                </Tabs>
+                            </Container>
+                            <CustomTabPanel value={tabValue} index={0}>
+                                {isRefetching ? <Skeleton /> : <DetailStoryTab story={story} handleRefetch={refetch} />}
+                            </CustomTabPanel>
+                            <CustomTabPanel value={tabValue} index={1}>
+                                {isLoading || isRefetching ? <div>
+                                    {Array(10).map((e, index) => <Skeleton key={index} animation="wave" />)}
+                                </div> : <Grid container width={1 / 1}>
+                                    <ChapterListTab list={story.chapters ?? []} storyId={storyId} refetch={refetch} onPublish={onPublishChapter} onDelete={onDeleteChapter} />
+                                </Grid>}
 
+                            </CustomTabPanel>
+                            <CustomTabPanel value={tabValue} index={2}>
+                                {isRefetching ? <Skeleton /> : <Grid container width={1 / 1}>
+                                    <PaywalledStoryTab story={story} handleRefetch={refetch} />
+                                </Grid>}
+                            </CustomTabPanel>
+
+                        </Grid>
+                    </Grid>
+
+                </Grid>
 
             </div>
 

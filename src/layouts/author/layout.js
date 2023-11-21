@@ -4,12 +4,10 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 
 import { styled } from '@mui/material/styles';
-import path from 'path';
 import { withAuthGuard } from 'src/hocs/with-auth-guard';
 
-import AuthorBreadcrum from './bread-crum';
 import { TopNav } from './top-nav';
-import AuthorBreadCrumbs from '@/components/author-bread-crumbs';
+import Footer from './footer';
 
 const SIDE_NAV_WIDTH = 0;
 
@@ -59,6 +57,7 @@ export const Layout = withAuthGuard((props) => {
             <LayoutRoot>
                 <LayoutContainer>{children}</LayoutContainer>
             </LayoutRoot>
+            {/* <Footer></Footer> */}
         </>
     );
 });

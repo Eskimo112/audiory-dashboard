@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { BarChart, ChatBubbleOutline, Edit, NotificationsNone, Search } from '@mui/icons-material';
-import { Avatar, Box, Button, Grid, IconButton, Typography } from '@mui/material';
+import { ArrowDropDownCircleOutlined, BarChart, ChatBubbleOutline, Edit, NotificationsNone, Search } from '@mui/icons-material';
+import { Avatar, Box, Button, Container, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { usePopover } from 'src/hooks/use-popover';
@@ -12,6 +12,7 @@ import AppIcon from '@/components/app-icon';
 import { useAuth } from '@/hooks/use-auth';
 
 import { AccountPopover } from '../dashboard/account-popover';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 
 const TOP_NAV_HEIGHT = 60;
@@ -47,7 +48,7 @@ export const TopNav = (props) => {
                     <Grid item xs={3}>
                         <AppIcon />
                     </Grid>
-                    <Grid item xs="auto" justifyContent="center" container direction="row" alignItems="center" alignContent="center">
+                    <Grid item xs="auto" columnGap={1} justifyContent="center" container direction="row" alignItems="center" alignContent="center">
                         {/* <Button startIcon={<SendIcon />} variant="text" color="primary">
                             Khám phá
                         </Button> */}
@@ -58,34 +59,28 @@ export const TopNav = (props) => {
                             Sáng tác
                         </Button>
                     </Grid>
-                    <Grid item xs={3} container alignItems="center" justifyContent="end">
-                        <Grid item xs={2}>
+                    <Grid item xs={3} container alignItems="center" justifyContent="end" columnGap={1}>
+                        <Grid item xs="auto">
                             <IconButton aria-label="delete" size="medium" color='inherit' >
-                                <NotificationsNone fontSize="inherit" />
+                                <NotificationsNone color="primary" />
                             </IconButton></Grid>
 
-                        <Grid item xs={6} container direction="row" alignItems="center">
-                            <Grid item xs={3}><Avatar
-                                onClick={accountPopover.handleOpen}
-                                ref={accountPopover.anchorRef}
-                                sx={{
-                                    cursor: 'pointer',
-                                    height: 40,
+                        <Grid item xs="auto">
+                            <Grid container aria-label="delete" alignItems="center" size="medium" color='inherit' onClick={accountPopover.handleOpen}>
+                                <Avatar
+                                    ref={accountPopover.anchorRef}
+                                    sx={{
+                                        cursor: 'pointer',
+                                        height: 30,
+                                        width: 30,
 
-                                }}
-                                src={auth?.user?.avatar_url ?? ''}
-                            /></Grid>
-                            <Grid item xs="auto" container direction="column" justifyContent="space-around" >
-                                <Grid item xs>
-                                    <Typography gutterBottom variant="subtitle2" component="div">
-                                        {auth?.user?.username ?? ''}
-                                    </Typography>
-                                    <Typography gutterBottom variant="body2">
-                                        {auth?.user?.full_name ?? ''}
-                                    </Typography>
-                                </Grid>
+                                    }}
+                                    src={auth?.user?.avatar_url ?? ''}
+                                />
+                                <ArrowDropDownIcon fontSize="inherit" color='primary' />
                             </Grid>
                         </Grid>
+
                     </Grid>
                 </Grid>
 
