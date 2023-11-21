@@ -23,11 +23,12 @@ import { useQuery, useQueryClient } from 'react-query';
 import * as Yup from 'yup';
 
 import AppBreadCrumbs from '@/components/app-bread-crumbs';
-import { AppImageUpload } from '@/components/app-image-upload';
 import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import GiftService from '@/services/gift';
 import { toastError, toastSuccess } from '@/utils/notification';
+
+import { AppLottie } from '../../../components/app-lottie';
 
 const GiftEditPage = ({ giftId }) => {
   const requestHeader = useRequestHeader();
@@ -190,10 +191,7 @@ const GiftEditPage = ({ giftId }) => {
                         aspectRatio: '1',
                         height: '280px',
                       }}>
-                      <AppImageUpload
-                        defaultUrl={gift?.image_url}
-                        onChange={(file) => setSelectedFile(file)}
-                      />
+                      <AppLottie url={gift?.image_url} />
                     </Box>
                   </Stack>
                 </Card>

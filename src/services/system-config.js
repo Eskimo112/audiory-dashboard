@@ -29,8 +29,20 @@ export default class SystemConfigService {
     return response.data;
   }
 
-  async getNextEffectiveById(configId) {
-    const url = `system-configs/next-effective/${configId}`;
+  async deleteById(configId) {
+    const url = `system-configs/${configId}`;
+
+    const response = await request({
+      url,
+      method: 'delete',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return null;
+    return response.data;
+  }
+
+  async getNextEffectiveByKey(key) {
+    const url = `system-configs/next-effective/${key}`;
 
     const response = await request({
       url,
@@ -38,6 +50,22 @@ export default class SystemConfigService {
       requestHeaders: this.requestHeader,
     });
     if (!response.data) return [];
+    return response.data;
+  }
+
+  async create({ body }) {
+    const url = `system-configs`;
+    const requestHeaders = {
+      ...this.requestHeader,
+    };
+
+    const response = await request({
+      url,
+      method: 'post',
+      requestHeaders,
+      payload: body,
+    });
+    if (!response.data) return null;
     return response.data;
   }
 }

@@ -28,6 +28,10 @@ const ROUTE_NAME_MAP = (name1, name2) => ({
   '/admin/system-configs': 'Thông số hệ thống',
   '/admin/system-configs/[config_id]': name1,
   '/admin/system-configs/create': 'Tạo thông số hệ thống',
+  '/admin/levels': 'Quản lý cấp',
+  '/admin/levels/author': 'Tác giả',
+  '/admin/levels/author/create': 'Tạo thông số hệ thống',
+  '/admin/levels/author/[level_id]': name1,
 });
 
 const AppBreadCrumbs = ({ name1, name2 }) => {
