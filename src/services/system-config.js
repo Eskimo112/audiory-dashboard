@@ -51,6 +51,7 @@ export default class SystemConfigService {
     };
 
     const formData = toFormData(body);
+    console.log(formData);
     const response = await request({
       url,
       method: 'post',

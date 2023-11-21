@@ -133,6 +133,7 @@ const SystemConfigDetailPage = ({ configId }) => {
       key: config?.key,
       value,
     };
+
     try {
       await new SystemConfigService(requestHeader).create({ body });
       toastSuccess('Thêm thành công');

@@ -103,7 +103,7 @@ const TransactionPage = () => {
       },
       {
         accessorKey: 'coin.value',
-        header: 'Số lượng',
+        header: 'Giá trị',
         size: 80,
       },
       {
