@@ -230,7 +230,7 @@ const MyStoryPage = () => {
                             </Stack>
 
                             <Stack spacing={4}>
-                                <Grid container direction="row" alignItems="center" sx={{ height: "20px" }}>
+                                <Grid container direction="row" alignItems="center">
                                     <Grid xs={10}>
                                         <TextField
                                             fullWidth
@@ -254,9 +254,9 @@ const MyStoryPage = () => {
                                     </Grid>
                                 </Grid>
 
-                                <Grid container rowSpacing={2} >
+                                <Grid container rowGap={4} sx={{ paddingY: 1 }}>
                                     {myStories?.map((story, index) => (
-                                        <Grid item lg={6} xs={12} key={story.id} sx={{ paddingRight: index % 2 === 0 ? '0.5em' : '0em', paddingLeft: index % 2 !== 0 ? '0.5em' : '0em' }}>
+                                        <Grid item lg={6} xs={12} key={story.id} sx={{ paddingRight: index % 2 === 0 ? '1em' : '0em', paddingLeft: index % 2 !== 0 ? '1em' : '0em' }}>
                                             <StoryOverViewCard story={story}></StoryOverViewCard>
                                         </Grid>
                                     ))}

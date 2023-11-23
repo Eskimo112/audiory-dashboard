@@ -31,6 +31,7 @@ const StoryForm = () => {
     const { data: categoriesData = [], isLoading, isSuccess } = useQuery(
         ['categories'],
         async () => await CategoryService(requestHeader).getAll(),
+        { refetchOnMount: false, refetchOnWindowFocus: false }
     );
     useEffect(() => {
         setSelectedCategory(categoriesData[0]?.id ?? '');
