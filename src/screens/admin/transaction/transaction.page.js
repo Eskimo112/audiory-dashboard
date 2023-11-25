@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
+  Avatar,
   Box,
   Card,
   Chip,
@@ -29,8 +30,6 @@ import { useRequestHeader } from '@/hooks/use-request-header';
 import TransactionService from '@/services/transaction';
 import { formatDate } from '@/utils/formatters';
 
-import UserInfo from '../report/user-info.component';
-
 const TransactionPage = () => {
   const requestHeader = useRequestHeader();
   const { data: transactions, isLoading } = useQuery(
@@ -50,7 +49,34 @@ const TransactionPage = () => {
       {
         accessorKey: 'user',
         header: 'Người dùng',
-        Cell: ({ row }) => <UserInfo userId={row.original.user_id} />,
+        Cell: ({ row }) => {
+          if (!row.original.user) return;
+          return (
+            <Stack
+              alignItems="center"
+              direction={'row'}
+              spacing={1}
+              sx={{ cursor: 'pointer' }}
+              onClick={() => {
+                router.push(`/admin/users/${row.original.user.id}`);
+              }}>
+              <Avatar
+                src={row.original.user.avatar_url}
+                sx={{ width: '40px', height: '40px' }}></Avatar>
+              <Stack alignItems="start">
+                <Typography variant="subtitle2">
+                  {row.original.user.full_name ?? 'Không có tên'}
+                </Typography>
+                <Typography
+                  variant="subtitle2"
+                  fontStyle="italic"
+                  color="ink.lighter">
+                  {row.original.user.username ?? 'Không có username'}
+                </Typography>
+              </Stack>
+            </Stack>
+          );
+        },
       },
       {
         accessorKey: 'transaction_type',
@@ -102,7 +128,7 @@ const TransactionPage = () => {
         },
       },
       {
-        accessorKey: 'coin.value',
+        accessorKey: 'coin_value',
         header: 'Giá trị',
         size: 80,
       },

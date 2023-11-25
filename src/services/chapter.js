@@ -5,14 +5,15 @@ export default class ChapterService {
     this.requestHeader = requestHeader ?? undefined;
   }
 
-  async getById({ chapterId }) {
+  async getById(chapterId) {
     const url = `chapters/${chapterId}`;
 
     const response = await request({
       url,
       method: 'get',
       requestHeaders: this.requestHeader,
-    }); if (!response.data) return null;
+    });
+    if (!response.data) return null;
     return response.data;
   }
 
@@ -21,7 +22,6 @@ export default class ChapterService {
     const response = await request({
       url,
       method: 'post',
-
     });
     return response;
   }
@@ -31,7 +31,6 @@ export default class ChapterService {
     const response = await request({
       url,
       method: 'post',
-
     });
     return response;
   }
@@ -42,7 +41,7 @@ export default class ChapterService {
       url,
       method: 'post',
       payload: body,
-      requestHeaders: this.requestHeader
+      requestHeaders: this.requestHeader,
     });
     if (!response.data) return null;
     return response.data;
