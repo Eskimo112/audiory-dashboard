@@ -17,7 +17,7 @@ import {
   Unstable_Grid2 as Grid,
 } from '@mui/material';
 import { useFormik } from 'formik';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import * as Yup from 'yup';
 
 import AppBreadCrumbs from '@/components/app-bread-crumbs';
@@ -26,6 +26,8 @@ import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import UserService from '@/services/user';
 
+import { toastSuccess } from '../../../utils/notification';
+
 const MyProfilePage = () => {
   const requestHeader = useRequestHeader();
   const { data: user = {}, isLoading } = useQuery(
@@ -33,6 +35,7 @@ const MyProfilePage = () => {
     async () => await new UserService(requestHeader).getById('me'),
   );
   const [selectedFile, setSelectedFile] = useState();
+  const queryClient = useQueryClient();
 
   const formik = useFormik({
     initialValues: {
@@ -51,14 +54,22 @@ const MyProfilePage = () => {
       full_name: Yup.string().max(255).required('Họ và tên là bắt buộc'),
     }),
     onSubmit: async (values, helpers) => {
-      //   try {
-      //     await auth.signIn(values.email, values.password);
-      //     router.push('/');
-      //   } catch (err) {
-      //     helpers.setStatus({ success: false });
-      //     helpers.setErrors({ submit: err.message });
-      //     helpers.setSubmitting(false);
-      //   }
+      await new UserService(requestHeader).edit({
+        body: {
+          category_id: values.category_id,
+          title: values.title,
+          description: values.description,
+          is_draft: values.is_draft,
+          is_mature: values.is_draft,
+          is_paywalled: values.is_draft,
+          is_copyright: values.is_draft,
+          tags: values.tags ?? [],
+          form_file: selectedFile ?? undefined,
+        },
+        userId: user?.id,
+      });
+      toastSuccess('Chỉnh sửa thành công');
+      queryClient.invalidateQueries({ queryKey: ['users', 'my-profile'] });
     },
   });
 
@@ -97,7 +108,10 @@ const MyProfilePage = () => {
                 <AppBreadCrumbs />
               </Stack>
               <Stack direction="row" gap="16px" height="fit-content">
-                <Button disabled={!canSaveChanges} variant="contained">
+                <Button
+                  disabled={!canSaveChanges}
+                  variant="contained"
+                  onClick={() => formik.handleSubmit()}>
                   Lưu thay đổi
                 </Button>
               </Stack>

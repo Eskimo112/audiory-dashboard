@@ -75,4 +75,22 @@ export default class UserService {
     if (!response.data) return [];
     return response.data;
   }
+
+  async edit({ body, userId }) {
+    const url = `users/${userId}/profile`;
+    const requestHeaders = {
+      'Content-Type': 'multipart/form-data',
+      ...this.requestHeader,
+    };
+
+    const formData = FormData(body);
+    const response = await request({
+      url,
+      method: 'put',
+      requestHeaders,
+      payload: formData,
+    });
+
+    return response;
+  }
 }
