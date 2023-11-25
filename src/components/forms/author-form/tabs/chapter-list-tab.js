@@ -16,7 +16,6 @@ import { toastError, toastSuccess } from "@/utils/notification";
 const ChapterListTab = ({ list, storyId, refetch, onPublish, onPreview, onDelete }) => {
     const router = useRouter();
     const requestHeader = useRequestHeader();
-    console.log(list)
 
     const ChapterCard = ({ chapter, index }) => {
         const handleNavigate = () => {
@@ -54,12 +53,13 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onPreview, onDelete
                     justifyContent="space-between"
                     alignItems="center"
                     wrap="wrap"
+                    fullWidth
                 >
 
                     <Grid xs={8} spacing={0} container justifyContent="flex-start" onClick={handleNavigate}>
                         <Grid container spacing={0} direction="column" alignItems="flex-start">
 
-                            <Typography variant="subtitle1" noWrap sx={{ paddingRight: "2em", fontWeight: isDraft ? "normal" : "bold" }}>Chương {index + 1}: {chapter?.title ?? 'Tiêu đề chương'}   </Typography>
+                            <Typography variant="subtitle2" noWrap sx={{ paddingRight: "2em", fontWeight: isDraft ? "normal" : "bold" }}>Chương {index + 1}: {chapter?.title ?? 'Tiêu đề chương'}   </Typography>
                             <Typography color={isDraft ? 'ink.main' : 'ink.main'} variant="subtitle2" noWrap sx={{ paddingRight: "2em", fontWeight: isDraft ? "normal" : "bold" }}>  {isDraft ? 'Bản thảo ' : 'Đã đăng tải '} {formatDate(chapter.updated_date ?? chapter?.created_date).split(' ')[0]} </Typography>
 
                         </Grid>
@@ -124,8 +124,8 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onPreview, onDelete
                         </Popover>
                     </Grid>
 
-                </Grid>
-            </Button>
+                </Grid >
+            </Button >
         )
     }
     const handleCreateChapter = async () => {
@@ -133,10 +133,11 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onPreview, onDelete
             position: list.length + 1, story_id: storyId
         };
         try {
-            await new ChapterService(requestHeader).create(body).then(res => {
-                refetch(true);
+            await new ChapterService(requestHeader).create(body).then(async res => {
+                // refetch(true);
 
-                toastSuccess("Tạo chương mới thành công")
+                // toastSuccess("Tạo chương mới thành công");
+                await router.push(`${router.asPath}/write/${res.current_version_id}`)
             })
 
         } catch (error) {
@@ -146,16 +147,17 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onPreview, onDelete
     }
     return (
         <>
-            <Button onClick={handleCreateChapter} sx={{ height: "4em" }} fullWidth variant="contained" startIcon={<PlusIcon />}>
+            <Button fullWidth onClick={handleCreateChapter} sx={{ height: "3em" }} variant="contained" startIcon={<PlusIcon />}>
                 <Typography variant="subtitle1">Tạo chương mới</Typography>
             </Button>
             {list.map((chapter, index) => (
-                <div key={index}>
+                <Grid width={1 / 1} key={index}>
                     <ChapterCard chapter={chapter} index={index} />
-
-                </div>
+                </Grid>
             ))
             }
+
+
         </>
     )
 }

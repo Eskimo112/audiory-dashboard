@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Clear, HelpOutline, Remove } from '@mui/icons-material';
-import { Box, Button, Card, CircularProgress, Container, Grid, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material';
+import { Clear, HelpOutline } from '@mui/icons-material';
+import { Box, Button, CircularProgress, Container, Grid, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material';
 import { useFormik } from 'formik';
 import { useQuery } from 'react-query';
 import * as Yup from 'yup';
@@ -12,6 +12,7 @@ import * as Yup from 'yup';
 import { AppImageUpload } from '@/components/app-image-upload';
 import { COPYRIGHTS_LIST, MATURE_OPTIONS } from '@/constants/story_options';
 import { useAuth } from '@/hooks/use-auth';
+import { useRequestHeader } from '@/hooks/use-request-header';
 import CategoryService from '@/services/category';
 import StoryService from '@/services/story';
 import { toastError } from '@/utils/notification';
@@ -22,13 +23,15 @@ const StoryForm = () => {
     const router = useRouter();
     const auth = useAuth();
     const jwt = auth?.user.token;
+    const requestHeader = useRequestHeader();
     const [selectedCategory, setSelectedCategory] = useState('');
     const [tag, setTag] = useState('');
     const [tagList, setTagList] = useState([])
 
     const { data: categoriesData = [], isLoading, isSuccess } = useQuery(
         ['categories'],
-        async () => await CategoryService.getAll(),
+        async () => await CategoryService(requestHeader).getAll(),
+        { refetchOnMount: false, refetchOnWindowFocus: false }
     );
     useEffect(() => {
         setSelectedCategory(categoriesData[0]?.id ?? '');

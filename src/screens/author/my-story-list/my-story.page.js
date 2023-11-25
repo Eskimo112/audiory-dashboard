@@ -28,7 +28,7 @@ import ConfirmDialog from '@/components/dialog/reuse-confirm-dialog';
 import { useAuth } from '@/hooks/use-auth';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import StoryService from '@/services/story';
-import { countDiffenceFromNow } from '@/utils/formatters';
+import { countDiffenceFromNow, formatStatistic } from '@/utils/formatters';
 import { toastSuccess } from '@/utils/notification';
 
 
@@ -171,11 +171,11 @@ const MyStoryPage = () => {
                                     gridTemplateColumns: 'repeat(2, 1fr)',
                                 }}
                             >
-                                <DetailInfo icon={<EyeIcon strokeWidth={3}></EyeIcon>} content={`${story.read_count ?? 0} lượt đọc`} />
+                                <DetailInfo icon={<EyeIcon strokeWidth={3}></EyeIcon>} content={`${formatStatistic(story.read_count ?? 0)} lượt đọc`} />
                                 <DetailInfo icon={<Menu strokeWidth={3}></Menu>} content={`${story.published_count ?? 0} chương`} />
-                                <DetailInfo icon={<Comment strokeWidth={3}></Comment>} content={`${story.comment_count ?? 0} bình luận`} />
+                                <DetailInfo icon={<Comment strokeWidth={3}></Comment>} content={`${formatStatistic(story.comment_count ?? 0)} bình luận`} />
                                 <DetailInfo icon={<Menu strokeWidth={3}></Menu>} content={`${story.draft_count ?? 0} bản thảo`} />
-                                <DetailInfo icon={<FavoriteBorder strokeWidth={3}></FavoriteBorder>} content={`${story.vote_count ?? 0} lượt`} />
+                                <DetailInfo icon={<FavoriteBorder strokeWidth={3}></FavoriteBorder>} content={`${formatStatistic(story.vote_count ?? 0)} lượt`} />
 
                             </Box>
                             <Box sx={{
@@ -230,7 +230,7 @@ const MyStoryPage = () => {
                             </Stack>
 
                             <Stack spacing={4}>
-                                <Grid container direction="row" alignItems="center" sx={{ height: "20px" }}>
+                                <Grid container direction="row" alignItems="center">
                                     <Grid xs={10}>
                                         <TextField
                                             fullWidth
@@ -254,9 +254,9 @@ const MyStoryPage = () => {
                                     </Grid>
                                 </Grid>
 
-                                <Grid container rowSpacing={2} >
+                                <Grid container rowGap={4} sx={{ paddingY: 1 }}>
                                     {myStories?.map((story, index) => (
-                                        <Grid item lg={6} xs={12} key={story.id} sx={{ paddingRight: index % 2 === 0 ? '0.5em' : '0em', paddingLeft: index % 2 !== 0 ? '0.5em' : '0em' }}>
+                                        <Grid item lg={6} xs={12} key={story.id} sx={{ paddingRight: index % 2 === 0 ? '1em' : '0em', paddingLeft: index % 2 !== 0 ? '1em' : '0em' }}>
                                             <StoryOverViewCard story={story}></StoryOverViewCard>
                                         </Grid>
                                     ))}

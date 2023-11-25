@@ -29,7 +29,7 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
 
     const { data: categoriesData = [], isLoading } = useQuery(
         ['categories'],
-        async () => await CategoryService.getAll(),
+        async () => await new CategoryService(requestHeader).getAll(),
     );
 
     const { data: criteriaData = [], isLoading: isLoadingCriteria } = useQuery(
@@ -79,7 +79,7 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
     }
 
     const [isContractOpen, setIsContractOpen] = React.useState(false)
-    const handleDialogContracOpen = () => {
+    const handleDialogContractOpen = () => {
         setIsContractOpen(true);
     }
     const handleDialogContractClose = async (isConfirm) => {
@@ -221,7 +221,7 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
                     alignItems="center"
                     spacing={2}
                 >
-                    <Grid width={1 / 2} container direction="row" justifyContent="center">
+                    <Grid container direction="row" justifyContent="center">
 
 
                         <TextFieldLabel label='Tiêu đề truyện' isRequired={true} />
@@ -325,90 +325,8 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
                             </Grid>
 
                         </Grid>
-                        <Grid
-                            container
-                            direction="row"
-                            justifyContent="space-between"
-                            alignItems="flex-start"
-                            alignContent="stretch"
-                            wrap="wrap"
-                        >
-                            <Grid xs={8}>
-                                <TextFieldLabel label='Trả phí trên truyện' isRequired={false} />
-                            </Grid>
-                            <Grid xs={1} >
-                                {/* check 5 criteria */}
-                                <Switch
-                                    name='isPaywalled'
-                                    checked={formik.values.isPaywalled}
-                                    value={formik.values.isPaywalled}
-                                    onChange={formik.handleChange}
-                                    onClick={() => {
-                                        if (formik.values.isPaywalled === false && formik.values.chapter_price === 0) {
-                                            handleDialogOpen();
-                                        }
-                                    }}
-                                    inputProps={{ "aria-label": '' }}
-                                />
-                                <ConfirmDialog
-                                    width="50%"
-                                    title={`Đánh giá tiêu chuẩn dành cho truyện trả phí`}
-                                    actionBgColor={allCheckedCriteria ? 'primary' : 'secondary'}
-                                    isReverse={true}
-                                    content={isLoadingCriteria ? <Skeleton /> : <Grid container spacing={0}>
-                                        {
-                                            criteriaData.message?.map((criteria, index) => (
-                                                <Grid key={index} container direction="column" sx={{ padding: "1em 2em" }}>
-                                                    <Grid container spacing={0} >
-                                                        <Grid xs={1}>
-                                                            <CheckedCirCle isChecked={criteria?.is_passed} /> </Grid>
-                                                        <Grid xs={11} >{
-                                                            criteria?.description
-                                                        }</Grid>
-                                                    </Grid>
-                                                </Grid>
-                                            ))
-                                        }
-                                    </Grid>}
-                                    isOpen={isOpen}
-                                    handleClose={handleDialogClose}
-                                    actionContent={allCheckedCriteria ? 'Tiếp tục' : 'Tôi đã hiểu'}
-                                    cancelContent='Hủy thao tác'
-                                />
 
-                                <ConfirmDialog
-                                    width={'50%'}
-                                    title={``}
-                                    actionBgColor='primary'
-                                    isReverse={true}
-                                    content={isLoadingCriteria ? <Skeleton /> : <Grid container direction="column" sx={{ padding: "1em 1.2em" }}>
-                                        <PaywalledContract />
-                                    </Grid>}
-                                    isOpen={isContractOpen}
-                                    handleClose={() => { handleDialogContractClose(true) }}
-                                    actionContent='Tôi đồng ý, đi tiếp'
-                                    cancelContent='Tôi không đồng ý'
-                                />
-                            </Grid>
-                        </Grid>
-                        {formik.values.isPaywalled ? <Grid
-                            container
-                            direction="row"
-                            justifyContent="space-between"
-                            alignItems="flex-start"
-                            wrap="wrap"
-                        >
-                            <TextField
-                                variant="outlined"
-                                fullWidth
-                                name='chapter_price'
-                                type="number"
-                                size="small"
-                                value={formik.values.chapter_price}
-                                min="0"
-                                onChange={formik.handleChange}
-                            />
-                        </Grid> : <></>}
+
                         <Grid
                             container
                             direction="row"

@@ -132,7 +132,7 @@ export default class StoryService {
 
   async paywall({ storyId, price }) {
     const url = `stories/${storyId}/paywalled/apply`;
-    const response = await request({ url, method: 'post', payload: { 'chapter_price': price } });
+    const response = await request({ url, method: 'post', payload: { 'chapter_price': price }, requestHeaders: this.requestHeader });
 
     if (!response.code) return response.data;
     return response.data;

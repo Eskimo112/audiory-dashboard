@@ -13,14 +13,13 @@ import ChapterVersionService from '@/services/chapter-version';
 import { useRouter } from 'next/router';
 import ChapterService from '@/services/chapter';
 import { useQuery } from 'react-query';
-import { useAuth } from '@/hooks/use-auth';
 import { toastError, toastSuccess } from '@/utils/notification';
 import { AppImageUpload } from '@/components/app-image-upload';
-import AuthorBreadcrum from '@/layouts/author/bread-crum';
 import AuthorBreadCrumbs from '@/components/author-bread-crumbs';
-import { CheckBoxSharp, CheckCircle } from '@mui/icons-material';
+import { CheckCircle } from '@mui/icons-material';
 import { formatDate } from '@/utils/formatters';
 import { useRequestHeader } from '@/hooks/use-request-header';
+import { MAX_CONTENT_SIZE, byteSizeFromString, convertImageLinkToBase64, fileSizeFromBase64 } from '@/utils/filesize-counter';
 
 const toolbarOptions = [
     ['bold', 'italic', 'underline'],        // toggled buttons
@@ -33,7 +32,7 @@ const toolbarOptions = [
     // [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
     ['image'],          // add's image support
 
-    [{ 'font': [] }],
+    // [{ 'font': [] }],
     [{ 'align': [] }],
 
 ];
@@ -45,22 +44,22 @@ const NewChapterPage = () => {
     const storyId = router.query.id;
     const chapterId = router.query['chapter-id'];
 
-    const auth = useAuth();
-    const jwt = auth?.user.token;
 
     const { data: chapterData = {}, isLoading, isSuccess, refetch, isRefetching } = useQuery(
-        ['chapter'],
+        ['chapter', chapterId],
         async () => await new ChapterService(requestHeader).getById({ chapterId }),
     );
 
     const { data: chapterVersionsData = [], isSucces2, refetch: refetch2 } = useQuery(
         ['chapterVersionList'],
-        async () => await new ChapterVersionService(requestHeader).getAll({ chapterId, jwt }),
+        async () => await new ChapterVersionService(requestHeader).getAll({ chapterId }),
 
     );
 
     const [currentChapterVersion, setCurrentChapterVersion] = useState({});
     const [value, setValue] = useState('');
+    const [contentSize, setContentSize] = useState(0);
+    const [imageArr, setImageArr] = useState([]);
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const handleClick = (event, storyData) => {
@@ -116,6 +115,8 @@ const NewChapterPage = () => {
         }
     })
 
+
+
     const onEditorChange = (content, delta, source, editor) => {
 
         // console.log('size', Blob(editor.getContents()))
@@ -126,16 +127,28 @@ const NewChapterPage = () => {
         // console.log('richtext', formik.values.rich_text);
         // console.log('CHARACTERS COUNT', editor.getLength())
 
+        // count bytes
+        // console.log('TEXT', editor.getText())
+        // console.log('BYTES IN TEXT', byteSizeFromString(editor.getText()))
+        // console.log('COUNT', editor.getLength());
+
+
+        var imagesArr = editor.getContents().ops?.filter(ele => ele.insert.image !== undefined)?.map((image) => image?.insert?.image);
+        setImageArr(imagesArr)
         setValue(editor.getText().trim())
         formik.setFieldValue('rich_text', JSON.stringify(editor.getContents()));
         formik.setFieldValue('images', JSON.stringify(editor.getContents().ops?.filter(ele => ele.insert.image !== undefined)?.map((image) => image?.insert?.image)));
-        formik.setFieldValue('content', editor.getText())
+        formik.setFieldValue('content', editor.getText());
+
+
+
     }
 
     const handleCreateChapter = async () => {
         const body = {
             position: storyData.chapters.length + 1, story_id: storyId
         };
+
         try {
             await new ChapterService(requestHeader).create(body).then(res => {
                 toastSuccess("Tạo chương mới thành công")
@@ -146,6 +159,8 @@ const NewChapterPage = () => {
             toastError('Tạo chương không thành công')
 
         }
+
+
     }
 
     const renderCustomToolbar = () => {
@@ -161,50 +176,71 @@ const NewChapterPage = () => {
 
 
     const onSaveDraftChapter = async (isPreview, isPublish) => {
-        if (value.split(' ').length < MIN_WORDS) {
+        if (value.split(' ').length < MIN_WORDS && imageArr.length === 0) {
             toastError(`Quá ngắn để lưu bản thảo`)
         } else {
-            // create chapter version
-            const values = formik.values;
-            const formData = new FormData();
-            Object.keys(values).forEach(key => formData.append(key, values[key]));
-            console.log('body', formData)
-            try {
-                await new ChapterVersionService(requestHeader).create({ body: formData }).then(res => {
-                    if (res.code === 200) {
-                        console.log('res for create ', res)
-                        if (isPreview) {
-                            console.log('pre');
-                            refetch2().then(res => {
-                                console.log(res);
-                                router.replace(`/my-works/${router.query?.id}/preview/${chapterVersionsData[chapterVersionsData.length - 1].id}`)
+            // content size (text+image) handler
+            // calculate link images and file images size
+            var imagesInBytes = 0;
+            imageArr.forEach(image => {
+                if (image.includes('http')) {
+                    console.log('link')
+                    console.log(image)
+                    convertImageLinkToBase64(
+                        image, function (base64String) {
+                            imagesInBytes += fileSizeFromBase64({ base64String })
+                        }
+                    )
+                } else {
+                    imagesInBytes += fileSizeFromBase64({ base64String: image })
+                }
+            })
+            setContentSize(byteSizeFromString(value) + imagesInBytes)
+            console.log(contentSize)
 
-                            });
+            if (contentSize > MAX_CONTENT_SIZE) {
 
-                        } else if (isPublish) {
-                            console.log('pub')
+                toastError('Nội dung chương vượt quá 2MB')
+            } else {
+                // create chapter version
+                const values = formik.values;
+                const formData = new FormData();
+                Object.keys(values).forEach(key => formData.append(key, values[key]));
+                try {
+                    await new ChapterVersionService(requestHeader).create({ body: formData }).then(res => {
+                        if (res.code === 200) {
+                            console.log('res for create ', res)
+                            if (isPreview) {
+                                refetch2().then(res => {
+                                    router.replace(`/my-works/${router.query?.id}/preview/${chapterVersionsData[chapterVersionsData.length - 1].id}`)
 
-                            new ChapterService().publish(chapterId).then(res => {
-                                console.log('res', res)
-                                if (res.code === 200) {
-                                    toastSuccess('Đăng tải thành công')
-                                } else {
-                                    toastError(res.message);
-                                }
-                            })
+                                });
+
+                            } else if (isPublish) {
+                                console.log('pub')
+
+                                new ChapterService().publish(chapterId).then(res => {
+                                    console.log('res', res)
+                                    if (res.code === 200) {
+                                        toastSuccess('Đăng tải thành công')
+                                    } else {
+                                        toastError(res.message);
+                                    }
+                                })
+
+                            } else {
+                                toastSuccess('Lưu bản thảo thành công');
+                                refetch2();
+                            }
 
                         } else {
-                            toastSuccess('Lưu bản thảo thành công');
-                            refetch2();
+                            toastError(res.message);
                         }
+                    });
 
-                    } else {
-                        toastError(res.message);
-                    }
-                });
-
-            } catch (error) {
-                console.log(error)
+                } catch (error) {
+                    console.log(error)
+                }
             }
         }
 
@@ -227,6 +263,7 @@ const NewChapterPage = () => {
                 <CircularProgress />
             </Card>
         );
+
     return (
 
         <>
@@ -287,25 +324,31 @@ const NewChapterPage = () => {
                         alignItems="center"
                         sx={{ margin: "1em 0" }}
                     >
-                        <Grid xs={5} container spacing={0}>
-                            <TextField
-                                variant="outlined"
-                                select
-                                placeholder='Chọn chapter'
-                                onBlur={formik.handleBlur}
-                                type="text"
-                                size="small"
-                                value={currentChapterVersion?.id ?? ''}
 
-                            >
-                                {chapterVersionsData && chapterVersionsData?.sort((a, b) => a?.created_date > b?.created_date).map((category, index) => (
-                                    <MenuItem key={index} value={category.id} onClick={() => {
-                                        router.push(`/my-works/${router.query?.id}/preview/${category.id}`)
-                                    }}>
-                                        {category.version_name}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
+                        <Grid xs={5} container spacing={0}>
+
+                            {chapterVersionsData?.length !== 0 ? <>
+                                <TextField
+                                    variant="outlined"
+                                    select
+                                    placeholder='Chọn chapter'
+                                    onBlur={formik.handleBlur}
+                                    type="text"
+                                    size="small"
+                                    value={currentChapterVersion?.id ?? ''}
+
+                                >
+                                    {chapterVersionsData && chapterVersionsData?.sort((a, b) => a?.created_date > b?.created_date).map((category, index) => (
+                                        <MenuItem key={index} value={category.id} onClick={() => {
+                                            router.push(`/my-works/${router.query?.id}/preview/${category.id}`)
+                                        }}>
+                                            {category.version_name}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                            </> : <>
+                            </>}
+
                         </Grid>
                         <Grid
                             xs={7}

@@ -2,7 +2,7 @@ import React from "react";
 
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
-const ConfirmDialog = ({ title, content, isOpen, handleClose, actionContent = 'Xác nhận', cancelContent = 'Hủy', isReverse = false, actionBgColor = 'primary', width = "30%" }) => {
+const ConfirmDialog = ({ title, content, isOpen, handleClose, actionContent = 'Xác nhận', cancelContent = 'Hủy', isReverse = false, actionBgColor = 'primary', width = 1200 }) => {
     return (
         <React.Fragment>
             <Dialog
@@ -14,9 +14,10 @@ const ConfirmDialog = ({ title, content, isOpen, handleClose, actionContent = 'X
                     "& .MuiDialog-container": {
                         "& .MuiPaper-root": {
                             width: "100%",
-                            maxWidth: { width },  // Set your width here
+                            maxWidth: width,  // Set your width here
                         },
                     },
+
                 }}
             >
                 <DialogTitle id="alert-dialog-title">

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
@@ -23,18 +22,18 @@ const Page = () => {
     enableReinitialize: true,
     validationSchema: Yup.object({
       email: Yup.string()
-        // .email('Must be a valid email')
         .max(255)
-        .required('Email is required'),
-      password: Yup.string().max(255).required('Password is required'),
+        .required('Không được để trống'),
+      password: Yup.string().max(255).required('Mật khẩu trống'),
     }),
+
     onSubmit: async (values, helpers) => {
       try {
         await auth.signInWithPassword(values.email, values.password);
         router.push('/my-works');
       } catch (err) {
         helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.message });
+        helpers.setErrors({ submit: err.response.data.message ?? 'Tài khoản hoặc mật khẩu sai' });
         helpers.setSubmitting(false);
         toastError('Đăng nhập không thành công');
       }
@@ -79,6 +78,9 @@ const Page = () => {
             </Typography>
           </Stack>
 
+
+
+
           <form noValidate onSubmit={formik.handleSubmit}>
             <Stack spacing={3}>
               <TextField
@@ -90,7 +92,6 @@ const Page = () => {
                 name="email"
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
-                type="email"
                 value={formik.values.email}
               />
               <TextField
@@ -111,15 +112,21 @@ const Page = () => {
                 {formik.errors.submit}
               </Typography>
             )}
+
             <Button
               fullWidth
               size="large"
               sx={{ mt: 3, mb: 2 }}
               type="submit"
+
               variant="contained"
-              disabled={!formik.isValid}>
+              disabled={!formik.isValid}
+              spin
+            >
               Đăng nhập
             </Button>
+
+            {/* {formik.isSubmitting} */}
 
             {/* <Button fullWidth size="large" sx={{ mt: 3 }} onClick={handleSkip}>
                   Skip authentication
@@ -130,6 +137,9 @@ const Page = () => {
                   </div>
                 </Alert> */}
           </form>
+
+
+
 
           <Typography variant="body1" color="ink.lighter" textAlign="center">
             Hoặc

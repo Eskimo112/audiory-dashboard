@@ -47,9 +47,8 @@ const AuthorBreadCrumbs = ({ storyTitle, storyGenerator, chapterTitle, handleOpe
                         href={accumulativeLink}
                         style={{ textDecoration: 'none' }}>
                         <Typography
-                            variant="body1"
                             sx={{
-                                fontSize: '16px',
+                                fontSize: '14px',
                                 color: 'ink.main',
                                 ':hover': {
                                     textDecoration: 'underline',
@@ -68,7 +67,6 @@ const AuthorBreadCrumbs = ({ storyTitle, storyGenerator, chapterTitle, handleOpe
                     accumulativeRoute = title;
                     break;
                 case 2:
-                    console.log(paths[2])
                     accumulativeRoute = paths.length === 3 ? cTitle ?? '' : paths[2] === 'write' ? 'Viết' : 'Xem';
                     break;
                 case 3:
@@ -88,7 +86,7 @@ const AuthorBreadCrumbs = ({ storyTitle, storyGenerator, chapterTitle, handleOpe
 
                     noWrap
                     variant="subtitle1"
-                    sx={{ fontSize: '16px', color: 'ink.lighter', maxWidth: "20em", textOverflow: "ellipsis", textDecoration: "underline" }}>
+                    sx={{ fontSize: '14px', color: 'ink.main', maxWidth: "20em", textOverflow: "ellipsis", textDecoration: "underline", fontWeight: "600" }}>
                     {/* {ROUTE_NAME_MAP[accumulativeRoute]} */}
                     {renderRouteName(accumulativeRoute)}
                 </Typography>

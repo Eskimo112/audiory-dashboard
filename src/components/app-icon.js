@@ -2,7 +2,7 @@ import NextLink from 'next/link';
 
 import { Typography } from '@mui/material';
 
-export default function AppIcon({ size = 32, sx }) {
+export default function AppIcon({ size = 26, sx }) {
   return (
     <Typography
       href="/"

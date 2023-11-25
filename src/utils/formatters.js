@@ -18,10 +18,13 @@ export const formatStatistic = (value) => {
 
 export function countDiffenceFromNow(dateString) {
   const date = new Date(dateString);
-  const now = Date.now();
+  const now = new Date().getTime();
+
+
   const diffTime = Math.abs(now - date);
   const diffInMinutes = Math.ceil(diffTime / (1000 * 60));
   const diffInHours = Math.ceil(diffTime / (1000 * 60 * 60));
+
   if (diffInMinutes < 1) {
     return diffInMinutes + ' giây trước';
   } else if (diffInHours < 1) {

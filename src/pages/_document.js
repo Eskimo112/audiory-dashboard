@@ -40,7 +40,9 @@ class CustomDocument extends Document {
             httpEquiv="Content-Security-Policy"
             content="upgrade-insecure-requests"
           /> */}
-          <Favicon />
+          <link rel="icon" type="image/png" sizes="32x32" href="/static/audiory-logo.png" />
+
+          {/* <Favicon /> */}
           <Fonts />
         </Head>
         <body>
