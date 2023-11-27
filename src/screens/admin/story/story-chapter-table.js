@@ -47,8 +47,8 @@ const StoryChapterTable = ({ story }) => {
             sx={{
               backgroundColor:
                 cell.getValue() === 'Viết nháp'
-                  ? 'success.alpha20'
-                  : 'error.alpha20',
+                  ? 'error.alpha20'
+                  : 'success.alpha20',
             }}
           />
         ),
@@ -70,8 +70,8 @@ const StoryChapterTable = ({ story }) => {
             sx={{
               backgroundColor:
                 cell.getValue() === 'Miễn phí'
-                  ? 'error.alpha20'
-                  : 'success.alpha20',
+                  ? 'success.alpha20'
+                  : 'error.alpha20',
             }}
           />
         ),
@@ -102,23 +102,25 @@ const StoryChapterTable = ({ story }) => {
         <MenuItem
           key="show"
           onClick={() => {
-            router.push(`/admin/stories/${row.original.id}`);
+            router.push(
+              `/admin/stories/${story.id}/chapters/${row.original.id}`,
+            );
           }}>
           <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
             <Visibility />
           </SvgIcon>
           Xem
         </MenuItem>,
-        <MenuItem
-          key="edit"
-          onClick={() => {
-            router.push(`/admin/stories/${row.original.id}`);
-          }}>
-          <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
-            <Edit />
-          </SvgIcon>
-          Chỉnh sửa
-        </MenuItem>,
+        // <MenuItem
+        //   key="edit"
+        //   onClick={() => {
+        //     router.push(`/admin/stories/${row.original.id}`);
+        //   }}>
+        //   <SvgIcon fontSize="small" sx={{ width: '16px', mr: '8px' }}>
+        //     <Edit />
+        //   </SvgIcon>
+        //   Chỉnh sửa
+        // </MenuItem>,
         <MenuItem
           key="de-activate"
           sx={{ color: 'error.main' }}
