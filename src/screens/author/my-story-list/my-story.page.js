@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 
 import EyeIcon from '@heroicons/react/24/solid/EyeIcon';
 import {
+  CleaningServices,
   Comment,
   FavoriteBorder,
   Menu,
@@ -52,8 +53,12 @@ const MyStoryPage = () => {
     ['myStories'],
     async () => await new StoryService(requestHeader).getMyStories(),
   );
+
+  const [query, setQuery] = useState('');
+
   useEffect(() => {
     setMyStories(storiesData ?? []);
+
   }, [storiesData]);
 
   const handleDelete = async ({ id }, title) => {
@@ -246,7 +251,7 @@ const MyStoryPage = () => {
     );
   };
 
-  const setName = (searchVal) => { };
+
   return (
     <>
       <Head>
@@ -261,28 +266,34 @@ const MyStoryPage = () => {
           }}>
           <Container
             maxWidth="xl"
-            sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Stack spacing={3}>
+            sx={{ display: 'flex', justifyContent: 'center', marginY: 4 }}>
+            <Stack spacing={1}>
               <Stack direction="row" justifyContent="center">
                 <Stack sx={{ marginY: '2em' }}>
                   <Typography variant="h3">Sáng tác của tôi</Typography>
                 </Stack>
               </Stack>
 
-              <Stack spacing={4}>
-                <Grid container direction="row" alignItems="center">
+              <Grid spacing={4}>
+                <Grid width={"70vw"} container direction="row" alignItems="center">
                   <Grid xs={10}>
                     <TextField
                       fullWidth
                       id="outlined-controlled"
                       label="Tìm kiếm"
-                      value={name}
-                      onChange={(event) => {
-                        setName(event.target.value);
+                      value={query}
+                      onChange={(e) => {
+                        setQuery(e.target.value);
+
+                        setMyStories(e.target.value !== "" ? storiesData.filter((person) =>
+                          person?.title.toLowerCase().includes(e.target.value.toLowerCase())
+                        ) : storiesData);
                       }}
                       sx={{}}
                     />
                   </Grid>
+
+
                   <Grid xs={2} container direction="row" justifyContent="end" columnGap={1}>
                     <Button style={{
                       backgroundColor: (theme) => theme.palette.ink.main,
@@ -296,7 +307,10 @@ const MyStoryPage = () => {
                 </Grid>
 
                 <Grid container rowGap={4} sx={{ paddingY: 1 }}>
-                  {myStories?.map((story, index) => (
+                  {myStories.length === 0 ? <Grid container spacing={0}>
+                    <Typography>Không tìm thấy truyện nào</Typography>
+
+                  </Grid> : myStories?.map((story, index) => (
                     <Grid
                       item
                       lg={6}
@@ -310,7 +324,7 @@ const MyStoryPage = () => {
                     </Grid>
                   ))}
                 </Grid>
-              </Stack>
+              </Grid>
             </Stack>
           </Container>
         </Box>
