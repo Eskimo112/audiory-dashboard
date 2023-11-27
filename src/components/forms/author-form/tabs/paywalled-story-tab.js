@@ -10,11 +10,10 @@ import * as Yup from 'yup';
 
 import ConfirmDialog from "@/components/dialog/reuse-confirm-dialog";
 import { PaywalledContract } from "@/constants/paywalled_contract";
-import { CONTRACT_TERMS, StoryAssesCriteria } from "@/constants/story_assess_criteria";
+import { StoryAssesCriteria } from "@/constants/story_assess_criteria";
 import { useRequestHeader } from "@/hooks/use-request-header";
 import StoryService from "@/services/story";
 import { toastError, toastSuccess } from "@/utils/notification";
-import { fontWeight } from "@mui/system";
 
 const PaywalledStoryTab = ({ story, handleRefetch }) => {
     const requestHeader = useRequestHeader();
@@ -165,62 +164,49 @@ const PaywalledStoryTab = ({ story, handleRefetch }) => {
     const CheckedCirCle = ({ isChecked = true }) => {
         return isChecked ? <CheckCircleOutline color="primary" /> : <RadioButtonUnchecked color="secondary" />
     }
-    const ContractTermComponent = ({ index, title, contents }) => {
-        return <Grid sx={{ marginBottom: 1 }} container spacing={0}>
-            <Typography variant="subtitle1" sx={{ fontWeight: "600" }} color="initial">{title}</Typography>
-            {contents.length === 1 ? <Typography align='justify' variant="body5" color="inherit">{contents}</Typography> : <Grid container spacing={0}>
-                {contents.map((content, idx) => (
-                    <Typography align='justify' key={idx} variant="body5" color="inherit">{`${index}.${idx + 1}`}. {content}</Typography>
 
-                ))}
-            </Grid>}
-        </Grid>
-    }
 
 
     return (
         <>
             <Grid container width={1}>
-                {story?.is_paywalled ? <Grid container direction="column" width={"40vw"}>
-                    <Typography variant="h6" color="initial">Truyện đã thương mại hóa</Typography>
+                {story?.is_paywalled ? <Grid container fullWidth direction="column" sx={{ padding: 0, width: "100%", height: 400 }} >
+                    <Stack container spacing={0}>
+                        <Typography variant="body1" color="initial">Truyện đã thương mại hóa</Typography>
+                    </Stack>
 
                     <form noValidate >
-                        <TextField
-                            variant="outlined"
-                            fullWidth
-                            name='chapter_price'
-                            type="number"
-                            size="small"
-                            value={formik.values.chapter_price}
-                            min="1"
-                            max="10"
-                            onInput={(e) => {
-                                if (e.target.value < 1) e.target.value = 1;
-                                if (e.target.value > 10) e.target.value = 10;
-                            }}
-                            error={
-                                !!(formik.touched.chapter_price && formik.errors.chapter_price)
-                            }
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                        />
-                        <Typography variant="body2" color="ink.light">Khoảng giá 1-10 xu</Typography>
-                        <Typography variant="body2" color="ink.light">* Giá của chương có thể thay đổi sau đó</Typography>
-                        <Button fullWidth variant="contained" color="primary" onClick={handlePaywalled}>
-                            Cập nhật giá chương
-                        </Button>
-                        <Grid sx={{ marginTop: 2 }} container spacing={0}>
-                            {
-                                CONTRACT_TERMS.slice(1, 3).map((term, index) => (
-                                    <ContractTermComponent key={index} index={index + 1} title={` ${term.title}`} contents={term.contents} />
-                                ))
-                            }
+                        <Grid
+                            sx={{ width: "100%" }}
+                            container
+                            direction="column"
+                        >
+                            <TextField
+                                variant="outlined"
+                                fullWidth
+                                name='chapter_price'
+                                type="number"
+                                size="small"
+                                value={formik.values.chapter_price}
+                                min="1"
+                                max="10"
+                                onInput={(e) => {
+                                    if (e.target.value < 1) e.target.value = 1;
+                                    if (e.target.value > 10) e.target.value = 10;
+                                }}
+                                error={
+                                    !!(formik.touched.chapter_price && formik.errors.chapter_price)
+                                }
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                            />
+                            <Typography variant="body2" color="ink.light">Khoảng giá 1-10 xu</Typography>
+                            <Typography variant="body2" color="ink.light">* Giá của chương có thể thay đổi sau đó</Typography>
+                            <Button fullWidth variant="contained" color="primary" onClick={handlePaywalled}>
+                                Đổi giá chương
+                            </Button>
                         </Grid>
                     </form>
-
-
-
-
 
 
                 </Grid>
