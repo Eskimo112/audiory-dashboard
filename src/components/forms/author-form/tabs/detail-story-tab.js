@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { useRouter } from "next/router";
 
-import { CheckBoxOutlined, CheckCircle, CheckCircleOutline, DeleteOutline, HelpOutline, RadioButtonUnchecked } from "@mui/icons-material";
+import { CheckBoxOutlined, CheckCircle, CheckCircleOutline, Clear, DeleteOutline, HelpOutline, RadioButtonUnchecked } from "@mui/icons-material";
 import { Box, Button, Grid, MenuItem, Skeleton, Stack, Switch, TextField, Typography } from "@mui/material";
 import { FieldArray, useFormik } from "formik";
 import { useQuery } from "react-query";
@@ -290,11 +290,11 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
                             onKeyDown={(e) => handleAddTag(e)}
                         />
 
-                        <Grid container direction="row">
+                        <Grid sx={{ marginTop: 1 }} container direction="row">
                             {tagList.length > 0 && tagList?.map((tag, index) => (
                                 <Box color="ink.main" key={index} >
-                                    <Button type="button" >
-                                        {tag}  <DeleteOutline onClick={() => {
+                                    <Button sx={{ height: "2em", marginRight: 1 }} type="button" variant="contained">
+                                        {tag}  <Clear onClick={() => {
                                             setTagList(tagList.filter((ele) => ele !== tag))
                                         }} fontSize="1em" sx={{ marginLeft: "2em" }} />
                                     </Button>

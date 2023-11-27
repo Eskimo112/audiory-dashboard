@@ -166,6 +166,7 @@ const EditStoryPage = () => {
                                 >
                                     <Container sx={{
                                         width: "100%",
+                                        height: "20em"
                                     }} >
                                         <AppImageUpload defaultUrl={story.cover_url ?? ''} onChange={(file) => setImageFile(file)} />
                                     </Container>

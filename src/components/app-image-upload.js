@@ -102,7 +102,7 @@ export const AppImageUpload = (props) => {
               right: 0,
               top: 0,
               zIndex: 101,
-              color: 'primary.lightest',
+              color: 'secondary.light',
               padding: '12px',
               borderRadius: 4,
               minWidth: 0,

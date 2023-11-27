@@ -113,11 +113,11 @@ const MyStoryPage = () => {
                     <CardMedia
                         onClick={() => { router.push(`my-works/${story.id}`) }}
                         component="img"
-                        sx={{ width: "16em", height: "14em", objectFit: "inherit" }}
+                        sx={{ width: "33%", height: "14em", objectFit: "cover" }}
                         src={story.cover_url !== '' ? story.cover_url : "https://imgv3.fotor.com/images/gallery/Fiction-Book-Covers.jpg"}
                         alt="Live from space album cover"
                     />
-                    <CardContent sx={{ boxSizing: "border-box", display: 'flex', flexDirection: 'column', width: "100%", alignItems: "stretch", padding: 1, height: "14em" }}>
+                    <CardContent sx={{ boxSizing: "border-box", display: 'flex', flexDirection: 'column', width: "67%", alignItems: "stretch", height: "14em" }}>
                         <Stack direction="column" justifyContent="center" >
                             <Stack direction="row" justifyContent="space-between">
                                 <Typography onClick={() => { router.push(`my-works/${story.id}`) }} component="div" variant="h6">
@@ -240,6 +240,7 @@ const MyStoryPage = () => {
                                             onChange={(event) => {
                                                 setName(event.target.value);
                                             }}
+                                            sx={{}}
                                         />
                                     </Grid>
                                     <Grid xs={2} container direction="row" justifyContent="end" columnGap={1}>

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Clear, HelpOutline } from '@mui/icons-material';
+import { Clear, Delete, HelpOutline, Remove } from '@mui/icons-material';
 import { Box, Button, CircularProgress, Container, Grid, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material';
 import { useFormik } from 'formik';
 import { useQuery } from 'react-query';
@@ -134,27 +134,27 @@ const StoryForm = () => {
             setTag(val);
         }
     }
-    if (isLoading)
-        return (
-            <Grid
-                sx={{
-                    display: 'flex',
-                    width: '100%',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: "100vh"
-                }}>
-                <CircularProgress />
-            </Grid>
-        );
+    // if (isLoading)
+    //     return (
+    //         <Grid
+    //             sx={{
+    //                 display: 'flex',
+    //                 width: '100%',
+    //                 justifyContent: 'center',
+    //                 alignItems: 'center',
+    //                 height: "100vh"
+    //             }}>
+    //             <CircularProgress />
+    //         </Grid>
+    //     );
 
     return (
         <>
             <div>
                 <form noValidate onSubmit={(e) => { e.preventDefault(); handleCreate() }}>
                     <Stack spacing={3} >
-                        <Grid container spacing={0} sx={{ paddingTop: '2em' }}>
-                            <Grid xs={8} sx={{ paddingRight: '2em' }}>
+                        <Grid container spacing={0} sx={{ paddingTop: '2em' }} justifyContent="space-between">
+                            <Grid xs={8} >
                                 <TextFieldLabel label='Tiêu đề truyện' isRequired={true} />
                                 <TextField
                                     variant="outlined"
@@ -220,10 +220,10 @@ const StoryForm = () => {
                                     onKeyDown={(e) => handleAddTag(e)}
                                     helperText={formik.touched.currentTag && formik.errors.tags}
                                 />
-                                <Grid container direction="row" sx={{ marginTop: "10px" }}>
+                                <Grid container direction="row" sx={{ marginTop: 1 }}>
                                     {tagList.length > 0 && tagList?.map((tag, index) => (
                                         <Box color="secondary" key={index} >
-                                            <Button variant='outlined' type="button" size='small' sx={{ marginRight: "0.3em", marginBottom: "0.3em" }} >
+                                            <Button sx={{ height: "2em", marginRight: 1 }} variant='contained' type="button" size='small' sx={{ marginRight: "0.3em", marginBottom: "0.3em" }} >
                                                 {tag}  <Clear onClick={() => {
                                                     setTagList(tagList.filter((ele) => ele !== tag))
                                                 }} fontSize="1em" sx={{ marginLeft: "2em" }} />
@@ -300,10 +300,16 @@ const StoryForm = () => {
                                     {COPYRIGHTS_LIST.find((e) => e.value === formik.values.isCopyright)?.content}
                                 </Typography>
                             </Grid>
-                            <Grid xs={4} spacing={0}>
-                                <Container maxWidth="lg" >
-                                    <AppImageUpload sx={{ width: "20em", height: "30em" }} onChange={(file) => { formik.setFieldValue('formFile', file) }} />
-                                </Container>
+                            <Grid xs={3} >
+                                <Box container justifyContent="center"
+                                    direction="row"
+                                    alignItems="center"
+                                    alignContent="center"
+                                    wrap="wrap">
+                                    <Container sx={{ width: "100%", height: "20em" }}>
+                                        <AppImageUpload onChange={(file) => { formik.setFieldValue('formFile', file) }} />
+                                    </Container>
+                                </Box>
 
                             </Grid>
                         </Grid>
