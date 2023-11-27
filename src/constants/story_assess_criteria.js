@@ -1,12 +1,7 @@
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
-
-
-
-
-
-const CONTRACT_TERMS = [
+export const CONTRACT_TERMS = [
     {
         title: 'Điều kiện ký hợp đồng',
         contents: ['Tác phẩm đang đăng tải trên App, đã cập nhật được tối thiểu 5 chương,1.000 lượt đọc và đạt 10.000 chữ trở lên có thể xin ký hợp đồng.',

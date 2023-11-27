@@ -10,7 +10,7 @@ import * as Yup from 'yup';
 
 import ConfirmDialog from "@/components/dialog/reuse-confirm-dialog";
 import { PaywalledContract } from "@/constants/paywalled_contract";
-import { StoryAssesCriteria } from "@/constants/story_assess_criteria";
+import { CONTRACT_TERMS, StoryAssesCriteria } from "@/constants/story_assess_criteria";
 import { useRequestHeader } from "@/hooks/use-request-header";
 import StoryService from "@/services/story";
 import { toastError, toastSuccess } from "@/utils/notification";
@@ -144,20 +144,16 @@ const PaywalledStoryTab = ({ story, handleRefetch }) => {
 
     });
 
-    const TextFieldLabel = ({ label = 'Tiêu đề', isRequired = false, hasSuffixIcon = false }) => {
-        return (
-            <>
-                <Grid container direction='row' >
-                    <Grid sx={11} container direction='row'>
-                        <Typography variant='subtitle1' sx={{ color: 'ink.dark' }}>{label}</Typography>
-                        {isRequired ? <Typography variant="subtitle1" color="secondary.main"> *</Typography> : <Typography></Typography>}
-                    </Grid>
-                    <Grid sx={1} display="flex" justifyContent="end">
-                        {hasSuffixIcon ? <HelpOutline /> : <></>}
-                    </Grid>
-                </Grid>
-            </>
-        );
+    const ContractTermComponent = ({ index, title, contents }) => {
+        return <Grid sx={{ marginBottom: 1 }} container spacing={0}>
+            <Typography variant="subtitle1" sx={{ fontWeight: "600" }} color="initial">{title}</Typography>
+            {contents.length === 1 ? <Typography align='justify' variant="body2" color="inherit">{contents}</Typography> : <Grid container spacing={0}>
+                {contents.map((content, idx) => (
+                    <Typography align='justify' key={idx} variant="body2" color="inherit">{idx === 4 ? '' : `${idx + 1}.`} {content}</Typography>
+
+                ))}
+            </Grid>}
+        </Grid>
     }
 
 
@@ -170,9 +166,9 @@ const PaywalledStoryTab = ({ story, handleRefetch }) => {
     return (
         <>
             <Grid container width={1}>
-                {story?.is_paywalled ? <Grid container fullWidth direction="column" sx={{ padding: 0, width: "100%", height: 400 }} >
+                {story?.is_paywalled ? <Grid container fullWidth direction="column" sx={{ padding: 0, width: "40vw", height: 400 }} >
                     <Stack container spacing={0}>
-                        <Typography variant="body1" color="initial">Truyện đã thương mại hóa</Typography>
+                        <Typography variant="h6" color="initial">Truyện đã thương mại hóa</Typography>
                     </Stack>
 
                     <form noValidate >
@@ -205,6 +201,13 @@ const PaywalledStoryTab = ({ story, handleRefetch }) => {
                             <Button fullWidth variant="contained" color="primary" onClick={handlePaywalled}>
                                 Đổi giá chương
                             </Button>
+                            <Grid sx={{ marginTop: 2 }} container spacing={0}>
+                                {
+                                    CONTRACT_TERMS.slice(1, 3).map((term, index) => (
+                                        <ContractTermComponent key={index} index={index + 1} title={` ${term.title}`} contents={term.contents} />
+                                    ))
+                                }
+                            </Grid>
                         </Grid>
                     </form>
 
