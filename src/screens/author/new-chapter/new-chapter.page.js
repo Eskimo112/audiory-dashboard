@@ -67,7 +67,7 @@ const NewChapterPage = () => {
     isRefetching,
   } = useQuery(
     ['chapter', chapterId],
-    async () => await new ChapterService(requestHeader).getById({ chapterId }),
+    async () => await new ChapterService(requestHeader).getById(chapterId),
     { refetchOnWindowFocus: false },
   );
 
@@ -247,7 +247,7 @@ const NewChapterPage = () => {
                 } else if (isPublish) {
                   console.log('pub');
 
-                  new ChapterService().publish(chapterId).then((res) => {
+                  new ChapterService(requestHeader).publish(chapterId).then((res) => {
                     console.log('res', res);
                     if (res.code === 200) {
                       toastSuccess('Đăng tải thành công');

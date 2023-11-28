@@ -20,7 +20,7 @@ import ChapterService from '@/services/chapter';
 import { countDiffenceFromNow, formatDate } from '@/utils/formatters';
 import { toastError } from '@/utils/notification';
 
-const ChapterCard = ({ chapter, index, onPublish, onPreview, onDelete, storyId, length }) => {
+const ChapterCard = ({ chapter, index, onPublish, onDelete, storyId, length }) => {
     const router = useRouter();
     const handleNavigate = () => {
         router.push(`/my-works/${storyId}/write/${chapter.id}`);
