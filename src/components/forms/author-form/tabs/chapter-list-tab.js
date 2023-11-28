@@ -2,10 +2,17 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
-import CurrencyDollarIcon from "@heroicons/react/24/outline/CurrencyDollarIcon";
-import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
-import { MoreVert } from "@mui/icons-material";
-import { Button, Grid, IconButton, Popover, Stack, Typography } from "@mui/material";
+import CurrencyDollarIcon from '@heroicons/react/24/outline/CurrencyDollarIcon';
+import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
+import { MoreVert } from '@mui/icons-material';
+import {
+    Button,
+    Grid,
+    IconButton,
+    Popover,
+    Stack,
+    Typography,
+} from '@mui/material';
 
 import ConfirmDialog from '@/components/dialog/reuse-confirm-dialog';
 import { useRequestHeader } from '@/hooks/use-request-header';
@@ -29,18 +36,18 @@ const ChapterCard = ({ chapter, index, onPublish, onPreview, onDelete, storyId, 
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
 
-    const [isOpen, setIsOpen] = React.useState(false)
+    const [isOpen, setIsOpen] = React.useState(false);
     const handleDialogOpen = () => {
-        console.log('open')
+        console.log('open');
         setIsOpen(true);
-    }
+    };
     const handleDialogClose = (isConfirm, id) => {
         console.log('confirm ', isConfirm);
         setIsOpen(false);
         if (isConfirm === true) {
-            onDelete({ chapterId: id })
+            onDelete({ chapterId: id });
         }
-    }
+    };
 
     const isDraft = chapter.is_draft;
     const isLast = length === 1;
@@ -140,10 +147,11 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onDelete }) => {
 
     const handleCreateChapter = async () => {
         const body = {
-            position: list.length + 1, story_id: storyId
+            position: list.length + 1,
+            story_id: storyId,
         };
         try {
-            await new ChapterService(requestHeader).create(body).then(async res => {
+            await new ChapterService(requestHeader).create(body).then(async (res) => {
                 // refetch(true);
 
                 // toastSuccess("Tạo chương mới thành công");
