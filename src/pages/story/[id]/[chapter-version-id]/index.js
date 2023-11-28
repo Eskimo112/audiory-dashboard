@@ -1,6 +1,6 @@
 import { Layout as AuthorLayout } from 'src/layouts/author/layout';
 
-import PreviewChapterPage from '@/screens/author/preview-chapter/preview-chapter.page';
+import PreviewChapterPage from '@/screens/author/preview-chapter/PreviewChapterPage';
 
 
 const Page = () => <PreviewChapterPage />;

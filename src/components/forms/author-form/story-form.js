@@ -245,6 +245,8 @@ const StoryForm = () => {
                   onChange={(e) => setTag(e.target.value)}
                   onKeyDown={(e) => handleAddTag(e)}
                   helperText={formik.touched.currentTag && formik.errors.tags}
+                  onError={formik.errors.tags}
+
                 />
                 <Grid container direction="row" sx={{ marginTop: 1 }}>
                   {tagList.length > 0 && tagList?.map((tag, index) => (

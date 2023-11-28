@@ -88,19 +88,17 @@ export default class StoryService {
   async edit({ body, storyId }) {
     const url = `stories/${storyId}`;
     const requestHeaders = {
-      // 'Content-Type': 'multipart/form-data',
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'multipart/form-data',
+      // 'Content-Type': 'application/x-www-form-urlencoded',
       ...this.requestHeader,
     };
 
-    const formData = FormData(body);
-    const response = axios.patch(`${process.env.API}${url}`, formData, { headers: requestHeaders });
-    // const response = await request({
-    //   url,
-    //   method: 'patch',
-    //   requestHeaders
-    //   payload: formData,
-    // });
+    const response = await request({
+      url,
+      method: 'patch',
+      requestHeaders,
+      payload: body,
+    });
 
     return response;
   }

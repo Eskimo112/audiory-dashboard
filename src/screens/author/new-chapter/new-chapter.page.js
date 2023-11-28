@@ -188,6 +188,8 @@ const NewChapterPage = () => {
       await new ChapterService(requestHeader).create(body).then((res) => {
         toastSuccess('Tạo chương mới thành công');
       });
+      chapterData.refetch();
+      storyData.refetch();
     } catch (error) {
       toastError('Tạo chương không thành công');
     }
@@ -238,10 +240,11 @@ const NewChapterPage = () => {
               if (res.code === 200) {
                 console.log('res for create ', res);
                 if (isPreview) {
-                  refetch2().then((res) => {
+                  refetch2().then((response) => {
+                    console.log('preview');
+                    console.log(res.data)
                     router.replace(
-                      `/my-works/${router.query?.id}/preview/${chapterVersionsData[chapterVersionsData.length - 1].id
-                      }`,
+                      `/my-works/${router.query?.id}/preview/${res.data?.id}`,
                     );
                   });
                 } else if (isPublish) {
@@ -390,7 +393,10 @@ const NewChapterPage = () => {
                   fullWidth
                   variant="contained"
                   sx={{ margin: '1em 2em' }}
-                  onClick={handleCreateChapter}>
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleCreateChapter();
+                  }}>
                   Thêm chương mới
                 </Button>
               </Grid>

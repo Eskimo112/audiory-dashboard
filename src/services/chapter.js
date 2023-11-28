@@ -57,7 +57,6 @@ export default class ChapterService {
       url,
       method: 'delete',
     });
-    if (!response.data) return null;
-    return response.data;
+    return response;
   }
 }

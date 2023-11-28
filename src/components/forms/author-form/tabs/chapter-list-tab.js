@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 
 import CurrencyDollarIcon from '@heroicons/react/24/outline/CurrencyDollarIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { MoreVert } from '@mui/icons-material';
+import { CleaningServices, MoreVert } from '@mui/icons-material';
 import {
     Button,
     Grid,
@@ -18,10 +18,11 @@ import ConfirmDialog from '@/components/dialog/reuse-confirm-dialog';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import ChapterService from '@/services/chapter';
 import { countDiffenceFromNow, formatDate } from '@/utils/formatters';
-import { toastError } from '@/utils/notification';
+import { toastError, toastSuccess } from '@/utils/notification';
 
-const ChapterCard = ({ chapter, index, onPublish, onDelete, storyId, length }) => {
+const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
     const router = useRouter();
+    const requestHeader = useRequestHeader();
     const handleNavigate = () => {
         router.push(`/my-works/${storyId}/write/${chapter.id}`);
     };
@@ -30,7 +31,9 @@ const ChapterCard = ({ chapter, index, onPublish, onDelete, storyId, length }) =
         event.stopPropagation();
         setAnchorEl(event.currentTarget);
     };
-    const handleClose = () => {
+    const handleClose = (e) => {
+        event.stopPropagation();
+
         setAnchorEl(null);
     };
     const open = Boolean(anchorEl);
@@ -45,13 +48,67 @@ const ChapterCard = ({ chapter, index, onPublish, onDelete, storyId, length }) =
         console.log('confirm ', isConfirm);
         setIsOpen(false);
         if (isConfirm === true) {
-            onDelete({ chapterId: id });
+            onDeleteChapter({ chapterId: id });
         }
     };
 
     const isDraft = chapter.is_draft;
     const isLast = length === 1;
+    // chapter handler
+    const onPublishChapter = async ({ chapterId, isPublish = true }) => {
+        console.log('chapterId', chapterId);
+        console.log('isPublish', isPublish);
+        if (isPublish) {
+            await new ChapterService(requestHeader).publish(chapterId).then(res => {
+                if (res.code === 200) {
+                    toastSuccess('Đăng tải thành công');
+                    refetch();
+                } else {
+                    toastError('Không thể đăng tải chương trống');
+                }
+            })
 
+        } else {
+            try {
+                await new ChapterService(requestHeader).unpublish(chapterId).then(res => {
+                    if (res.code === 200) {
+                        toastSuccess('Gỡ đăng tải thành công');
+                        refetch();
+                    } else {
+                        toastError(res.message);
+                    }
+                })
+
+            } catch (error) {
+                console.log(error)
+                toastError('Gỡ đăng tải không thành công')
+            }
+
+        }
+    }
+    const onDeleteChapter = async ({ chapterId, isLast = false }) => {
+
+        await new ChapterService(requestHeader).delete(chapterId).then(res => {
+            console.log(res);
+            if (res.code === 200) {
+                toastSuccess('Xóa thành công');
+                refetch();
+            } else {
+                toastError(res.message);
+            }
+        })
+        if (isLast) {
+            await new ChapterService(requestHeader).delete(chapterId).then(res => {
+                console.log(res)
+                if (res.code === 200) {
+                    toastSuccess('Xóa thành công');
+                    refetch();
+                } else {
+                    toastError(res.message);
+                }
+            })
+        }
+    }
 
     return (
         <Button fullWidth color={isDraft ? 'inherit' : "inherit"} variant='text' key={index} sx={{
@@ -101,19 +158,29 @@ const ChapterCard = ({ chapter, index, onPublish, onDelete, storyId, length }) =
                     >
                         <Grid container direction="column">
 
-                            <Button variant="text" color="primary" onClick={() => { handleNavigate() }
+                            {/* <Button variant="text" color="primary" onClick={() => { handleNavigate() }
                             }>
                                 Xem trước
-                            </Button>
-                            {chapter.is_draft ? <Button variant="text" color="primary" onClick={() => onPublish({ chapterId: chapter.id, isPublish: true })}>
+                            </Button> */}
+                            {chapter.is_draft ? <Button variant="text" color="primary" onClick={(e) => {
+                                e.stopPropagation();
+                                onPublishChapter({ chapterId: chapter.id, isPublish: true });
+                            }}>
                                 Đăng tải
-                            </Button> : !chapter.is_paywalled ? <Button variant="text" color="primary" onClick={() => onPublish({ chapterId: chapter.id, isPublish: false })}>
+                            </Button> : !chapter.is_paywalled ? <Button variant="text" color="primary" onClick={(e) => {
+                                e.stopPropagation();
+                                onPublishChapter({ chapterId: chapter.id, isPublish: false })
+                            }}>
                                 Gỡ đăng tải
                             </Button> : <></>}
-                            {!chapter.is_paywalled ? <Button variant="text" color="secondary" onClick={() => handleDialogOpen()}>
+                            {!chapter.is_paywalled ? <Button variant="text" color="secondary" onClick={(e) => {
+                                e.stopPropagation();
+                                handleDialogOpen()
+                            }}>
                                 Xóa chương
                             </Button> : <></>}
                             <ConfirmDialog
+                                width={"30%"}
                                 title={`Xác nhận xóa chương ${chapter.title}`}
                                 actionBgColor='secondary'
                                 isReverse={true}
@@ -127,7 +194,10 @@ const ChapterCard = ({ chapter, index, onPublish, onDelete, storyId, length }) =
                                     }
                                 </Grid>}
                                 isOpen={isOpen}
-                                handleClose={(isConfirm) => { handleDialogClose(isConfirm, chapter.id) }}
+                                handleClose={(isConfirm) => {
+                                    console.log(isConfirm)
+                                    handleDialogClose(isConfirm, chapter.id)
+                                }}
                                 actionContent='Xác nhận xóa'
                                 cancelContent='Hủy thao tác'
                             />
@@ -140,7 +210,7 @@ const ChapterCard = ({ chapter, index, onPublish, onDelete, storyId, length }) =
         </Button >
     )
 }
-const ChapterListTab = ({ list, storyId, refetch, onPublish, onDelete }) => {
+const ChapterListTab = ({ list, storyId, refetch }) => {
     const router = useRouter();
     const requestHeader = useRequestHeader();
 
@@ -155,7 +225,7 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onDelete }) => {
                 // refetch(true);
 
                 // toastSuccess("Tạo chương mới thành công");
-                await router.push(`${router.asPath}/write/${res.current_version_id}`);
+                await router.push(`${router.asPath}/write/${res.id}`);
             });
         } catch (error) {
             toastError('Tạo chương không thành công');
@@ -173,8 +243,8 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onDelete }) => {
                 {list.map((chapter, index) => (
                     <Stack width={"100%"} key={index}>
                         <ChapterCard chapter={chapter} index={index}
-                            storyId={storyId} onDelete={onDelete}
-                            onPublish={onPublish}
+                            storyId={storyId}
+                            refetch={refetch}
                             length={list.length} />
                     </Stack>
                 ))

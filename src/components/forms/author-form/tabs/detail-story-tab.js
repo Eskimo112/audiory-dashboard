@@ -108,8 +108,7 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
             isDraft: story.is_draft ?? true,
             isMature: story.is_mature ?? false,
             isCopyright: story.is_copyright ?? false,
-            isComplete: story.is_complete ?? false,
-            isPaywalled: story.is_paywalled ?? false,
+            isComplete: story.is_completed ?? false,
             chapter_price: story?.chapter_price ?? 0,
             formFile: story.cover_url ?? null,
             submit: null,
@@ -154,19 +153,26 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
     }
 
     const handleEdit = async () => {
+        var actualList = [];
+        for (let index = 0; index < tagList.length; index++) {
+            const element = { 'name': tagList[index] };
+            actualList.push(element);
+
+        }
         const values = formik.values;
-        var body = new FormData();
+        const body = new FormData();
 
         body.append('category_id', values.category);
         body.append('description', values.description);
-        body.append('tags', tagList.map((str, index) => ({ value: str, id: index + 1 })));
+        body.append('tags', JSON.stringify(actualList));
         body.append('title', values.title);
         body.append('is_mature', values.isMature);
         body.append('is_copyright', values.isCopyright);
         body.append('is_completed', values.isComplete);
-        body.append('is_draft', true);
+        // body.append('is_draft', true);
 
-        body.append('is_paywalled', values.isPaywalled);
+
+        console.log(body)
         if (values.isPaywalled) {
             body.append('chapter_price', values.chapter_price)
         }
@@ -176,6 +182,7 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
         try {
             await new StoryService(requestHeader).edit({ body, storyId: story.id }).then(
                 res => {
+                    console.log(res)
                     if (res.code === 200) {
                         toastSuccess('Sửa thành công truyện ');
                         handleRefetch();
@@ -209,9 +216,7 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
             setTag(val);
         }
     }
-    const CheckedCirCle = ({ isChecked = true }) => {
-        return isChecked ? <CheckCircleOutline color="primary" /> : <RadioButtonUnchecked color="secondary" />
-    }
+
 
     return (
         <>

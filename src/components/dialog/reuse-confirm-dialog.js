@@ -29,10 +29,18 @@ const ConfirmDialog = ({ title, content, isOpen, handleClose, actionContent = 'X
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ display: 'flex', flexDirection: isReverse ? "row-reverse" : "row", justifyContent: "end", columnGap: "0.3em   " }}>
-                    <Button onClick={() => { handleClose(false) }} color='inherit'>
+                    <Button onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleClose(false);
+                    }} color='inherit'>
                         {cancelContent}
                     </Button>
-                    <Button onClick={() => { handleClose(true) }} variant='contained' autoFocus color={actionBgColor}>{actionContent}</Button>
+                    <Button onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleClose(true);
+                    }} variant='contained' autoFocus color={actionBgColor}>{actionContent}</Button>
                 </DialogActions>
             </Dialog>
         </React.Fragment>

@@ -65,6 +65,7 @@ const MyStoryPage = () => {
   const handleDelete = async ({ id }, title) => {
     try {
       await new StoryService(requestHeader).delete(id).then((res) => {
+        console.log(res)
         toastSuccess('Xóa thành công truyện');
         refetch();
       });
@@ -162,6 +163,7 @@ const MyStoryPage = () => {
                         Xóa truyện
                       </Button>}
                       <ConfirmDialog
+                        width={"30%"}
                         title={`Xác nhận xóa truyện ${story.title}`}
                         actionBgColor='secondary'
                         isReverse={true}
@@ -311,7 +313,7 @@ const MyStoryPage = () => {
                 </Grid>
 
                 <Grid container rowGap={4} sx={{ paddingY: 1 }}>
-                  {myStories.length === 0 ? <Grid container spacing={0}>
+                  {myStories.length === 0 && isSuccess ? <Grid container spacing={0}>
                     <Typography>Không tìm thấy truyện nào</Typography>
 
                   </Grid> : myStories?.map((story, index) => (

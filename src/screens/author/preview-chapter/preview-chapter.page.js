@@ -2,23 +2,12 @@ import React, { useEffect, useState } from 'react';
 
 import 'react-quill/dist/quill.snow.css';
 
-import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
 import {
   CheckCircle,
-  FastForward,
-  FastRewind,
-  FavoriteBorderOutlined,
-  GifBoxOutlined,
-  ListAlt,
-  PlayArrow,
-  Settings,
-  SettingsOutlined,
 } from '@mui/icons-material';
 import {
   Button,
   Card,
-  CardContent,
   CardMedia,
   Container,
   Grid,
@@ -28,18 +17,14 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import LinearProgress, {
-  linearProgressClasses,
-} from '@mui/material/LinearProgress';
 import { QuillDeltaToHtmlConverter } from 'quill-delta-to-html';
 import { useQuery } from 'react-query';
 
 import AuthorBreadCrumbs from '@/components/author-bread-crumbs';
-import { useAuth } from '@/hooks/use-auth';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import ChapterService from '@/services/chapter';
 import ChapterVersionService from '@/services/chapter-version';
-import { formatDateTime } from '@/utils/formatters';
+import { formatDate } from '@/utils/formatters';
 import { toastError, toastSuccess } from '@/utils/notification';
 
 const { useRouter } = require('next/router');
@@ -53,7 +38,6 @@ const PreviewChapterPage = () => {
 
   const [value, setValue] = useState('');
   const [html, setHtml] = useState('<p></p>');
-
   const ReactQuill =
     typeof window === 'object' ? require('react-quill') : () => false;
 
@@ -96,93 +80,39 @@ const PreviewChapterPage = () => {
   const id = open ? 'simple-popover' : undefined;
 
   const [storyData, setStoryData] = useState({});
+  const [currentChapter, setCurrentChapter] = useState({});
   useEffect(() => {
     setValue(JSON.parse(chapterVersionData?.rich_text === '' ?? '{}'));
     setChapterId(chapterVersionData.chapter_id);
+    setCurrentChapter(chapterData);
     var cfg = {};
     var converter = new QuillDeltaToHtmlConverter(value, cfg);
 
     setHtml(converter.convert());
   }, [chapterVersionData, isSucces, chapterData, router.isReady]);
 
-  const MediaControlCard = () => {
-    const theme = useTheme();
-    const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
-      height: 8,
-      borderRadius: 5,
-      [`&.${linearProgressClasses.colorPrimary}`]: {
-        backgroundColor: 'sky.light',
-      },
-      [`& .${linearProgressClasses.bar}`]: {
-        borderRadius: 5,
-        backgroundColor: 'primary.dark',
-      },
-    }));
 
-    return (
-      <Card sx={{ width: '100%', backgroundColor: 'sky.lightest' }}>
-        <Grid
-          xs={{ width: '100%' }}
-          container
-          direction="column"
-          alignItems="center">
-          <Grid
-            container
-            direction="column"
-            alignItems="center"
-            alignContent="center"
-            xs={12}>
-            <CardContent>
-              <Typography component="div" variant="h6">
-                Nghe audio
-              </Typography>
-            </CardContent>
-          </Grid>
 
-          <Grid container xs={12} direction="column">
-            <Grid xs={12}>
-              <BorderLinearProgress
-                variant="determinate"
-                value={35}
-                sx={{ margin: '0em 1em' }}
-              />
-            </Grid>
-            <Stack
-              direction="row"
-              justifyContent="center"
-              alignItems="center"
-              spacing={2}>
-              <IconButton aria-label="previous">
-                {theme.direction === 'rtl' ? <FastForward /> : <FastRewind />}
-              </IconButton>
-              <IconButton aria-label="play/pause">
-                <PlayArrow sx={{ height: 38, width: 38 }} />
-              </IconButton>
-              <IconButton aria-label="next">
-                {theme.direction === 'rtl' ? <FastRewind /> : <FastForward />}
-              </IconButton>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Card>
-    );
-  };
-
-  const handleRevertChapterVersion = async (e) => {
-    e.preventDefault();
+  const handleRevertChapterVersion = async () => {
 
     await new ChapterVersionService()
       .revert({ chapterVersionId: router.query['chapter-version-id'] })
       .then((res) => {
+
         if (res.code === 200) {
           toastSuccess('Khôi phục thành công');
-
-          router.push(`/my-works/${router.query.id}/write/${chapterId}`);
+          router.push(`/my-works/${storyId}/write/${chapterId}`);
         } else {
           console.log(res);
           toastError(res.message);
         }
       });
+  };
+
+  const navigateToWrite = (e) => {
+    // e.preventDefault();
+    // router.push(`/my-works/${router.query.id}/write/${chapterId}`);
+    router.back();
   };
 
   return (
@@ -228,8 +158,9 @@ const PreviewChapterPage = () => {
                     padding: '0.6em 1.2em',
                   }}
                   onClick={(e) => {
-                    console.log(`/story/${storyId}/${chapterId}`);
-                    router.push(`/story/${storyData?.id}/${chapter?.id}`);
+                    // console.log(`/story/${storyId}/${chapterId}`);
+                    console.log(currentChapter?.current_version_id);
+                    // router.push(`/my-works/${storyData?.id}/preview/${currentChapter?.current_version_id}`);
                   }}>
                   <Grid xs={10} container spacing={0}>
                     <Grid
@@ -266,11 +197,10 @@ const PreviewChapterPage = () => {
                         variant="body1">
                         ({chapter?.is_draft ? 'Bản thảo' : 'Đã đăng tải'}){' '}
                       </Typography>
-                      <Typography variant="body1" color="sky.dark">{`${
-                        formatDate(
-                          chapter?.updated_date ?? chapter?.created_date,
-                        ).split(' ')[0]
-                      }`}</Typography>
+                      <Typography variant="body1" color="sky.dark">{`${formatDate(
+                        chapter?.updated_date ?? chapter?.created_date,
+                      ).split(' ')[0]
+                        }`}</Typography>
                     </Grid>
                   </Grid>
                   <Grid
@@ -328,16 +258,25 @@ const PreviewChapterPage = () => {
             fullWidth
             variant="outlined"
             color="primary"
-            onClick={handleRevertChapterVersion}
+            onClick={navigateToWrite}
+            sx={{ margin: '0.5em 0', width: 1 / 3 }}>
+            Quay trở lại viết
+          </Button>
+          <Button
+            fullWidth
+            variant="outlined"
+            color="primary"
+            onClick={() => {
+              // e.preventDefault();
+              handleRevertChapterVersion()
+            }}
             sx={{ margin: '1em 0', width: 1 / 3 }}>
             Khôi phục
           </Button>
         </Grid>
 
-        <Grid direction="column" container alignItems="center">
-          {/* <Grid xs={2} >
-                        <Typography variant="h5" color="initial"></Typography>
-                    </Grid> */}
+        <Stack width={"100%"} direction="column" container alignItems="center">
+
           <Grid xs={6} container>
             {/* {isLoading ? <Skeleton /> : <MediaControlCard />} */}
 
@@ -396,7 +335,7 @@ const PreviewChapterPage = () => {
                             </IconButton>
                         </Container> */}
           </Grid>
-        </Grid>
+        </Stack>
       </Grid>
     </>
   );
