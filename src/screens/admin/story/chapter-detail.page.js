@@ -47,6 +47,8 @@ const ChapterDetailPage = ({ chapterId, storyId }) => {
   const { data: chapter = {}, isLoading } = useQuery(
     ['chapter', chapterId],
     async () => await new ChapterService(requestHeader).getById(chapterId),
+    { refetchOnWindowFocus: false }
+
   );
 
   const [openDialog, setOpenDialog] = useState();

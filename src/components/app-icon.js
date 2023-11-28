@@ -1,6 +1,7 @@
 import NextLink from 'next/link';
 
 import { Typography } from '@mui/material';
+import { useAuthContext } from '@/contexts/auth-context';
 
 export default function AppIcon({ size = 26, sx }) {
   return (

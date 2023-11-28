@@ -32,8 +32,8 @@ const StoryForm = () => {
     isSuccess,
   } = useQuery(
     ['categories'],
-    async () => await CategoryService(requestHeader).getAll(),
-    { refetchOnMount: false, refetchOnWindowFocus: false },
+    async () => await new CategoryService(requestHeader).getAll(),
+    { refetchOnWindowFocus: false },
   );
   useEffect(() => {
     setSelectedCategory(categoriesData[0]?.id ?? '');
@@ -108,21 +108,28 @@ const StoryForm = () => {
   };
 
   const handleCreate = async () => {
+    var actualList = [];
+    for (let index = 0; index < tagList.length; index++) {
+      const element = { 'name': tagList[index] };
+      actualList.push(element);
+
+    }
     const values = formik.values;
     const body = new FormData();
     body.append('author_id', auth?.user?.id ?? '');
     body.append('category_id', values.category);
     body.append('description', values.description);
-    body.append('tags', values.tags);
+    body.append('tags', JSON.stringify(actualList));
     body.append('title', values.title);
     body.append('is_mature', values.isMature);
     body.append('is_copyright', values.isCopyright);
     body.append('is_completed', false);
     body.append('is_draft', true);
     body.append('form_file', values.formFile);
-
+    console.log(body);
     try {
-      const data = await StoryService.create({ body, jwt });
+      const data = await new StoryService(requestHeader).create({ body, jwt });
+      console.log('body', body)
       console.log('data', data);
       const storyId = data.id;
       const chapterId = data.chapters[0].id;
@@ -169,7 +176,7 @@ const StoryForm = () => {
   return (
     <>
       <div>
-        <form noValidate onSubmit={(e) => { e.preventDefault(); handleCreate() }}>
+        <form noValidate >
           <Stack spacing={3} >
             <Grid container spacing={0} sx={{ paddingTop: '2em' }} justifyContent="space-between">
               <Grid xs={8} >
@@ -352,10 +359,16 @@ const StoryForm = () => {
           )}
           <Button
             fullWidth
-            sx={{ mt: 3 }}
+            sx={{ mt: 3, mb: 3 }}
             disabled={!formik.isValid}
             type="submit"
-            variant="contained">
+            variant="contained"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleCreate();
+            }}
+          >
             Tạo
           </Button>
 

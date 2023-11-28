@@ -52,6 +52,7 @@ const MyStoryPage = () => {
   } = useQuery(
     ['myStories'],
     async () => await new StoryService(requestHeader).getMyStories(),
+    { refetchOnWindowFocus: false }
   );
 
   const [query, setQuery] = useState('');

@@ -147,7 +147,11 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onPreview, onDelete
     }
     return (
         <>
-            <Button fullWidth onClick={handleCreateChapter} sx={{ height: "3em" }} variant="contained" startIcon={<PlusIcon />}>
+            <Button fullWidth onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleCreateChapter();
+            }} sx={{ height: "3em" }} variant="contained" startIcon={<PlusIcon />}>
                 <Typography variant="subtitle1">Tạo chương mới</Typography>
             </Button>
             {list.map((chapter, index) => (

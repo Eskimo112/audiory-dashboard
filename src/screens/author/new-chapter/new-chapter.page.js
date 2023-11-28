@@ -48,11 +48,14 @@ const NewChapterPage = () => {
     const { data: chapterData = {}, isLoading, isSuccess, refetch, isRefetching } = useQuery(
         ['chapter', chapterId],
         async () => await new ChapterService(requestHeader).getById({ chapterId }),
+        { refetchOnWindowFocus: false }
     );
 
     const { data: chapterVersionsData = [], isSucces2, refetch: refetch2 } = useQuery(
         ['chapterVersionList'],
         async () => await new ChapterVersionService(requestHeader).getAll({ chapterId }),
+        { refetchOnWindowFocus: false }
+
 
     );
 
@@ -84,7 +87,7 @@ const NewChapterPage = () => {
         refetch();
         refetch2();
     }, [router])
-
+    print(chapterData);
 
     const ReactQuill = typeof window === 'object' ? require('react-quill') : () => false;
     const formik = useFormik({

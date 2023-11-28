@@ -117,6 +117,7 @@ export default class StoryService {
       payload: body,
       requestHeaders,
     });
+    console.log(response)
 
     if (!response.code) return response.data;
     return response.data;

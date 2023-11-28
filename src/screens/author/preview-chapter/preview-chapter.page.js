@@ -80,6 +80,8 @@ const PreviewChapterPage = () => {
       await new ChapterService(requestHeader).getById({
         chapterId: chapterVersionData?.chapter_id,
       }),
+    { refetchOnWindowFocus: false }
+
   );
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -264,11 +266,10 @@ const PreviewChapterPage = () => {
                         variant="body1">
                         ({chapter?.is_draft ? 'Bản thảo' : 'Đã đăng tải'}){' '}
                       </Typography>
-                      <Typography variant="body1" color="sky.dark">{`${
-                        formatDate(
-                          chapter?.updated_date ?? chapter?.created_date,
-                        ).split(' ')[0]
-                      }`}</Typography>
+                      <Typography variant="body1" color="sky.dark">{`${formatDate(
+                        chapter?.updated_date ?? chapter?.created_date,
+                      ).split(' ')[0]
+                        }`}</Typography>
                     </Grid>
                   </Grid>
                   <Grid
