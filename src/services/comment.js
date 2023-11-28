@@ -15,4 +15,27 @@ export default class CommentService {
     if (!response.data) return [];
     return response.data;
   }
+
+  async getById(commentId) {
+    const url = `comments/${commentId}`;
+
+    const response = await request({
+      url,
+      method: 'get',
+    });
+    if (!response.data) return [];
+    return response.data;
+  }
+
+  async deleteById(commentId) {
+    const url = `comments/${commentId}`;
+
+    const response = await request({
+      url,
+      method: 'delete',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return [];
+    return response.data;
+  }
 }

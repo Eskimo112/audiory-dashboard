@@ -12,6 +12,9 @@ const ROUTE_NAME_MAP = (name1, name2) => ({
   '/admin/reports': 'Quản lý báo cáo',
   '/admin/reports/[report_id]': 'Chi tiết báo cáo',
   '/admin/reports/create': 'Tạo báo cáo mới',
+  '/admin/reports/[report_id]/moderation': '',
+  '/admin/reports/[report_id]/moderation/[chapter_version_id]':
+    'Chi tiết vi phạm',
   '/admin/stories': 'Quản lý truyện',
   '/admin/stories/[story_id]': name1,
   '/admin/stories/[story_id]/chapters': 'Danh sách chương',
@@ -46,25 +49,26 @@ const AppBreadCrumbs = ({ name1, name2 }) => {
 
     paths.forEach((path, index) => {
       if (index !== 0 && index !== 1) {
-        result.push(
-          <Link
-            key={index}
-            href={accumulativeLink}
-            style={{ textDecoration: 'none' }}>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                fontSize: '16px',
-                fontWeight: 400,
-                color: 'ink.main',
-                ':hover': {
-                  textDecoration: 'underline',
-                },
-              }}>
-              {ROUTE_NAME_MAP(name1, name2)[accumulativeRoute]}
-            </Typography>
-          </Link>,
-        );
+        if (path)
+          result.push(
+            <Link
+              key={index}
+              href={accumulativeLink}
+              style={{ textDecoration: 'none' }}>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontSize: '16px',
+                  fontWeight: 400,
+                  color: 'ink.main',
+                  ':hover': {
+                    textDecoration: 'underline',
+                  },
+                }}>
+                {ROUTE_NAME_MAP(name1, name2)[accumulativeRoute]}
+              </Typography>
+            </Link>,
+          );
       }
       accumulativeLink += '/' + path;
       accumulativeRoute += '/' + routes[index];

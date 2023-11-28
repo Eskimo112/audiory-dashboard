@@ -10,8 +10,10 @@ import UserService from '@/services/user';
 
 const UserInfo = ({ userId, isReversed }) => {
   const requestHeader = useRequestHeader();
-  const { data: user = {}, isLoading } = useQuery(['user', userId], () =>
-    new UserService(requestHeader).getById(userId),
+  const { data: user = {}, isLoading } = useQuery(
+    ['user', userId],
+    () => new UserService(requestHeader).getById(userId),
+    { refetchOnWindowFocus: false, refetchOnMount: false },
   );
   const router = useRouter();
   if (isLoading) return <CircularProgress />;
