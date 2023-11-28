@@ -40,7 +40,11 @@ export const PaidRateChart = (props) => {
   const { data, isLoading, isFetching } = useQuery(
     ['dashboard', 'paid', dates[0], dates[1]],
     () => new DashboardService(requestHeader).getPaidRatio(dates[0], dates[1]),
-    { enabled: Boolean(dates[0]) && Boolean(dates[1]) },
+    {
+      enabled: Boolean(dates[0]) && Boolean(dates[1]),
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    },
   );
 
   const chartOptions = useMemo(() => {

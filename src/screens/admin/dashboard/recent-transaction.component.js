@@ -26,7 +26,7 @@ import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '@/constants/chip_colors';
 import { TRANSACTION_TYPE_MAP } from '@/constants/status_map';
 import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
-import { countDiffenceFromNow, formatDateTime } from '@/utils/formatters';
+import { formatDateTime } from '@/utils/formatters';
 
 import TransactionService from '../../../services/transaction';
 
@@ -39,6 +39,7 @@ const RecentTransactionsTable = () => {
   } = useQuery(
     ['transactions'],
     async () => await new TransactionService(requestHeader).getAll(),
+    { refetchOnMount: false, refetchOnWindowFocus: false },
   );
 
   const router = useRouter();
@@ -109,7 +110,6 @@ const RecentTransactionsTable = () => {
           );
         },
       },
-
       {
         accessorKey: 'coin_value',
         header: 'Giá trị',

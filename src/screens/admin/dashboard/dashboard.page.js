@@ -24,8 +24,10 @@ const DashboardPage = () => {
     data: stats = {},
     isLoading,
     isError,
-  } = useQuery(['dashboard', 'stat'], () =>
-    new DashboardService(requestHeader).getStat(),
+  } = useQuery(
+    ['dashboard', 'stat'],
+    () => new DashboardService(requestHeader).getStat(),
+    { refetchOnMount: false, refetchOnWindowFocus: false },
   );
 
   return (

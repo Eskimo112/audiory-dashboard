@@ -34,6 +34,40 @@ export const countDiffenceFromNow = (dateString) => {
   return formatDateTime(dateString).split(' ')[0];
 };
 
+export function timeAgo(dateString) {
+  const currentDate = new Date();
+  const inputDate = new Date(dateString);
+
+  const timeDifference = currentDate - inputDate;
+  const seconds = Math.floor(timeDifference / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(months / 12);
+
+  if (years > 0) {
+    return years + ' năm trước';
+  } else if (months > 0) {
+    return months + ' tháng trước';
+  } else if (days > 0) {
+    return days + ' ngày trước';
+  } else if (hours > 0) {
+    return hours + ' giờ trước';
+  } else if (minutes > 0) {
+    return minutes + ' phút trước';
+  } else if (seconds > 10) {
+    return seconds + ' giây trước';
+  } else {
+    return 'Vừa xong';
+  }
+}
+
+// Example usage:
+const dateTimeString = '2023-11-29T12:00:00Z'; // Replace this with your date string
+const relativeTime = timeAgo(dateTimeString);
+console.log(relativeTime);
+
 export function formatDateTime(dateString) {
   const date = new Date(dateString);
   const year = date.getFullYear();

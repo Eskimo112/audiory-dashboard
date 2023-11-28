@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import Head from 'next/head';
 import Link from 'next/link';
@@ -26,13 +26,14 @@ import ReportService from '@/services/report';
 import { formatDateTime } from '@/utils/formatters';
 
 import UserInfo from './user-info.component';
+import CommentDetailDialog from '../story/comment-detail-dialog';
 
 export const REPORT_TYPE_MAP = {
   USER: 'Người dùng',
   STORY: 'Truyện',
   COMMENT: 'Bình luận',
   REVENUE_COMPLAINT: 'Khiếu nại doanh thu',
-  CONTENT_VIOLATION_COMPLAINT: 'Khiếu nại vi phạm',
+  CONTENT_VIOLATION_COMPLAINT: 'Nội dung vi phạm',
 };
 export const REPORT_STATUS_MAP = {
   APPROVED: 'Chấp nhận',
@@ -51,6 +52,7 @@ const ReportPage = () => {
     ['report'],
     async () => await reportService.getAll(),
   );
+  const [commentDialog, setCommentDialog] = useState();
 
   const router = useRouter();
   const theme = useTheme();
@@ -135,16 +137,17 @@ const ReportPage = () => {
               );
             case 'COMMENT':
               return (
-                <Link
-                  href={`/admin/chapters/${reportedId}`}
-                  style={{
+                <Typography
+                  variant="body2"
+                  color="primary.main"
+                  sx={{
+                    textDecoration: 'underline',
                     textDecorationColor: theme.palette.primary.main,
                     WebkitTextDecorationColor: theme.palette.primary.main,
-                  }}>
-                  <Typography variant="body2" color="primary.main">
-                    Chi tiết comment
-                  </Typography>
-                </Link>
+                  }}
+                  onClick={() => setCommentDialog(reportedId)}>
+                  Chi tiết bình luận
+                </Typography>
               );
             case 'REVENUE_COMPLAINT':
               return (
@@ -162,7 +165,7 @@ const ReportPage = () => {
             case 'CONTENT_VIOLATION_COMPLAINT':
               return (
                 <Link
-                  href={`/admin/chapters/${reportedId}`}
+                  href={`/admin/reports/${row.original.id}/moderation/${reportedId}`}
                   style={{
                     textDecorationColor: theme.palette.primary.main,
                     WebkitTextDecorationColor: theme.palette.primary.main,
@@ -292,6 +295,13 @@ const ReportPage = () => {
             />
           </Stack>
         </Container>
+        {commentDialog && (
+          <CommentDetailDialog
+            commentId={commentDialog}
+            open={Boolean(commentDialog)}
+            onClose={() => setCommentDialog(null)}
+          />
+        )}
       </Box>
     </>
   );

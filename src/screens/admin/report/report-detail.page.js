@@ -1,27 +1,32 @@
 /* eslint-disable no-unused-vars */
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import Head from 'next/head';
+import Link from 'next/link';
 
 import ClockIcon from '@heroicons/react/24/outline/ClockIcon';
 import {
   Box,
-  Breadcrumbs,
   Button,
   Card,
   CardHeader,
   Chip,
   CircularProgress,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControlLabel,
   OutlinedInput,
   Radio,
   RadioGroup,
   Stack,
   SvgIcon,
-  TextField,
   Typography,
   Unstable_Grid2 as Grid,
+  useTheme,
 } from '@mui/material';
 import { useFormik } from 'formik';
 import { useQuery } from 'react-query';
@@ -38,6 +43,8 @@ import ReportService from '@/services/report';
 import { formatDateTime } from '@/utils/formatters';
 import { toastError, toastSuccess } from '@/utils/notification';
 
+import CommentService from '../../../services/comment';
+import CommentDetailDialog from '../story/comment-detail-dialog';
 import ChapterInfo from './chapter-info.component';
 import { REPORT_STATUS_MAP, REPORT_TYPE_MAP } from './report.page';
 import StoryInfo from './story-info.component';
@@ -50,12 +57,21 @@ const ReportDetailPage = ({ reportId }) => {
     [requestHeaders],
   );
 
-  const { data: report, isLoading } = useQuery(
+  const [commentDialog, setCommentDialog] = useState();
+
+  const dialogCallbackRef = useRef(null);
+  const {
+    data: report,
+    isLoading,
+    refetch,
+  } = useQuery(
     ['report', reportId],
     async () => await reportService.getById(reportId),
   );
 
   const { user } = useAuth();
+  const theme = useTheme();
+
   const [imageFile, setImageFile] = useState();
 
   const formik = useFormik({
@@ -66,23 +82,79 @@ const ReportDetailPage = ({ reportId }) => {
     validationSchema: Yup.object({}),
     onSubmit: async (values, helpers) => {
       try {
+        if (
+          values.result === 'approved' &&
+          report.report_type === 'CONTENT_VIOLATION_COMPLAINT'
+        ) {
+          dialogCallbackRef.current = async () => {
+            try {
+              await reportService.updateReport({
+                reportId,
+                approved_date: new Date().toISOString(),
+                aprroved_by: user.id,
+                report_status: 'APPROVED',
+                response_message: values.content,
+                form_file: imageFile,
+              });
+              // await .updateReport({
+              //   reportId,
+              //   approved_date: new Date().toISOString(),
+              //   aprroved_by: user.id,
+              //   report_status: 'APPROVED',
+              //   response_message: values.content,
+              //   form_file: imageFile,
+              // });
+              refetch();
+              toastSuccess('Xử lý báo cáo thành công');
+            } catch (error) {
+              toastError('Có lỗi xảy ra. Thử lại sau');
+            }
+          };
+          return;
+        }
+
+        if (values.result === 'approved' && report.report_type === 'COMMENT') {
+          dialogCallbackRef.current = async () => {
+            try {
+              await reportService.updateReport({
+                reportId,
+                approved_date: new Date().toISOString(),
+                aprroved_by: user.id,
+                report_status: 'APPROVED',
+                response_message: values.content,
+                form_file: imageFile,
+              });
+              await new CommentService(requestHeaders).deleteById(
+                report.reported_id,
+              );
+              refetch();
+              toastSuccess('Xử lý báo cáo thành công');
+            } catch (error) {
+              toastError('Có lỗi xảy ra. Thử lại sau');
+            }
+          };
+          return;
+        }
         if (values.result === 'approved')
           await reportService.updateReport({
             reportId,
-            approved_date: new Date().toUTCString(),
+            approved_date: new Date().toISOString(),
             aprroved_by: user.id,
             report_status: 'APPROVED',
+            response_message: values.content,
             form_file: imageFile,
           });
         else
           await reportService.updateReport({
             reportId,
-            rejected_date: new Date().toUTCString(),
+            rejected_date: new Date().toISOString(),
             rejected_by: user.id,
-            report_status: 'APPROVED',
+            report_status: 'REJECTED',
+            response_message: values.content,
             form_file: imageFile,
           });
         toastSuccess('Xử lý báo cáo thành công');
+        refetch();
       } catch (error) {
         toastError('Có lỗi xảy ra. Thử lại sau');
       }
@@ -182,13 +254,89 @@ const ReportDetailPage = ({ reportId }) => {
                         const reportedId = report.reported_id;
                         switch (reportType) {
                           case 'USER':
-                            return <UserInfo userId={reportedId} isReversed />;
+                            return (
+                              <Link
+                                href={`/admin/users/${reportedId}`}
+                                style={{
+                                  textDecorationColor:
+                                    theme.palette.primary.main,
+                                  WebkitTextDecorationColor:
+                                    theme.palette.primary.main,
+                                }}>
+                                <Typography
+                                  variant="body2"
+                                  color="primary.main">
+                                  Chi tiết người dùng
+                                </Typography>
+                              </Link>
+                            );
                           case 'STORY':
                             return (
-                              <StoryInfo storyId={reportedId} isReversed />
+                              <Link
+                                href={`/admin/stories/${reportedId}`}
+                                style={{
+                                  textDecorationColor:
+                                    theme.palette.primary.main,
+                                  WebkitTextDecorationColor:
+                                    theme.palette.primary.main,
+                                }}>
+                                <Typography
+                                  variant="body2"
+                                  color="primary.main">
+                                  Chi tiết truyện
+                                </Typography>
+                              </Link>
                             );
-                          case 'CHAPTER':
-                            return <ChapterInfo chapterId={reportedId} />;
+                          case 'COMMENT':
+                            return (
+                              <Typography
+                                variant="body2"
+                                color="primary.main"
+                                sx={{
+                                  textDecoration: 'underline',
+                                  textDecorationColor:
+                                    theme.palette.primary.main,
+                                  WebkitTextDecorationColor:
+                                    theme.palette.primary.main,
+                                }}
+                                onClick={() => setCommentDialog(reportedId)}>
+                                Chi tiết bình luận
+                              </Typography>
+                            );
+                          case 'REVENUE_COMPLAINT':
+                            return (
+                              <Link
+                                href={`/admin/stories/${reportedId}`}
+                                style={{
+                                  textDecorationColor:
+                                    theme.palette.primary.main,
+                                  WebkitTextDecorationColor:
+                                    theme.palette.primary.main,
+                                }}>
+                                <Typography
+                                  variant="body2"
+                                  color="primary.main">
+                                  Chi tiết truyện
+                                </Typography>
+                              </Link>
+                            );
+                          case 'CONTENT_VIOLATION_COMPLAINT':
+                            return (
+                              <Link
+                                href={`/admin/reports/${report.id}/moderation/${reportedId}`}
+                                style={{
+                                  textDecorationColor:
+                                    theme.palette.primary.main,
+                                  WebkitTextDecorationColor:
+                                    theme.palette.primary.main,
+                                }}>
+                                <Typography
+                                  variant="body2"
+                                  color="primary.main">
+                                  Chi tiết vi phạm
+                                </Typography>
+                              </Link>
+                            );
                         }
                         return null;
                       })()}
@@ -376,6 +524,53 @@ const ReportDetailPage = ({ reportId }) => {
                 )}
               </Grid>
             </Grid>
+
+            {commentDialog && (
+              <CommentDetailDialog
+                commentId={commentDialog}
+                open={Boolean(commentDialog)}
+                onClose={() => setCommentDialog(null)}
+              />
+            )}
+
+            <Dialog
+              open={Boolean(dialogCallbackRef.current)}
+              onClose={() => {
+                dialogCallbackRef.current = null;
+              }}
+              PaperProps={{
+                sx: {
+                  p: 1,
+                  width: '400px',
+                },
+              }}>
+              <DialogTitle>Bạn có chắc chắn ?</DialogTitle>
+              <DialogContent>
+                <DialogContentText>
+                  {report.report_type === 'CONTENT_VIOLATION_COMPLAINT'
+                    ? 'Khi bạn chấp nhận báo cáo này, chương của người dùng sẽ được xuất bản'
+                    : 'Khi bạn chấp nhận báo cáo này, bình luận của người dùng sẽ bị xóa'}
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    dialogCallbackRef.current = null;
+                  }}>
+                  Hủy bỏ
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    dialogCallbackRef.current();
+                    dialogCallbackRef.current = null;
+                  }}
+                  autoFocus>
+                  Xác nhận
+                </Button>
+              </DialogActions>
+            </Dialog>
           </Stack>
         </Container>
       </Box>
