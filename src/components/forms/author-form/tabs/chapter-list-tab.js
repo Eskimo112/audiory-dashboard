@@ -19,8 +19,6 @@ import { useRequestHeader } from '@/hooks/use-request-header';
 import ChapterService from '@/services/chapter';
 import { countDiffenceFromNow, formatDate } from '@/utils/formatters';
 import { toastError } from '@/utils/notification';
-import { countDiffenceFromNow, formatDate } from '@/utils/formatters';
-import { toastError } from '@/utils/notification';
 
 const ChapterCard = ({
   chapter,
