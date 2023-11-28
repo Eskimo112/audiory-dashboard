@@ -108,7 +108,6 @@ const NewChapterPage = () => {
     refetch();
     refetch2();
   }, [router]);
-  print(chapterData);
 
   const ReactQuill =
     typeof window === 'object' ? require('react-quill') : () => false;
@@ -119,7 +118,7 @@ const NewChapterPage = () => {
       content: chapterData?.current_chapter_version?.content ?? '',
       rich_text:
         chapterData?.current_chapter_version?.rich_text === '' ||
-        chapterData?.current_chapter_version?.rich_text === undefined
+          chapterData?.current_chapter_version?.rich_text === undefined
           ? '{}'
           : chapterData?.current_chapter_version?.rich_text,
       title: chapterData?.current_chapter_version?.title ?? '',
@@ -241,8 +240,7 @@ const NewChapterPage = () => {
                 if (isPreview) {
                   refetch2().then((res) => {
                     router.replace(
-                      `/my-works/${router.query?.id}/preview/${
-                        chapterVersionsData[chapterVersionsData.length - 1].id
+                      `/my-works/${router.query?.id}/preview/${chapterVersionsData[chapterVersionsData.length - 1].id
                       }`,
                     );
                   });
@@ -368,11 +366,10 @@ const NewChapterPage = () => {
                           variant="body1">
                           ({chapter?.is_draft ? 'Bản thảo' : 'Đã đăng tải'}){' '}
                         </Typography>
-                        <Typography variant="body1" color="sky.dark">{`${
-                          formatDateTime(
-                            chapter?.updated_date ?? chapter?.created_date,
-                          ).split(' ')[0]
-                        }`}</Typography>
+                        <Typography variant="body1" color="sky.dark">{`${formatDateTime(
+                          chapter?.updated_date ?? chapter?.created_date,
+                        ).split(' ')[0]
+                          }`}</Typography>
                       </Grid>
                     </Grid>
                     <Grid

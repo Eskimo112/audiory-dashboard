@@ -11,6 +11,7 @@ import { useQuery } from 'react-query';
 
 import { useRequestHeader } from '@/hooks/use-request-header';
 import StoryService from '@/services/story';
+import { bool } from 'prop-types';
 
 
 const renderRouteName = (routeName) => {
@@ -25,10 +26,11 @@ const AuthorBreadCrumbs = ({ storyTitle, storyGenerator, chapterTitle, handleOpe
     const routes = router.route.slice(1).split('/');
     const [title, setTitle] = React.useState(storyTitle);
     const [cTitle, setCTitle] = React.useState(chapterTitle);
-
+    const storyId = router.asPath.slice(1).split('/')[1];
     const { data: storyData = {}, isLoading, isSuccess } = useQuery(
-        ['story', storyGenerator === true, router.isReady],
-        async () => await new StoryService(requestHeader).getById(router.asPath.slice(1).split('/')[1]),
+        ['story', storyId],
+        async () => await new StoryService(requestHeader).getById(storyId),
+        { refetchOnWindowFocus: false, enabled: Boolean(storyId) }
     );
     useEffect(() => {
         setTitle(storyData?.title)

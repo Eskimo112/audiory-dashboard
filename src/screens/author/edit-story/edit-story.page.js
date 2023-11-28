@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Box, Card, CircularProgress, Container, Grid, Skeleton, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Card, CircularProgress, Container, Grid, Skeleton, Stack, Tab, Tabs, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useQuery } from "react-query";
 
@@ -188,9 +188,9 @@ const EditStoryPage = () => {
                             <CustomTabPanel value={tabValue} index={1}>
                                 {isLoading || isRefetching ? <div>
                                     {Array(10).map((e, index) => <Skeleton key={index} animation="wave" />)}
-                                </div> : <Grid container width={1 / 1}>
+                                </div> : <Stack container width={"100%"}>
                                     <ChapterListTab list={story.chapters ?? []} storyId={storyId} refetch={refetch} onPublish={onPublishChapter} onDelete={onDeleteChapter} />
-                                </Grid>}
+                                </Stack>}
 
                             </CustomTabPanel>
                             <CustomTabPanel value={tabValue} index={2}>
