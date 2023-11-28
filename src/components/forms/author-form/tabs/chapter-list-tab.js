@@ -14,11 +14,13 @@ import { countDiffenceFromNow, formatDate } from '@/utils/formatters';
 import { toastError } from '@/utils/notification';
 
 const ChapterCard = ({ chapter, index, onPublish, onPreview, onDelete, storyId, length }) => {
-    // const handleNavigate = () => {
-    //     router.push(`/my-works/${storyId}/write/${chapter.id}`);
-    // };
+    const router = useRouter();
+    const handleNavigate = () => {
+        router.push(`/my-works/${storyId}/write/${chapter.id}`);
+    };
     const [anchorEl, setAnchorEl] = React.useState(null);
     const handleClick = (event) => {
+        event.stopPropagation();
         setAnchorEl(event.currentTarget);
     };
     const handleClose = () => {
@@ -42,13 +44,15 @@ const ChapterCard = ({ chapter, index, onPublish, onPreview, onDelete, storyId, 
 
     const isDraft = chapter.is_draft;
     const isLast = length === 1;
+
+
     return (
         <Button fullWidth color={isDraft ? 'inherit' : "inherit"} variant='text' key={index} sx={{
             marginTop: "0.5em", backgroundColor: !isDraft ? 'primary.lightest' : 'sky.lightest'
 
         }} onClick={(e) => {
             e.preventDefault();
-            // handleNavigate();
+            handleNavigate();
         }}>
             <Grid
                 container
@@ -90,8 +94,7 @@ const ChapterCard = ({ chapter, index, onPublish, onPreview, onDelete, storyId, 
                     >
                         <Grid container direction="column">
 
-                            <Button variant="text" color="primary" onClick={() =>
-                                onPreview({ chapterId: chapter.id })
+                            <Button variant="text" color="primary" onClick={() => { handleNavigate() }
                             }>
                                 Xem trước
                             </Button>
@@ -126,11 +129,11 @@ const ChapterCard = ({ chapter, index, onPublish, onPreview, onDelete, storyId, 
                     </Popover>
                 </Grid>
 
-            </Grid>
-        </Button>
+            </Grid >
+        </Button >
     )
 }
-const ChapterListTab = ({ list, storyId, refetch, onPublish, onPreview, onDelete }) => {
+const ChapterListTab = ({ list, storyId, refetch, onPublish, onDelete }) => {
     const router = useRouter();
     const requestHeader = useRequestHeader();
 
@@ -152,7 +155,8 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onPreview, onDelete
     }
     return (
         <>
-            <Button fullWidth onClick={() => {
+            <Button fullWidth onClick={(e) => {
+                e.preventDefault();
                 handleCreateChapter();
             }} sx={{ height: "3em" }} variant="contained" startIcon={<PlusIcon />}>
                 <Typography variant="subtitle1">Tạo chương mới</Typography>
@@ -162,7 +166,7 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onPreview, onDelete
                     <Stack width={"100%"} key={index}>
                         <ChapterCard chapter={chapter} index={index}
                             storyId={storyId} onDelete={onDelete}
-                            onPreview={onPreview} onPublish={onPublish}
+                            onPublish={onPublish}
                             length={list.length} />
                     </Stack>
                 ))
