@@ -35,7 +35,7 @@ import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { useAuth } from '@/hooks/use-auth';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import ReportService from '@/services/report';
-import { formatDate } from '@/utils/formatters';
+import { formatDateTime } from '@/utils/formatters';
 import { toastError, toastSuccess } from '@/utils/notification';
 
 import ChapterInfo from './chapter-info.component';
@@ -134,7 +134,7 @@ const ReportDetailPage = ({ reportId }) => {
                       <ClockIcon />
                     </SvgIcon>
                     <Typography variant="body1" fontStyle="italic">
-                      {formatDate(report.created_date)}
+                      {formatDateTime(report.created_date)}
                     </Typography>
                   </Stack>
                   <Stack gap="12px">
@@ -335,7 +335,7 @@ const ReportDetailPage = ({ reportId }) => {
                         <ClockIcon />
                       </SvgIcon>
                       <Typography variant="body1" fontStyle="italic">
-                        {formatDate(report.rejected_date)}
+                        {formatDateTime(report.rejected_date)}
                       </Typography>
                     </Stack>
                     <Stack gap="12px">

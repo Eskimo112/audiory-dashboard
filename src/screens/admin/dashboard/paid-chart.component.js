@@ -24,6 +24,11 @@ import { getRecentDates } from '@/utils/get-recent-dates';
 import { getPieChartCommonOptions } from './chart.util';
 import { SHARED_SELECT_PROPS, TIME_OPTIONS } from './constant';
 
+const PAID_RATE_MAP = {
+  paid_users: 'Trả phí',
+  free_users: 'Chưa trả phí',
+};
+
 export const PaidRateChart = (props) => {
   const { sx } = props;
   const theme = useTheme();
@@ -41,7 +46,7 @@ export const PaidRateChart = (props) => {
   const chartOptions = useMemo(() => {
     if (!data) return null;
     const formattedSeries = Object.entries(data).map(([key, value]) => ({
-      name: key,
+      name: PAID_RATE_MAP[key],
       value,
     }));
 

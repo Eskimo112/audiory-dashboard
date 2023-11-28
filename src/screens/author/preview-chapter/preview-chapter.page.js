@@ -39,7 +39,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import ChapterService from '@/services/chapter';
 import ChapterVersionService from '@/services/chapter-version';
-import { formatDate } from '@/utils/formatters';
+import { formatDateTime } from '@/utils/formatters';
 import { toastError, toastSuccess } from '@/utils/notification';
 
 const { useRouter } = require('next/router');
@@ -265,7 +265,7 @@ const PreviewChapterPage = () => {
                         ({chapter?.is_draft ? 'Bản thảo' : 'Đã đăng tải'}){' '}
                       </Typography>
                       <Typography variant="body1" color="sky.dark">{`${
-                        formatDate(
+                        formatDateTime(
                           chapter?.updated_date ?? chapter?.created_date,
                         ).split(' ')[0]
                       }`}</Typography>

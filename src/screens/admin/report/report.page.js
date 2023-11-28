@@ -13,6 +13,7 @@ import {
   Container,
   Stack,
   Typography,
+  useTheme,
 } from '@mui/material';
 import { MaterialReactTable } from 'material-react-table';
 import { useQuery } from 'react-query';
@@ -22,17 +23,16 @@ import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import ReportService from '@/services/report';
-import { formatDate } from '@/utils/formatters';
+import { formatDateTime } from '@/utils/formatters';
 
-import ChapterInfo from './chapter-info.component';
-import StoryInfo from './story-info.component';
 import UserInfo from './user-info.component';
 
 export const REPORT_TYPE_MAP = {
   USER: 'Người dùng',
   STORY: 'Truyện',
   COMMENT: 'Bình luận',
-  CHAPTER: 'Chương',
+  REVENUE_COMPLAINT: 'Khiếu nại doanh thu',
+  CONTENT_VIOLATION_COMPLAINT: 'Khiếu nại vi phạm',
 };
 export const REPORT_STATUS_MAP = {
   APPROVED: 'Chấp nhận',
@@ -53,6 +53,7 @@ const ReportPage = () => {
   );
 
   const router = useRouter();
+  const theme = useTheme();
 
   const columns = useMemo(
     () => [
@@ -107,24 +108,70 @@ const ReportPage = () => {
           const reportedId = row.original.reported_id;
           switch (reportType) {
             case 'USER':
-              return <UserInfo userId={reportedId} />;
+              return (
+                <Link
+                  href={`/admin/users/${reportedId}`}
+                  style={{
+                    textDecorationColor: theme.palette.primary.main,
+                    WebkitTextDecorationColor: theme.palette.primary.main,
+                  }}>
+                  <Typography variant="body2" color="primary.main">
+                    Chi tiết người dùng
+                  </Typography>
+                </Link>
+              );
             case 'STORY':
-              return <StoryInfo storyId={reportedId} />;
+              return (
+                <Link
+                  href={`/admin/stories/${reportedId}`}
+                  style={{
+                    textDecorationColor: theme.palette.primary.main,
+                    WebkitTextDecorationColor: theme.palette.primary.main,
+                  }}>
+                  <Typography variant="body2" color="primary.main">
+                    Chi tiết truyện
+                  </Typography>
+                </Link>
+              );
             case 'COMMENT':
               return (
-                <Link href="/" style={{ textDecoration: 'none' }}>
-                  <Typography
-                    variant="body2"
-                    color="primary.main"
-                    sx={{ textDecoration: 'none' }}>
+                <Link
+                  href={`/admin/chapters/${reportedId}`}
+                  style={{
+                    textDecorationColor: theme.palette.primary.main,
+                    WebkitTextDecorationColor: theme.palette.primary.main,
+                  }}>
+                  <Typography variant="body2" color="primary.main">
                     Chi tiết comment
                   </Typography>
                 </Link>
               );
             case 'REVENUE_COMPLAINT':
-              return <StoryInfo chapterId={reportedId} />;
+              return (
+                <Link
+                  href={`/admin/stories/${reportedId}`}
+                  style={{
+                    textDecorationColor: theme.palette.primary.main,
+                    WebkitTextDecorationColor: theme.palette.primary.main,
+                  }}>
+                  <Typography variant="body2" color="primary.main">
+                    Chi tiết truyện
+                  </Typography>
+                </Link>
+              );
             case 'CONTENT_VIOLATION_COMPLAINT':
-              return <StoryInfo chapterId={reportedId} />;
+              return (
+                <Link
+                  href={`/admin/chapters/${reportedId}`}
+                  style={{
+                    textDecorationColor: theme.palette.primary.main,
+                    WebkitTextDecorationColor: theme.palette.primary.main,
+                  }}>
+                  <Typography variant="body2" color="primary.main">
+                    Chi tiết vi phạm
+                  </Typography>
+                </Link>
+              );
           }
           return null;
         },
@@ -133,7 +180,7 @@ const ReportPage = () => {
         accessorKey: 'created_date',
         header: 'Ngày tạo',
         size: 80,
-        accessorFn: (row) => formatDate(row.created_date),
+        accessorFn: (row) => formatDateTime(row.created_date),
         // Cell: ({ cell }) => <Chip label={cell.getValue()} />,
       },
 

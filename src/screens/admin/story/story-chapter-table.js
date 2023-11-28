@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Edit, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { Chip, MenuItem, SvgIcon } from '@mui/material';
 import { MaterialReactTable } from 'material-react-table';
 
@@ -79,7 +79,7 @@ const StoryChapterTable = ({ story }) => {
       {
         accessorKey: 'updated_date',
         header: 'Ngày cập nhật',
-        accessorFn: (row) => formatDate(row.updated_date).slice(0, 10),
+        accessorFn: (row) => formatDate(row.updated_date),
       },
     ],
     [],

@@ -23,7 +23,7 @@ import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import SystemConfigService from '@/services/system-config';
-import { formatDate } from '@/utils/formatters';
+import { formatDateTime } from '@/utils/formatters';
 
 const SystemConfigPage = () => {
   const requestHeader = useRequestHeader();
@@ -52,7 +52,7 @@ const SystemConfigPage = () => {
       {
         accessorKey: 'effective_date',
         header: 'Ngày hiệu lực',
-        accessorFn: (row) => formatDate(row.effective_date),
+        accessorFn: (row) => formatDateTime(row.effective_date),
       },
       // {
       //   accessorKey: 'created_date',

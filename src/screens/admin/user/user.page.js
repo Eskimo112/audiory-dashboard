@@ -31,7 +31,7 @@ import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import UserService from '@/services/user';
-import { formatDate } from '@/utils/formatters';
+import { formatDateTime } from '@/utils/formatters';
 import { toastError, toastSuccess } from '@/utils/notification';
 
 import { STATUS_MAP } from '../../../constants/status_map';
@@ -138,7 +138,7 @@ const UserPage = () => {
       {
         accessorKey: 'created_date',
         header: 'Ngày tạo',
-        accessorFn: (row) => formatDate(row.created_date),
+        accessorFn: (row) => formatDateTime(row.created_date),
         // Cell: ({ cell }) => <Chip label={cell.getValue()} />,
       },
       {

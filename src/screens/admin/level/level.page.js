@@ -29,8 +29,8 @@ import { STATUS_MAP } from '@/constants/status_map';
 import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import LevelService from '@/services/level';
-import { formatDate, formatNumber } from '@/utils/formatters';
-import { toastError, toastSuccess } from '@/utils/notification';
+import { formatDateTime } from '@/utils/formatters';
+import { toastError } from '@/utils/notification';
 
 const LevelPage = () => {
   const requestHeader = useRequestHeader();
@@ -102,13 +102,13 @@ const LevelPage = () => {
         accessorKey: 'created_date',
         header: 'Ngày tạo',
         size: 75,
-        accessorFn: (row) => formatDate(row.created_date),
+        accessorFn: (row) => formatDateTime(row.created_date),
       },
       {
         accessorKey: 'updated_date',
         header: 'Ngày cập nhật',
         size: 75,
-        accessorFn: (row) => formatDate(row.created_date),
+        accessorFn: (row) => formatDateTime(row.created_date),
       },
       {
         accessorKey: 'deleted_date',
@@ -165,13 +165,13 @@ const LevelPage = () => {
         accessorKey: 'created_date',
         header: 'Ngày tạo',
         size: 75,
-        accessorFn: (row) => formatDate(row.created_date),
+        accessorFn: (row) => formatDateTime(row.created_date),
       },
       {
         accessorKey: 'updated_date',
         header: 'Ngày cập nhật',
         size: 75,
-        accessorFn: (row) => formatDate(row.created_date),
+        accessorFn: (row) => formatDateTime(row.created_date),
       },
       {
         accessorKey: 'deleted_date',

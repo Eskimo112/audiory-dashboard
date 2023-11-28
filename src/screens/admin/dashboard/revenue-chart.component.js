@@ -26,6 +26,11 @@ import { getRecentDates } from '@/utils/get-recent-dates';
 import { getLineChartCommonOptions } from './chart.util';
 import { SHARED_SELECT_PROPS, TIME_OPTIONS } from './constant';
 
+const REVENUE_MAP = {
+  revenue: 'Doanh thu',
+  profit: 'Lợi nhuận',
+};
+
 export const RevenueChart = (props) => {
   const { sx } = props;
   const theme = useTheme();
@@ -36,7 +41,11 @@ export const RevenueChart = (props) => {
   const { data, isLoading, isFetching, refetch } = useQuery(
     ['dashboard', 'revenue', dates[0], dates[1]],
     () => new DashboardService(requestHeader).getRevenue(dates[0], dates[1]),
-    { enabled: Boolean(dates[0]) && Boolean(dates[1]) },
+    {
+      enabled: Boolean(dates[0]) && Boolean(dates[1]),
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    },
   );
 
   const chartOptions = useMemo(() => {
@@ -45,7 +54,7 @@ export const RevenueChart = (props) => {
     if (!analytics) return null;
     const categories = Object.keys(analytics[0].values);
     const formattedSeries = analytics.map((series) => ({
-      name: series.metric,
+      name: REVENUE_MAP[series.metric],
       data: Object.values(series.values),
     }));
     const result = getLineChartCommonOptions(
@@ -151,7 +160,7 @@ export const RevenueChart = (props) => {
             </Button>
           </Stack>
         }
-        title="Tổng doanh thu"
+        title="Tổng doanh thu và Lợi nhuận"
       />
       <CardContent>
         {isLoading || isFetching ? (

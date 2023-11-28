@@ -3,12 +3,22 @@ export const createTypography = () => {
     fontFamily:
       '"Source Sans 3", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
     body1: {
-      fontSize: '1rem',
+      fontSize: '1.1rem',
       fontWeight: 400,
     },
     body2: {
       fontSize: '0.875rem',
       fontWeight: 400,
+    },
+    reading1: {
+      fontSize: '1.2rem',
+      fontWeight: 400,
+      fontFamily: 'Gelasio',
+    },
+    reading2: {
+      fontSize: '1rem',
+      fontWeight: 400,
+      fontFamily: 'Gelasio',
     },
     button: {
       fontWeight: 600,

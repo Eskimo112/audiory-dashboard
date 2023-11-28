@@ -14,7 +14,7 @@ import {
 import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import UserService from '@/services/user';
-import { formatDate } from '@/utils/formatters';
+import { formatDateTime } from '@/utils/formatters';
 
 const UserTransactionsTable = ({ userId }) => {
   const requestHeader = useRequestHeader();
@@ -86,7 +86,7 @@ const UserTransactionsTable = ({ userId }) => {
       {
         accessorKey: 'created_date',
         header: 'Ngày tạo',
-        accessorFn: (row) => formatDate(row.created_date),
+        accessorFn: (row) => formatDateTime(row.created_date),
       },
       {
         accessorKey: 'transaction_status',
