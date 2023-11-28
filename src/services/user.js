@@ -1,3 +1,4 @@
+import { toFormData } from 'axios';
 import { request } from './__base';
 
 export default class UserService {
@@ -83,7 +84,7 @@ export default class UserService {
       ...this.requestHeader,
     };
 
-    const formData = FormData(body);
+    const formData = toFormData(body);
     const response = await request({
       url,
       method: 'put',

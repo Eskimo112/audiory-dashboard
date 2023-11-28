@@ -13,8 +13,10 @@ import DashboardService from '@/services/dashboard';
 import { useRequestHeader } from '../../../hooks/use-request-header';
 import { CategoryChart } from './category-chart.component';
 import { PaidRateChart } from './paid-chart.component';
+import RecentTransactionsTable from './recent-transaction.component';
 import { RevenueChart } from './revenue-chart.component';
 import { StatCard } from './stat-card.component';
+import TopStoriesTable from './top-stories.component';
 
 const DashboardPage = () => {
   const requestHeader = useRequestHeader();
@@ -81,6 +83,12 @@ const DashboardPage = () => {
             </Grid>
             <Grid xs={12} md={6} lg={4}>
               <PaidRateChart />
+            </Grid>
+            <Grid xs={12} md={6} lg={5}>
+              <TopStoriesTable />
+            </Grid>
+            <Grid xs={12} md={6} lg={7}>
+              <RecentTransactionsTable />
             </Grid>
           </Grid>
         </Container>

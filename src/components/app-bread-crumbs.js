@@ -7,19 +7,19 @@ import { Breadcrumbs, Typography } from '@mui/material';
 
 const ROUTE_NAME_MAP = (name1, name2) => ({
   '/admin': 'Tổng quan',
-  '/admin/users': 'Người dùng',
+  '/admin/users': 'Quản lý người dùng',
   '/admin/users/[user_id]': name1,
-  '/admin/reports': 'Báo cáo',
+  '/admin/reports': 'Quản lý báo cáo',
   '/admin/reports/[report_id]': 'Chi tiết báo cáo',
   '/admin/reports/create': 'Tạo báo cáo mới',
-  '/admin/stories': 'Truyện',
+  '/admin/stories': 'Quản lý truyện',
   '/admin/stories/[story_id]': name1,
   '/admin/stories/[story_id]/chapters': 'Danh sách chương',
   '/admin/stories/[story_id]/chapters/[chapter_id]': name2,
   '/admin/coin-packs': 'Quản lý gói xu',
   '/admin/coin-packs/[coinpack_id]': name1,
   '/admin/coin-packs/create': 'Tạo gói xu mới',
-  '/admin/categories': 'Thể loại',
+  '/admin/categories': 'Quản lý thể loại',
   '/admin/categories/[category_id]': name1,
   '/admin/categories/create': 'Tạo thể loại mới',
   '/admin/gifts': 'Quản lý quà',
@@ -45,16 +45,17 @@ const AppBreadCrumbs = ({ name1, name2 }) => {
     let accumulativeRoute = '';
 
     paths.forEach((path, index) => {
-      if (index !== 0) {
+      if (index !== 0 && index !== 1) {
         result.push(
           <Link
             key={index}
             href={accumulativeLink}
             style={{ textDecoration: 'none' }}>
             <Typography
-              variant="body1"
+              variant="subtitle1"
               sx={{
                 fontSize: '16px',
+                fontWeight: 400,
                 color: 'ink.main',
                 ':hover': {
                   textDecoration: 'underline',
@@ -71,8 +72,8 @@ const AppBreadCrumbs = ({ name1, name2 }) => {
 
     result.push(
       <Typography
-        variant="body1"
-        sx={{ fontSize: '16px', color: 'ink.lighter' }}>
+        variant="subtitle1"
+        sx={{ fontSize: '16px', fontWeight: 400, color: 'ink.lighter' }}>
         {ROUTE_NAME_MAP(name1, name2)[accumulativeRoute]}
       </Typography>,
     );

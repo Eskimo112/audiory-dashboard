@@ -36,7 +36,7 @@ import { STATUS_MAP } from '@/constants/status_map';
 import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import CoinPackService from '@/services/coinpack';
-import { formatDate, formatNumber } from '@/utils/formatters';
+import { formatDateTime, formatNumber } from '@/utils/formatters';
 
 import { toastError, toastSuccess } from '../../../utils/notification';
 
@@ -100,13 +100,13 @@ const CoinPackPage = () => {
         accessorKey: 'created_date',
         header: 'Ngày tạo',
         size: 75,
-        accessorFn: (row) => formatDate(row.created_date),
+        accessorFn: (row) => formatDateTime(row.created_date),
       },
       {
         accessorKey: 'updated_date',
         header: 'Ngày cập nhật',
         size: 75,
-        accessorFn: (row) => formatDate(row.created_date),
+        accessorFn: (row) => formatDateTime(row.created_date),
       },
       {
         accessorKey: 'deleted_date',

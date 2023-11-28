@@ -26,7 +26,7 @@ import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import UserService from '@/services/user';
 
-import { toastSuccess } from '../../../utils/notification';
+import { toastError, toastSuccess } from '../../../utils/notification';
 
 const MyProfilePage = () => {
   const requestHeader = useRequestHeader();
@@ -50,26 +50,30 @@ const MyProfilePage = () => {
     enableReinitialize: true,
     validationSchema: Yup.object({
       email: Yup.string().email('Vui lòng nhập đúng định dạng email').max(255),
-      username: Yup.string().max(255).required('Tên người dùng là bắt buộc'),
+      username: Yup.string().max(32).required('Tên người dùng là bắt buộc'),
       full_name: Yup.string().max(255).required('Họ và tên là bắt buộc'),
     }),
     onSubmit: async (values, helpers) => {
-      await new UserService(requestHeader).edit({
-        body: {
-          category_id: values.category_id,
-          title: values.title,
-          description: values.description,
-          is_draft: values.is_draft,
-          is_mature: values.is_draft,
-          is_paywalled: values.is_draft,
-          is_copyright: values.is_draft,
-          tags: values.tags ?? [],
-          form_file: selectedFile ?? undefined,
-        },
-        userId: user?.id,
-      });
-      toastSuccess('Chỉnh sửa thành công');
-      queryClient.invalidateQueries({ queryKey: ['users', 'my-profile'] });
+      try {
+        await new UserService(requestHeader).edit({
+          body: {
+            category_id: values.category_id,
+            title: values.title,
+            description: values.description,
+            is_draft: values.is_draft,
+            is_mature: values.is_draft,
+            is_paywalled: values.is_draft,
+            is_copyright: values.is_draft,
+            tags: values.tags ?? [],
+            form_file: selectedFile ?? undefined,
+          },
+          userId: user?.id,
+        });
+        toastSuccess('Chỉnh sửa thành công');
+        queryClient.invalidateQueries({ queryKey: ['users', 'my-profile'] });
+      } catch (error) {
+        toastError('Có lỗi xảy ra. Thử lại sau');
+      }
     },
   });
 
@@ -110,6 +114,12 @@ const MyProfilePage = () => {
               <Stack direction="row" gap="16px" height="fit-content">
                 <Button
                   disabled={!canSaveChanges}
+                  variant="outlined"
+                  onClick={() => formik.handleReset()}>
+                  Đặt lại
+                </Button>
+                <Button
+                  disabled={!canSaveChanges}
                   variant="contained"
                   onClick={() => formik.handleSubmit()}>
                   Lưu thay đổi
@@ -125,13 +135,15 @@ const MyProfilePage = () => {
                   />
                   <Grid container spacing={3}>
                     <Grid xs={12} lg={6}>
-                      <Stack gap={2}>
+                      <Stack gap={0}>
                         <Stack gap={1}>
                           <FormLabel>Id người dùng</FormLabel>
                           <TextField
                             disabled
                             fullWidth
-                            helperText={formik.touched.id && formik.errors.id}
+                            helperText={
+                              (formik.touched.id && formik.errors.id) ?? ' '
+                            }
                             variant="outlined"
                             name="id"
                             onBlur={formik.handleBlur}
@@ -151,8 +163,9 @@ const MyProfilePage = () => {
                             }
                             fullWidth
                             helperText={
-                              formik.touched.full_name &&
-                              formik.errors.full_name
+                              (formik.touched.full_name &&
+                                formik.errors.full_name) ??
+                              ' '
                             }
                             variant="outlined"
                             name="full_name"
@@ -165,7 +178,7 @@ const MyProfilePage = () => {
                       </Stack>
                     </Grid>
                     <Grid xs={12} lg={6}>
-                      <Stack gap={2}>
+                      <Stack gap={0}>
                         <Stack gap={1}>
                           <FormLabel>Tên người dùng</FormLabel>
                           <TextField
@@ -177,7 +190,9 @@ const MyProfilePage = () => {
                             }
                             fullWidth
                             helperText={
-                              formik.touched.username && formik.errors.username
+                              (formik.touched.username &&
+                                formik.errors.username) ??
+                              ' '
                             }
                             variant="outlined"
                             name="username"
@@ -194,7 +209,8 @@ const MyProfilePage = () => {
                             }
                             fullWidth
                             helperText={
-                              formik.touched.email && formik.errors.email
+                              (formik.touched.email && formik.errors.email) ??
+                              ' '
                             }
                             variant="outlined"
                             name="email"

@@ -64,4 +64,22 @@ export default class DashboardService {
     if (!response.data) return null;
     return response.data;
   }
+
+  async getStoryRanking(startDate, endDate, page, pageSize) {
+    const url = 'dashboard/story-ranking';
+
+    const response = await request({
+      url,
+      method: 'get',
+      params: {
+        start_date: startDate,
+        end_date: endDate,
+        page,
+        page_size: pageSize,
+      },
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return [];
+    return response.data;
+  }
 }

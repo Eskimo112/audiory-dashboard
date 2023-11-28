@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export const formatNumber = (value) => {
   const formattedValue = (Math.round(value * 10) / 10).toLocaleString('en-US');
   return `${formattedValue}`;
@@ -16,11 +18,9 @@ export const formatStatistic = (value) => {
   }
 };
 
-export function countDiffenceFromNow(dateString) {
-  const date = new Date(dateString);
+export const countDiffenceFromNow = (dateString) => {
+  const date = new Date(dateString).getTime();
   const now = new Date().getTime();
-
-
   const diffTime = Math.abs(now - date);
   const diffInMinutes = Math.ceil(diffTime / (1000 * 60));
   const diffInHours = Math.ceil(diffTime / (1000 * 60 * 60));
@@ -30,10 +30,11 @@ export function countDiffenceFromNow(dateString) {
   } else if (diffInHours < 1) {
     return diffInHours + ' phút trước';
   } else if (diffInHours <= 23) return diffInHours + ' giờ trước';
-  return formatDate(dateString).split(' ')[0];
-}
 
-export function formatDate(dateString) {
+  return formatDateTime(dateString).split(' ')[0];
+};
+
+export function formatDateTime(dateString) {
   const date = new Date(dateString);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -41,6 +42,10 @@ export function formatDate(dateString) {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
 
-  const formattedDate = `${day}-${month}-${year} lúc ${hours}:${minutes}`;
+  const formattedDate = ` ${hours}:${minutes}, ${day}-${month}-${year}`;
   return formattedDate;
+}
+
+export function formatDate(dateString) {
+  return dayjs(dateString).format('DD/MM/YYYY');
 }

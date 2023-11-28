@@ -11,7 +11,7 @@ export default class ChapterService {
     const response = await request({
       url,
       method: 'get',
-      requestHeaders: this.requestHeader,
+      // requestHeaders: this.requestHeader,
     });
     console.log(response);
     if (!response.data) return null;

@@ -18,7 +18,7 @@ import {
 import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import AuthorDashboardService from '@/services/author-dashboard';
-import { formatDate } from '@/utils/formatters';
+import { formatDateTime } from '@/utils/formatters';
 
 import UserInfo from '../admin/report/user-info.component';
 
@@ -102,7 +102,7 @@ const ReaderTransactionsTable = () => {
       {
         accessorKey: 'created_date',
         header: 'Ngày tạo',
-        accessorFn: (row) => formatDate(row.created_date),
+        accessorFn: (row) => formatDateTime(row.created_date),
       },
       {
         accessorKey: 'transaction_status',

@@ -25,18 +25,19 @@ const StoryInfo = ({ storyId, isReversed }) => {
       onClick={() => {
         router.push(`/admin/stories/${storyId}`);
       }}>
-      <Box component="img" src={story.cover_url} width={40} height={53}></Box>
-      <Stack alignItems="start">
-        <Typography
-          variant="subtitle2"
-          overflow="hidden"
-          textOverflow="ellipsis">
-          {story.title ?? 'Không có tên'}
-        </Typography>
-        {/* <Typography variant="subtitle2" fontStyle="italic" color="ink.lighter">
-          {story.author.full_name ?? 'Không có username'}
-        </Typography> */}
-      </Stack>
+      <Box
+        component="img"
+        src={story.cover_url}
+        width={40}
+        height={53}
+        sx={{ objectFit: 'cover' }}></Box>
+      <Typography
+        variant="subtitle2"
+        overflow="hidden"
+        textOverflow="ellipsis"
+        whiteSpace="nowrap">
+        {story.title ?? 'Không có tên'}
+      </Typography>
     </Stack>
   );
 };
