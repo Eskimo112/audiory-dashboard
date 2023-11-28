@@ -89,7 +89,7 @@ const EditStoryPage = () => {
 
         } else {
             try {
-                await new ChapterService().unpublish(chapterId).then(res => {
+                await new ChapterService(requestHeader).unpublish(chapterId).then(res => {
                     if (res.code === 200) {
                         toastSuccess('Gỡ đăng tải thành công');
                         refetch();

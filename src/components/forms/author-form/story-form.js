@@ -128,15 +128,15 @@ const StoryForm = () => {
     body.append('is_draft', true);
     body.append('form_file', values.formFile);
     console.log(body);
-    // try {
-    const data = await new StoryService().create({ body, jwt });
-    console.log('body', body)
-    console.log('data', data);
-    const storyId = data.id;
-    const chapterId = data.chapters[0].id;
+    await new StoryService(requestHeader).create({ body, jwt }).then(res => {
+      console.log('body', body)
+      console.log('data', res);
+      const storyId = res.id;
+      const chapterId = res.chapters[0].id;
 
-    console.log(data.id);
-    router.push(`/my-works/${storyId}/write/${chapterId}`);
+      router.push(`/my-works/${storyId}/write/${chapterId}`);
+    });
+
 
   };
 
@@ -364,8 +364,10 @@ const StoryForm = () => {
             disabled={!formik.isValid}
             type="submit"
             variant="contained"
-            onClick={() =>
-              handleCreate()
+            onClick={(e) => {
+              e.preventDefault();
+              handleCreate();
+            }
             }
           >
             Tạo
@@ -373,7 +375,7 @@ const StoryForm = () => {
 
         </form>
 
-      </div>
+      </div >
     </>
   )
 
