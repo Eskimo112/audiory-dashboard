@@ -7,11 +7,11 @@ import { ExpandMore } from '@mui/icons-material';
 import { Box, Breadcrumbs, Chip, Divider, Grid, IconButton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { emphasize } from '@mui/system';
+import { bool } from 'prop-types';
 import { useQuery } from 'react-query';
 
 import { useRequestHeader } from '@/hooks/use-request-header';
 import StoryService from '@/services/story';
-import { bool } from 'prop-types';
 
 
 const renderRouteName = (routeName) => {
