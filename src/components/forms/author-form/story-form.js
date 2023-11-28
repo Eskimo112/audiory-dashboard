@@ -108,6 +108,7 @@ const StoryForm = () => {
   };
 
   const handleCreate = async () => {
+
     var actualList = [];
     for (let index = 0; index < tagList.length; index++) {
       const element = { 'name': tagList[index] };
@@ -127,16 +128,16 @@ const StoryForm = () => {
     body.append('is_draft', true);
     body.append('form_file', values.formFile);
     console.log(body);
-    try {
-      const data = await new StoryService(requestHeader).create({ body, jwt });
-      console.log('body', body)
-      console.log('data', data);
-      const storyId = data.id;
-      const chapterId = data.chapters[0].id;
-      router.push(`/my-works/${storyId}/write/${chapterId}`);
-    } catch (error) {
-      toastError(error);
-    }
+    // try {
+    const data = await new StoryService().create({ body, jwt });
+    console.log('body', body)
+    console.log('data', data);
+    const storyId = data.id;
+    const chapterId = data.chapters[0].id;
+
+    console.log(data.id);
+    router.push(`/my-works/${storyId}/write/${chapterId}`);
+
   };
 
   const handleAddTag = (event) => {
@@ -363,18 +364,16 @@ const StoryForm = () => {
             disabled={!formik.isValid}
             type="submit"
             variant="contained"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleCreate();
-            }}
+            onClick={() =>
+              handleCreate()
+            }
           >
             Tạo
           </Button>
 
         </form>
 
-      </div >
+      </div>
     </>
   )
 

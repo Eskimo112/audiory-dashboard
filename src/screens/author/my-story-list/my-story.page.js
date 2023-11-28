@@ -300,7 +300,10 @@ const MyStoryPage = () => {
                       backgroundColor: (theme) => theme.palette.ink.main,
                       fontSize: "1.2em"
 
-                    }} size="medium" variant='contained' onClick={() => router.push('/my-works/create', { scroll: false })
+                    }} size="medium" variant='contained' onClick={() => {
+                      router.push('/my-works/create');
+                      console.log('asdf');
+                    }
                     }>
                       Thêm truyện
                     </Button>
