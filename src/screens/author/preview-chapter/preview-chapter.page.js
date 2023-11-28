@@ -68,6 +68,7 @@ const PreviewChapterPage = () => {
       await new ChapterVersionService(requestHeader).getById(
         router.query['chapter-version-id'],
       ),
+    { refetchOnWindowFocus: false }
   );
 
   const {

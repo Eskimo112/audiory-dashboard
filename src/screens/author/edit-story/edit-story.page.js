@@ -108,26 +108,26 @@ const EditStoryPage = () => {
     const onDeleteChapter = async ({ chapterId, isLast = false }) => {
         console.log('chapterId', chapterId);
         console.log('isPublish', isLast);
-        await new ChapterService().delete(chapterId).then(res => {
+        await new ChapterService(requestHeader).delete(chapterId).then(res => {
             console.log(res);
-            // if (res.code === 200) {
-            //     toastSuccess('Xóa thành công');
-            //     refetch();
-            // } else {
-            //     toastError(res.message);
-            // }
+            if (res.code === 200) {
+                toastSuccess('Xóa thành công');
+                refetch();
+            } else {
+                toastError(res.message);
+            }
         })
-        // if (isLast) {
-        //     await new ChapterService().delete(chapterId).then(res => {
-        //         console.log(res)
-        //         if (res.code === 200) {
-        //             toastSuccess('Xóa thành công');
-        //             refetch();
-        //         } else {
-        //             toastError(res.message);
-        //         }
-        //     })
-        // }
+        if (isLast) {
+            await new ChapterService(requestHeader).delete(chapterId).then(res => {
+                console.log(res)
+                if (res.code === 200) {
+                    toastSuccess('Xóa thành công');
+                    refetch();
+                } else {
+                    toastError(res.message);
+                }
+            })
+        }
     }
 
     if (isLoading)

@@ -64,7 +64,7 @@ const MyStoryPage = () => {
 
   const handleDelete = async ({ id }, title) => {
     try {
-      await StoryService.delete(id).then((res) => {
+      await new StoryService(requestHeader).delete(id).then((res) => {
         toastSuccess('Xóa thành công truyện');
         refetch();
       });
@@ -171,7 +171,7 @@ const MyStoryPage = () => {
                           <Typography>Tất cả <strong>bình luận</strong> , nội dung sẽ bị <strong>xóa</strong></Typography>
                         </Grid>}
                         isOpen={isOpen}
-                        handleClose={() => { handleDialogClose(true, story.id) }}
+                        handleClose={(isConfirm) => handleDialogClose(isConfirm, story.id)}
                         actionContent='Xác nhận xóa'
                         cancelContent='Hủy thao tác'
                       />

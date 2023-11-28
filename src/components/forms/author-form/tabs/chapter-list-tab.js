@@ -37,6 +37,7 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onPreview, onDelete
             setIsOpen(true);
         }
         const handleDialogClose = (isConfirm, id) => {
+            console.log('confirm ', isConfirm);
             setIsOpen(false);
             if (isConfirm === true) {
                 onDelete({ chapterId: id })
@@ -46,7 +47,12 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onPreview, onDelete
         const isDraft = chapter.is_draft;
         const isLast = list.length === 1;
         return (
-            <Button fullWidth color={isDraft ? 'inherit' : "inherit"} variant='text' key={index} sx={{ marginTop: "0.5em", backgroundColor: !isDraft ? 'primary.lightest' : 'sky.lightest' }}>
+            <Button onClick={() =>
+
+                router.push(`/my-works/${storyId}/write/${chapter.id}`)
+            } fullWidth color={isDraft ? 'inherit' : "inherit"} variant='text' key={index} sx={{
+                marginTop: "0.5em", backgroundColor: !isDraft ? 'primary.lightest' : 'sky.lightest'
+            }}>
                 <Grid
                     container
                     direction="row"
@@ -56,7 +62,7 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onPreview, onDelete
                     fullWidth
                 >
 
-                    <Grid xs={8} spacing={0} container justifyContent="flex-start" onClick={handleNavigate}>
+                    <Grid xs={8} spacing={0} container justifyContent="flex-start" >
                         <Grid container spacing={0} direction="column" alignItems="flex-start">
 
                             <Typography variant="subtitle2" noWrap sx={{ paddingRight: "2em", fontWeight: isDraft ? "normal" : "bold" }}>Chương {index + 1}: {chapter?.title ?? 'Tiêu đề chương'}   </Typography>
@@ -115,7 +121,7 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onPreview, onDelete
                                         }
                                     </Grid>}
                                     isOpen={isOpen}
-                                    handleClose={() => { handleDialogClose(true, chapter.id) }}
+                                    handleClose={(isConfirm) => { handleDialogClose(isConfirm, chapter.id) }}
                                     actionContent='Xác nhận xóa'
                                     cancelContent='Hủy thao tác'
                                 />
@@ -147,9 +153,7 @@ const ChapterListTab = ({ list, storyId, refetch, onPublish, onPreview, onDelete
     }
     return (
         <>
-            <Button fullWidth onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
+            <Button fullWidth onClick={() => {
                 handleCreateChapter();
             }} sx={{ height: "3em" }} variant="contained" startIcon={<PlusIcon />}>
                 <Typography variant="subtitle1">Tạo chương mới</Typography>
