@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
 import Head from 'next/head';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 import EyeIcon from '@heroicons/react/24/solid/EyeIcon';
 import {
+  CleaningServices,
   Comment,
   FavoriteBorder,
   Menu,
@@ -52,18 +52,23 @@ const MyStoryPage = () => {
   } = useQuery(
     ['myStories'],
     async () => await new StoryService(requestHeader).getMyStories(),
+    { refetchOnWindowFocus: false }
   );
+
+  const [query, setQuery] = useState('');
+
   useEffect(() => {
     setMyStories(storiesData ?? []);
+
   }, [storiesData]);
 
   const handleDelete = async ({ id }, title) => {
     try {
-      await StoryService.delete(id).then((res) => {
+      await new StoryService(requestHeader).delete(id).then((res) => {
         toastSuccess('Xóa thành công truyện');
         refetch();
       });
-    } catch (error) {}
+    } catch (error) { }
   };
   const StoryOverViewCard = ({ story }) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -113,7 +118,7 @@ const MyStoryPage = () => {
           sx={{
             display: 'flex',
             width: '100%',
-            minWidth: '20em',
+            minWidth: "20em",
             justifyContent: 'center',
             alignItems: 'center',
             height: '14em',
@@ -123,48 +128,22 @@ const MyStoryPage = () => {
       );
     return (
       <>
-        <Card
-          aria-describedby="alo"
-          sx={{ display: 'flex', width: '100%', height: '14em' }}>
+        <Card sx={{ display: 'flex', width: "100%", height: "14em", }}>
           <CardMedia
-            onClick={() => {
-              router.push(`my-works/${story.id}`);
-            }}
+            onClick={() => { router.push(`my-works/${story.id}`) }}
             component="img"
-            sx={{ width: '16em', height: '14em', objectFit: 'inherit' }}
-            src={
-              story.cover_url !== ''
-                ? story.cover_url
-                : 'https://imgv3.fotor.com/images/gallery/Fiction-Book-Covers.jpg'
-            }
+            sx={{ width: "10em", height: "14em", objectFit: "cover" }}
+            src={story.cover_url !== '' ? story.cover_url : "https://imgv3.fotor.com/images/gallery/Fiction-Book-Covers.jpg"}
             alt="Live from space album cover"
           />
-          <CardContent
-            sx={{
-              boxSizing: 'border-box',
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              alignItems: 'stretch',
-              padding: 1,
-              height: '14em',
-            }}>
-            <Stack direction="column" justifyContent="center">
+          <CardContent sx={{ boxSizing: "border-box", display: 'flex', flexDirection: 'column', width: "67%", alignItems: "stretch", height: "14em" }}>
+            <Stack direction="column" justifyContent="center" >
               <Stack direction="row" justifyContent="space-between">
-                <Typography
-                  onClick={() => {
-                    router.push(`my-works/${story.id}`);
-                  }}
-                  component="div"
-                  variant="h6">
+                <Typography onClick={() => { router.push(`my-works/${story.id}`) }} component="div" variant="h6">
                   {story.title}
                 </Typography>
                 <Box>
-                  <IconButton
-                    color="inherit"
-                    aria-describedby={id}
-                    variant="text"
-                    onClick={handleClick}>
+                  <IconButton color='inherit' aria-describedby={id} variant="text" onClick={handleClick}>
                     <MoreVert />
                   </IconButton>
                   <Popover
@@ -175,57 +154,31 @@ const MyStoryPage = () => {
                     anchorOrigin={{
                       vertical: 'bottom',
                       horizontal: 'left',
-                    }}>
+                    }}
+                  >
                     <Grid container direction="column">
-                      {story.is_draft === false &&
-                      story.is_paywalled === false ? (
-                        <Button variant="text" color="primary">
-                          {' '}
-                          Gỡ đăng tải{' '}
-                        </Button>
-                      ) : (
-                        <></>
-                      )}
-                      {story.is_paywalled ? (
-                        <></>
-                      ) : (
-                        <Button
-                          variant="text"
-                          color="secondary"
-                          onClick={handleDialogOpen}>
-                          Xóa truyện
-                        </Button>
-                      )}
+                      {story.is_draft === false && story.is_paywalled === false ? <Button variant="text" color="primary"> Gỡ đăng tải </Button> : <></>}
+                      {story.is_paywalled ? <></> : <Button variant="text" color='secondary' onClick={handleDialogOpen}>
+                        Xóa truyện
+                      </Button>}
                       <ConfirmDialog
                         title={`Xác nhận xóa truyện ${story.title}`}
-                        actionBgColor="secondary"
+                        actionBgColor='secondary'
                         isReverse={true}
-                        content={
-                          <Grid container direction="column">
-                            <Typography>
-                              Tất cả <strong>lượt đoc</strong> , nội dung sẽ bị{' '}
-                              <strong>xóa</strong>
-                            </Typography>
-                            <Typography>
-                              Tất cả <strong>bình luận</strong> , nội dung sẽ bị{' '}
-                              <strong>xóa</strong>
-                            </Typography>
-                            <Typography>
-                              Tất cả <strong>bình luận</strong> , nội dung sẽ bị{' '}
-                              <strong>xóa</strong>
-                            </Typography>
-                          </Grid>
-                        }
+                        content={<Grid container direction="column" >
+                          <Typography>Tất cả <strong>lượt đoc</strong> , nội dung sẽ bị <strong>xóa</strong></Typography>
+                          <Typography>Tất cả <strong>bình luận</strong> , nội dung sẽ bị <strong>xóa</strong></Typography>
+                          <Typography>Tất cả <strong>bình luận</strong> , nội dung sẽ bị <strong>xóa</strong></Typography>
+                        </Grid>}
                         isOpen={isOpen}
-                        handleClose={() => {
-                          handleDialogClose(true, story.id);
-                        }}
-                        actionContent="Xác nhận xóa"
-                        cancelContent="Hủy thao tác"
+                        handleClose={(isConfirm) => handleDialogClose(isConfirm, story.id)}
+                        actionContent='Xác nhận xóa'
+                        cancelContent='Hủy thao tác'
                       />
                     </Grid>
                   </Popover>
                 </Box>
+
               </Stack>
 
               <Typography component="div" variant="subtitle1" color="sky.dark">
@@ -299,7 +252,7 @@ const MyStoryPage = () => {
     );
   };
 
-  const setName = (searchVal) => {};
+
   return (
     <>
       <Head>
@@ -314,50 +267,51 @@ const MyStoryPage = () => {
           }}>
           <Container
             maxWidth="xl"
-            sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Stack spacing={3}>
+            sx={{ display: 'flex', justifyContent: 'center', marginY: 4 }}>
+            <Stack spacing={1}>
               <Stack direction="row" justifyContent="center">
                 <Stack sx={{ marginY: '2em' }}>
                   <Typography variant="h3">Sáng tác của tôi</Typography>
                 </Stack>
               </Stack>
 
-              <Stack spacing={4}>
-                <Grid container direction="row" alignItems="center">
+              <Grid spacing={4}>
+                <Grid width={"70vw"} container direction="row" alignItems="center">
                   <Grid xs={10}>
                     <TextField
                       fullWidth
                       id="outlined-controlled"
                       label="Tìm kiếm"
-                      value={name}
-                      onChange={(event) => {
-                        setName(event.target.value);
+                      value={query}
+                      onChange={(e) => {
+                        setQuery(e.target.value);
+
+                        setMyStories(e.target.value !== "" ? storiesData.filter((person) =>
+                          person?.title.toLowerCase().includes(e.target.value.toLowerCase())
+                        ) : storiesData);
                       }}
+                      sx={{}}
                     />
                   </Grid>
-                  <Grid
-                    xs={2}
-                    container
-                    direction="row"
-                    justifyContent="end"
-                    columnGap={1}>
-                    <Button
-                      style={{
-                        backgroundColor: (theme) => theme.palette.ink.main,
-                        fontSize: '1.2em',
-                      }}
-                      size="medium"
-                      variant="contained"
-                      onClick={() =>
-                        router.push('/my-works/create', { scroll: false })
-                      }>
+
+
+                  <Grid xs={2} container direction="row" justifyContent="end" columnGap={1}>
+                    <Button style={{
+                      backgroundColor: (theme) => theme.palette.ink.main,
+                      fontSize: "1.2em"
+
+                    }} size="medium" variant='contained' onClick={() => router.push('/my-works/create', { scroll: false })
+                    }>
                       Thêm truyện
                     </Button>
                   </Grid>
                 </Grid>
 
                 <Grid container rowGap={4} sx={{ paddingY: 1 }}>
-                  {myStories?.map((story, index) => (
+                  {myStories.length === 0 ? <Grid container spacing={0}>
+                    <Typography>Không tìm thấy truyện nào</Typography>
+
+                  </Grid> : myStories?.map((story, index) => (
                     <Grid
                       item
                       lg={6}
@@ -371,7 +325,7 @@ const MyStoryPage = () => {
                     </Grid>
                   ))}
                 </Grid>
-              </Stack>
+              </Grid>
             </Stack>
           </Container>
         </Box>

@@ -68,6 +68,7 @@ const NewChapterPage = () => {
   } = useQuery(
     ['chapter', chapterId],
     async () => await new ChapterService(requestHeader).getById({ chapterId }),
+    { refetchOnWindowFocus: false },
   );
 
   const {
@@ -78,6 +79,7 @@ const NewChapterPage = () => {
     ['chapterVersionList'],
     async () =>
       await new ChapterVersionService(requestHeader).getAll({ chapterId }),
+    { refetchOnWindowFocus: false },
   );
 
   const [currentChapterVersion, setCurrentChapterVersion] = useState({});
@@ -106,6 +108,7 @@ const NewChapterPage = () => {
     refetch();
     refetch2();
   }, [router]);
+  print(chapterData);
 
   const ReactQuill =
     typeof window === 'object' ? require('react-quill') : () => false;

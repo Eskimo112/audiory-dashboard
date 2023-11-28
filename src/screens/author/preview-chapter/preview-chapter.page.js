@@ -68,6 +68,7 @@ const PreviewChapterPage = () => {
       await new ChapterVersionService(requestHeader).getById(
         router.query['chapter-version-id'],
       ),
+    { refetchOnWindowFocus: false },
   );
 
   const {
@@ -80,6 +81,7 @@ const PreviewChapterPage = () => {
       await new ChapterService(requestHeader).getById({
         chapterId: chapterVersionData?.chapter_id,
       }),
+    { refetchOnWindowFocus: false },
   );
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -265,7 +267,7 @@ const PreviewChapterPage = () => {
                         ({chapter?.is_draft ? 'Bản thảo' : 'Đã đăng tải'}){' '}
                       </Typography>
                       <Typography variant="body1" color="sky.dark">{`${
-                        formatDateTime(
+                        formatDate(
                           chapter?.updated_date ?? chapter?.created_date,
                         ).split(' ')[0]
                       }`}</Typography>

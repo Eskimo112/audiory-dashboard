@@ -36,8 +36,9 @@ const ChapterDetailPage = ({ chapterId, storyId }) => {
   // for comment dialog
   const [currentParaId, setCurrentParaId] = useState(null);
   const { data: chapter = {}, isLoading } = useQuery(
-    ['chapters', chapterId],
-    async () => await new ChapterService().getById(chapterId),
+    ['chapter', chapterId],
+    async () => await new ChapterService(requestHeader).getById(chapterId),
+    { refetchOnWindowFocus: false },
   );
   const { data: story = {}, isLoading: storyLoading } = useQuery(
     ['stories', storyId],
