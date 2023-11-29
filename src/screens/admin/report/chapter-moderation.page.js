@@ -82,7 +82,7 @@ const ChapterModerationPage = ({ chapterVersionId }) => {
                     chi tiết)
                   </Typography>
                   {paras.map((p, index) => {
-                    const isMatured = p.content_moderation.is_matured;
+                    const isMatured = p.content_moderation.is_mature;
                     const isReactionary = p.content_moderation.is_reactionary;
 
                     return (
@@ -154,11 +154,11 @@ const ChapterModerationPage = ({ chapterVersionId }) => {
                     variant="body1"
                     fontWeight={600}
                     color={
-                      currentModeration.is_matured
+                      currentModeration.is_mature
                         ? 'error.main'
                         : 'success.main'
                     }>
-                    {currentModeration.is_matured ? 'Có' : 'Không'}
+                    {currentModeration.is_mature ? 'Có' : 'Không'}
                   </Typography>
                 </Stack>
                 <Stack
