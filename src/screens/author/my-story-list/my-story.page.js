@@ -314,7 +314,7 @@ const MyStoryPage = () => {
 
                 <Grid container rowGap={4} sx={{ paddingY: 1 }}>
                   {myStories.length === 0 && isSuccess ? <Grid container spacing={0}>
-                    <Typography>Không tìm thấy truyện nào</Typography>
+                    {/* <Typography>Không tìm thấy truyện nào</Typography> */}
 
                   </Grid> : myStories?.map((story, index) => (
                     <Grid
