@@ -59,6 +59,8 @@ const ReportDetailPage = ({ reportId }) => {
 
   const [commentDialog, setCommentDialog] = useState();
 
+  const [confirmDialog, setConfirmDialog] = useState(false);
+
   const dialogCallbackRef = useRef(null);
   const {
     data: report,
@@ -86,6 +88,8 @@ const ReportDetailPage = ({ reportId }) => {
           values.result === 'approved' &&
           report.report_type === 'CONTENT_VIOLATION_COMPLAINT'
         ) {
+          setConfirmDialog(true);
+
           dialogCallbackRef.current = async () => {
             try {
               await reportService.updateReport({
@@ -104,6 +108,7 @@ const ReportDetailPage = ({ reportId }) => {
               //   response_message: values.content,
               //   form_file: imageFile,
               // });
+              setConfirmDialog(false);
               refetch();
               toastSuccess('Xử lý báo cáo thành công');
             } catch (error) {
@@ -114,6 +119,7 @@ const ReportDetailPage = ({ reportId }) => {
         }
 
         if (values.result === 'approved' && report.report_type === 'COMMENT') {
+          setConfirmDialog(true);
           dialogCallbackRef.current = async () => {
             try {
               await reportService.updateReport({
@@ -127,6 +133,7 @@ const ReportDetailPage = ({ reportId }) => {
               await new CommentService(requestHeaders).deleteById(
                 report.reported_id,
               );
+              setConfirmDialog(false);
               refetch();
               toastSuccess('Xử lý báo cáo thành công');
             } catch (error) {
@@ -534,9 +541,9 @@ const ReportDetailPage = ({ reportId }) => {
             )}
 
             <Dialog
-              open={Boolean(dialogCallbackRef.current)}
+              open={confirmDialog}
               onClose={() => {
-                dialogCallbackRef.current = null;
+                setConfirmDialog(false);
               }}
               PaperProps={{
                 sx: {
@@ -556,7 +563,7 @@ const ReportDetailPage = ({ reportId }) => {
                 <Button
                   variant="outlined"
                   onClick={() => {
-                    dialogCallbackRef.current = null;
+                    setConfirmDialog(false);
                   }}>
                   Hủy bỏ
                 </Button>
@@ -564,7 +571,7 @@ const ReportDetailPage = ({ reportId }) => {
                   variant="contained"
                   onClick={() => {
                     dialogCallbackRef.current();
-                    dialogCallbackRef.current = null;
+                    setConfirmDialog(false);
                   }}
                   autoFocus>
                   Xác nhận
