@@ -5,9 +5,9 @@ import { useRouter } from 'next/router';
 
 import EyeIcon from '@heroicons/react/24/solid/EyeIcon';
 import {
-  CleaningServices,
   Comment,
-  FavoriteBorder,
+  EditNote,
+  Favorite,
   Menu,
   MenuBook,
   MoreVert,
@@ -27,19 +27,19 @@ import {
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
+import { blue } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
 import { useQuery } from 'react-query';
 
 import ConfirmDialog from '@/components/dialog/reuse-confirm-dialog';
-import { useAuth } from '@/hooks/use-auth';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import StoryService from '@/services/story';
 import { countDiffenceFromNow, formatStatistic } from '@/utils/formatters';
 import { toastSuccess } from '@/utils/notification';
 
+
 const MyStoryPage = () => {
   const router = useRouter();
-  const auth = useAuth();
   const requestHeader = useRequestHeader();
 
   const [myStories, setMyStories] = useState([]);
@@ -96,7 +96,7 @@ const MyStoryPage = () => {
     const DetailInfo = ({ icon, content, isHighlight = false }) => {
       return (
         <>
-          <Stack direction="row" justifyContent="flex-start" columnGap="0.2em">
+          <Stack direction="row" justifyContent="flex-start" columnGap="0.2em" alignItems="center">
             <SvgIcon
               sx={{
                 width: '14px',
@@ -105,7 +105,7 @@ const MyStoryPage = () => {
               }}>
               {icon ?? <MenuBook></MenuBook>}
             </SvgIcon>
-            <Typography component="div" variant="body1">
+            <Typography component="div" variant="body2">
               {content ?? 'Mặc định'}
             </Typography>
           </Stack>
@@ -139,8 +139,8 @@ const MyStoryPage = () => {
           />
           <CardContent sx={{ boxSizing: "border-box", display: 'flex', flexDirection: 'column', width: "67%", alignItems: "stretch", height: "14em" }}>
             <Stack direction="column" justifyContent="center" >
-              <Stack direction="row" justifyContent="space-between">
-                <Typography onClick={() => { router.push(`my-works/${story.id}`) }} component="div" variant="h6">
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography onClick={() => { router.push(`my-works/${story.id}`) }} component="div" variant="h6" sx={{ textOverflow: "ellipsis", overflow: "hidden" }} noWrap>
                   {story.title}
                 </Typography>
                 <Box>
@@ -198,7 +198,7 @@ const MyStoryPage = () => {
                   gridTemplateColumns: 'repeat(2, 1fr)',
                 }}>
                 <DetailInfo
-                  icon={<EyeIcon strokeWidth={3}></EyeIcon>}
+                  icon={<EyeIcon color={blue[300]} strokeWidth={3}></EyeIcon>}
                   content={`${formatStatistic(story.read_count ?? 0)} lượt đọc`}
                 />
                 <DetailInfo
@@ -206,17 +206,17 @@ const MyStoryPage = () => {
                   content={`${story.published_count ?? 0} chương`}
                 />
                 <DetailInfo
-                  icon={<Comment strokeWidth={3}></Comment>}
+                  icon={<Comment color='primary' strokeWidth={3}></Comment>}
                   content={`${formatStatistic(
                     story.comment_count ?? 0,
                   )} bình luận`}
                 />
                 <DetailInfo
-                  icon={<Menu strokeWidth={3}></Menu>}
+                  icon={<EditNote fontSize='large' strokeWidth={3}></EditNote>}
                   content={`${story.draft_count ?? 0} bản thảo`}
                 />
                 <DetailInfo
-                  icon={<FavoriteBorder strokeWidth={3}></FavoriteBorder>}
+                  icon={<Favorite color='secondary' strokeWidth={3}></Favorite>}
                   content={`${formatStatistic(story.vote_count ?? 0)} lượt`}
                 />
               </Box>
@@ -229,9 +229,11 @@ const MyStoryPage = () => {
                 }}>
                 <Typography
                   component="div"
-                  variant="subtitle1"
-                  color="sky.base">
-                  Cập nhật vào {countDiffenceFromNow(story.updated_date)}
+                  variant="subtitle2"
+                  color="sky.base"
+                  sx={{ fontStyle: "italic" }}
+                >
+                  Cập nhật vào {countDiffenceFromNow(story?.updated_date ?? '_')}
                 </Typography>
                 <Button
                   sx={{
@@ -272,14 +274,14 @@ const MyStoryPage = () => {
             sx={{ display: 'flex', justifyContent: 'center', marginY: 4 }}>
             <Stack spacing={1}>
               <Stack direction="row" justifyContent="center">
-                <Stack sx={{ marginY: '2em' }}>
-                  <Typography variant="h3">Sáng tác của tôi</Typography>
+                <Stack sx={{ marginY: 1, fontStyle: "italic", }}>
+                  <Typography variant="h4">Sáng tác của tôi</Typography>
                 </Stack>
               </Stack>
 
-              <Grid spacing={4}>
-                <Grid width={"70vw"} container direction="row" alignItems="center">
-                  <Grid xs={10}>
+              <Grid >
+                <Grid width={"70vw"} container direction="row" alignItems="center" rowGap={1}>
+                  <Grid item xs={10}>
                     <TextField
                       fullWidth
                       id="outlined-controlled"
@@ -287,24 +289,27 @@ const MyStoryPage = () => {
                       value={query}
                       onChange={(e) => {
                         setQuery(e.target.value);
-
                         setMyStories(e.target.value !== "" ? storiesData.filter((person) =>
                           person?.title.toLowerCase().includes(e.target.value.toLowerCase())
                         ) : storiesData);
                       }}
-                      sx={{}}
+                      sx={{
+                        paddingRight: 1,
+                        height: "3em",
+                        marginY: 2
+
+                      }}
                     />
                   </Grid>
-
-
-                  <Grid xs={2} container direction="row" justifyContent="end" columnGap={1}>
-                    <Button style={{
+                  <Grid xs={2} direction="row" >
+                    <Button fullWidth style={{
                       backgroundColor: (theme) => theme.palette.ink.main,
-                      fontSize: "1.2em"
+                      fontSize: "1em",
+                      height: "3em"
 
                     }} size="medium" variant='contained' onClick={() => {
                       router.push('/my-works/create');
-                      console.log('asdf');
+
                     }
                     }>
                       Thêm truyện
@@ -314,7 +319,7 @@ const MyStoryPage = () => {
 
                 <Grid container rowGap={4} sx={{ paddingY: 1 }}>
                   {myStories.length === 0 && isSuccess ? <Grid container spacing={0}>
-                    {/* <Typography>Không tìm thấy truyện nào</Typography> */}
+                    <Typography>Không tìm thấy truyện nào</Typography>
 
                   </Grid> : myStories?.map((story, index) => (
                     <Grid
