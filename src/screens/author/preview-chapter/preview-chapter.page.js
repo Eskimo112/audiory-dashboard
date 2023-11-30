@@ -2,16 +2,12 @@ import React, { useEffect, useState } from 'react';
 
 import 'react-quill/dist/quill.snow.css';
 
-import {
-  CheckCircle,
-} from '@mui/icons-material';
+import { CheckCircle } from '@mui/icons-material';
 import {
   Button,
   Card,
   CardMedia,
-  Container,
   Grid,
-  IconButton,
   Popover,
   Skeleton,
   Stack,
@@ -91,14 +87,10 @@ const PreviewChapterPage = () => {
     setHtml(converter.convert());
   }, [chapterVersionData, isSucces, chapterData, router.isReady]);
 
-
-
   const handleRevertChapterVersion = async () => {
-
     await new ChapterVersionService()
       .revert({ chapterVersionId: router.query['chapter-version-id'] })
       .then((res) => {
-
         if (res.code === 200) {
           toastSuccess('Khôi phục thành công');
           router.push(`/my-works/${storyId}/write/${chapterId}`);
@@ -197,10 +189,11 @@ const PreviewChapterPage = () => {
                         variant="body1">
                         ({chapter?.is_draft ? 'Bản thảo' : 'Đã đăng tải'}){' '}
                       </Typography>
-                      <Typography variant="body1" color="sky.dark">{`${formatDate(
-                        chapter?.updated_date ?? chapter?.created_date,
-                      ).split(' ')[0]
-                        }`}</Typography>
+                      <Typography variant="body1" color="sky.dark">{`${
+                        formatDate(
+                          chapter?.updated_date ?? chapter?.created_date,
+                        ).split(' ')[0]
+                      }`}</Typography>
                     </Grid>
                   </Grid>
                   <Grid
@@ -268,15 +261,14 @@ const PreviewChapterPage = () => {
             color="primary"
             onClick={() => {
               // e.preventDefault();
-              handleRevertChapterVersion()
+              handleRevertChapterVersion();
             }}
             sx={{ margin: '1em 0', width: 1 / 3 }}>
             Khôi phục
           </Button>
         </Grid>
 
-        <Stack width={"100%"} direction="column" container alignItems="center">
-
+        <Stack width={'100%'} direction="column" container alignItems="center">
           <Grid xs={6} container>
             {/* {isLoading ? <Skeleton /> : <MediaControlCard />} */}
 
