@@ -29,11 +29,11 @@ const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const handleClick = (event) => {
         event.stopPropagation();
+        event.preventDefault();
         setAnchorEl(event.currentTarget);
     };
     const handleClose = (e) => {
-        event.stopPropagation();
-
+        e.stopPropagation();
         setAnchorEl(null);
     };
     const open = Boolean(anchorEl);
@@ -116,6 +116,7 @@ const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
 
         }} onClick={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             handleNavigate();
         }}>
             <Grid
@@ -169,12 +170,15 @@ const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
                                 Đăng tải
                             </Button> : !chapter.is_paywalled ? <Button variant="text" color="primary" onClick={(e) => {
                                 e.stopPropagation();
+                                e.preventDefault();
                                 onPublishChapter({ chapterId: chapter.id, isPublish: false })
                             }}>
                                 Gỡ đăng tải
                             </Button> : <></>}
                             {!chapter.is_paywalled ? <Button variant="text" color="secondary" onClick={(e) => {
                                 e.stopPropagation();
+                                e.preventDefault();
+
                                 handleDialogOpen()
                             }}>
                                 Xóa chương
