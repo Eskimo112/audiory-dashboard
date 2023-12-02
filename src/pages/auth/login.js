@@ -1,4 +1,3 @@
-
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
 
@@ -21,9 +20,7 @@ const Page = () => {
     },
     enableReinitialize: true,
     validationSchema: Yup.object({
-      email: Yup.string()
-        .max(255)
-        .required('Không được để trống'),
+      email: Yup.string().max(255).required('Không được để trống'),
       password: Yup.string().max(255).required('Mật khẩu trống'),
     }),
 
@@ -33,7 +30,9 @@ const Page = () => {
         router.push('/my-works');
       } catch (err) {
         helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.response.data.message ?? 'Tài khoản hoặc mật khẩu sai' });
+        helpers.setErrors({
+          submit: err.response.data.message ?? 'Tài khoản hoặc mật khẩu sai',
+        });
         helpers.setSubmitting(false);
         toastError('Đăng nhập không thành công');
       }
@@ -78,9 +77,6 @@ const Page = () => {
             </Typography>
           </Stack>
 
-
-
-
           <form noValidate onSubmit={formik.handleSubmit}>
             <Stack spacing={3}>
               <TextField
@@ -118,28 +114,12 @@ const Page = () => {
               size="large"
               sx={{ mt: 3, mb: 2 }}
               type="submit"
-
               variant="contained"
-              disabled={!formik.isValid}
-              spin
-            >
-              Đăng nhập
+              disabled={!formik.isValid || formik.isSubmitting}
+              spin>
+              {formik.isSubmitting ? 'Đợi chút xíu...' : 'Đăng nhập'}
             </Button>
-
-            {/* {formik.isSubmitting} */}
-
-            {/* <Button fullWidth size="large" sx={{ mt: 3 }} onClick={handleSkip}>
-                  Skip authentication
-                </Button> */}
-            {/* <Alert color="primary" severity="info" sx={{ mt: 3 }}>
-                  <div>
-                    You can use <b>demo@devias.io</b> and password <b>Password123!</b>
-                  </div>
-                </Alert> */}
           </form>
-
-
-
 
           <Typography variant="body1" color="ink.lighter" textAlign="center">
             Hoặc

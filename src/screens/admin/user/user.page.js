@@ -43,7 +43,11 @@ const ROLE_ID_MAP = {
 
 const UserPage = () => {
   const requestHeader = useRequestHeader();
-  const { data: users, isLoading } = useQuery(
+  const {
+    data: users,
+    isLoading,
+    refetch,
+  } = useQuery(
     ['users'],
     async () => await new UserService(requestHeader).getAll(),
   );
@@ -54,11 +58,12 @@ const UserPage = () => {
     try {
       if (user?.deleted_date) {
         await new UserService(requestHeader).activateById(user.id);
-        toastSuccess('Đã kích hdw oạt thành công');
+        toastSuccess('Đã kích hoạt thành thành công');
       } else {
         await new UserService(requestHeader).deactivateById(user.id);
         toastSuccess('Đã vô hiệu hóa thành công');
       }
+      refetch();
     } catch (e) {
       toastError('Đã có lỗi xảy ra, thử lại sau.');
     }

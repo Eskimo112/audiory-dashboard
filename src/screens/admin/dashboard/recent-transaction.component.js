@@ -187,7 +187,7 @@ const RecentTransactionsTable = () => {
               </Button>
             </Stack>
           }
-          title="Truyện nổi tiếng"
+          title="Giao dịch gần đây"
         />
         <CardContent sx={{ paddingTop: 0, paddingBottom: 0 }}>
           <MaterialReactTable

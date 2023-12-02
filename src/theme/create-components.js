@@ -1,10 +1,13 @@
 import {
   createTheme,
   filledInputClasses,
+  inputBaseClasses,
+  inputClasses,
   inputLabelClasses,
   outlinedInputClasses,
   paperClasses,
   tableCellClasses,
+  textFieldClasses,
 } from '@mui/material';
 
 // Used only to create transitions
@@ -308,7 +311,12 @@ export function createComponents(config) {
         variant: 'filled',
       },
       styleOverrides: {
-        root: {},
+        root: {
+          [`.${inputClasses.disabled}`]: {
+            fontSize: '16px',
+            WebkitTextFillColor: '#6C7072!important',
+          },
+        },
       },
     },
     MuiSwitch: {
