@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 
 export const AppImageUpload = (props) => {
-  const { defaultUrl, onChange } = props;
+  const { defaultUrl, onChange, disabled } = props;
   const [selectedFile, setSelectedFile] = useState();
   const [preview, setPreview] = useState(defaultUrl);
   // create a preview as a side effect, whenever selected file is changed
@@ -77,6 +77,7 @@ export const AppImageUpload = (props) => {
       <Input
         id="file-upload"
         type="file"
+        disabled={disabled}
         sx={{ display: 'none' }}
         onChange={onSelectFile}
         inputProps={{ accept: '.jpg,.jpeg,.png' }}

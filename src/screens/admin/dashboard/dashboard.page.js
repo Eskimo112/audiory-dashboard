@@ -72,6 +72,7 @@ const DashboardPage = () => {
                 value={stats.total_revenue}
                 title="Tổng doanh thu"
                 icon={<CurrencyDollarIcon />}
+                suffix={'₫'}
               />
             </Grid>
           </Grid>

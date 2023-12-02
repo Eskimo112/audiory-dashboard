@@ -14,7 +14,8 @@ import PropTypes from 'prop-types';
 import { formatNumber } from '@/utils/formatters';
 
 export const StatCard = (props) => {
-  const { difference, sx, value, title, icon, isLoading, isError } = props;
+  const { difference, sx, value, title, icon, isLoading, isError, suffix } =
+    props;
   if (isError) return <></>;
   if (isLoading) return <Skeleton width="270px" height="160px" />;
 
@@ -65,7 +66,7 @@ export const StatCard = (props) => {
               </Typography>
             )}
             <Typography variant="h4" sx={{ fontWeight: 700 }}>
-              {formatNumber(value)}
+              {formatNumber(value) + (suffix || '')}
             </Typography>
           </Stack>
           <Avatar
@@ -94,4 +95,5 @@ StatCard.prototypes = {
   title: PropTypes.string.isRequired,
   icon: PropTypes.elementType,
   color: PropTypes.string,
+  suffix: PropTypes.string,
 };

@@ -35,13 +35,13 @@ const handlers = {
       ...// if payload (user) is provided, then is authenticated
       (user
         ? {
-          isAuthenticated: true,
-          isLoading: false,
-          user,
-        }
+            isAuthenticated: true,
+            isLoading: false,
+            user,
+          }
         : {
-          isLoading: false,
-        }),
+            isLoading: false,
+          }),
     };
   },
   [HANDLERS.SIGN_IN]: (state, action) => {
@@ -88,8 +88,7 @@ export const AuthProvider = (props) => {
     let user = null;
 
     try {
-      isAuthenticated =
-        Cookies.get('authenticated') === 'true';
+      isAuthenticated = Cookies.get('authenticated') === 'true';
 
       token = Cookies.get('token');
 
@@ -164,7 +163,7 @@ export const AuthProvider = (props) => {
     const userInfo = await new UserService(requestHeader).getById('me');
     try {
       Cookies.set('authenticated', 'true');
-      Cookies.set('token', response)
+      Cookies.set('token', response);
 
       // window.sessionStorage.setItem('authenticated', 'true');
       // window.sessionStorage.setItem('token', response);
@@ -198,7 +197,7 @@ export const AuthProvider = (props) => {
     const userInfo = await new UserService(requestHeader).getById('me');
     try {
       Cookies.set('authenticated', 'true');
-      Cookies.set('token', response)
+      Cookies.set('token', response);
     } catch (err) {
       console.error(err);
     }
@@ -222,7 +221,6 @@ export const AuthProvider = (props) => {
   const signOut = () => {
     Cookies.remove('token');
     Cookies.remove('authenticated');
-
 
     dispatch({
       type: HANDLERS.SIGN_OUT,

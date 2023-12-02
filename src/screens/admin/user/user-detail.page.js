@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Head from 'next/head';
 
 import {
+  Avatar,
   Box,
   Button,
   Card,
@@ -35,7 +36,11 @@ import UserTransactionsTable from './user-transaction-table';
 
 const UserDetaiPage = ({ userId }) => {
   const requestHeader = useRequestHeader();
-  const { data: user = {}, isLoading } = useQuery(
+  const {
+    data: user = {},
+    isLoading,
+    refetch,
+  } = useQuery(
     ['users', userId],
     async () => await new UserService(requestHeader).getById(userId),
   );
@@ -74,11 +79,12 @@ const UserDetaiPage = ({ userId }) => {
     try {
       if (user?.deleted_date) {
         await new UserService(requestHeader).activateById(userId);
-        toastSuccess('Đã kích hdw oạt thành công');
+        toastSuccess('Đã kích hoạt thành thành công');
       } else {
         await new UserService(requestHeader).deactivateById(userId);
         toastSuccess('Đã vô hiệu hóa thành công');
       }
+      refetch();
     } catch (e) {
       toastError('Đã có lỗi xảy ra, thử lại sau.');
     }
@@ -177,6 +183,7 @@ const UserDetaiPage = ({ userId }) => {
                       <Stack gap={2}>
                         <Stack gap={1}>
                           <FormLabel>Id người dùng</FormLabel>
+
                           <TextField
                             disabled
                             fullWidth
@@ -286,23 +293,19 @@ const UserDetaiPage = ({ userId }) => {
                     title={`Ảnh đại diện & cài đặt`}
                   />
                   <Stack justifyContent="center" alignItems="center" gap="12px">
-                    <Box
-                      sx={{
-                        width: '80%',
-                        marginBottom: '0px',
-                        aspectRatio: '1',
-                      }}>
-                      <AppImageUpload
-                        defaultUrl={user?.avatar_url}
-                        onChange={(file) => setSelectedFile(file)}
-                      />
-                    </Box>
+                    <Avatar
+                      sx={{ width: '90%', aspectRatio: 1, height: '100%' }}
+                      src={user?.avatar_url}></Avatar>
+
                     <Stack justifyContent="center" alignItems="center">
                       <Typography variant="subtitle1" fontWeight={400}>
                         Người theo dõi: <b>{user?.number_of_followers ?? 0} </b>
                       </Typography>
                       <Typography variant="subtitle1" fontWeight={400}>
-                        Tác giả: <b> cấp {user?.author_level_id ?? 0} </b>
+                        Tác giả: <b> {user?.author_level.name ?? 0} </b>
+                      </Typography>
+                      <Typography variant="subtitle1" fontWeight={400}>
+                        Thành viên: <b> {user?.level.name ?? 0} </b>
                       </Typography>
                     </Stack>
 

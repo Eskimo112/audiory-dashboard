@@ -171,7 +171,7 @@ const TopStoriesTable = () => {
             </Button>
           </Stack>
         }
-        title="Giao dịch gần đây"
+        title="Truyện nổi tiếng"
       />
       <CardContent sx={{ paddingTop: 0, paddingBottom: 0 }}>
         {isLoading ? (
