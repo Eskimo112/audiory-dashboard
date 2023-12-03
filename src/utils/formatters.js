@@ -26,13 +26,23 @@ export const countDiffenceFromNow = (dateString) => {
   const diffInMinutes = Math.ceil(diffTime / (1000 * 60));
   const diffInHours = Math.ceil(diffTime / (1000 * 60 * 60));
 
-  if (diffInMinutes < 1) {
-    return diffInMinutes + ' giây trước';
-  } else if (diffInHours < 1) {
-    return diffInHours + ' phút trước';
-  } else if (diffInHours <= 23) return diffInHours + ' giờ trước';
+  console.log('---------------------');
+  console.log('diffTime ', diffTime);
+  console.log('diffTime ', diffInMinutes);
+  console.log('diffTime ', diffInHours);
+  // if (diffInMinutes < 1) {
+  //   console.log('sec')
+  //   return diffInMinutes + ' giây trước';
+  // } else if (diffInHours < 1) {
+  //   console.log('min')
+
+  //   return diffInHours + ' phút trước';
+  // } else if (diffInHours <= 23) {
+  //   console.log('hour')
+  //   return diffInHours + ' giờ trước'
+  // };
   console.log(formatDate(dateString))
-  return formatDateTime(dateString).split(',')[1];
+  return 'Cập nhật' + formatDateTime(dateString).split(',')[1];
 };
 
 export function timeAgo(dateString) {

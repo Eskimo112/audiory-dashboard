@@ -26,6 +26,8 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
 
     const [allCheckedCriteria, setAllCheckedCriteria] = useState(true);
     const [count, setCount] = useState(0)
+    const [isSubmit, setIsSubmit] = useState(false);
+
 
     const { data: categoriesData = [], isLoading } = useQuery(
         ['categories'],
@@ -153,6 +155,7 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
     }
 
     const handleEdit = async () => {
+        setIsSubmit(true);
         var actualList = [];
         for (let index = 0; index < tagList.length; index++) {
             const element = { 'name': tagList[index] };
@@ -190,9 +193,13 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
                         toastError(res.statusText)
                     }
                 }
-            );
+            ).finally(() => {
+                setIsSubmit(false);
+            });
         } catch (error) {
-            console.log('error', error)
+            console.log('error', error);
+            setIsSubmit(false);
+
         }
     }
 
@@ -400,9 +407,9 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
                             sx={{ mt: 3 }}
                             type="submit"
                             variant="contained"
-                            disabled={!formik.isValid || tagList.length < 1}
+                            disabled={!formik.isValid || tagList.length < 1 || isSubmit}
                         >
-                            Sửa
+                            {isSubmit ? 'Sửa truyện...' : "Sửa"}
                         </Button>
 
                     </Grid>

@@ -138,7 +138,7 @@ const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
                 {chapter?.price !== 0 ? <Grid xs={1} container justifyContent="flex-start" alignItems="center" >
                     {chapter?.price} <CurrencyDollarIcon width="1.5em" color="primary" />
                 </Grid> : <></>}
-                <Grid xs={3} spacing={0} container direction="row" alignItems="center" justifyContent="space-between">
+                <Grid xs={4} spacing={0} container direction="row" alignItems="center" justifyContent="space-between">
                     {countDiffenceFromNow(chapter.updated_date)} <IconButton sx={{ marginLeft: "0.2em" }} variant="text" color="primary" onClick={handleClick}>
                         <MoreVert />
                     </IconButton>

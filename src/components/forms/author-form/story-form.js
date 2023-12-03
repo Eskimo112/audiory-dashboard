@@ -25,6 +25,8 @@ const StoryForm = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [tag, setTag] = useState('');
   const [tagList, setTagList] = useState([]);
+  const [isSubmit, setIsSubmit] = useState(false);
+
 
   const {
     data: categoriesData = [],
@@ -108,7 +110,7 @@ const StoryForm = () => {
   };
 
   const handleCreate = async () => {
-
+    setIsSubmit(true);
     var actualList = [];
     for (let index = 0; index < tagList.length; index++) {
       const element = { 'name': tagList[index] };
@@ -135,6 +137,9 @@ const StoryForm = () => {
       const chapterId = res.chapters[0].id;
 
       router.push(`/my-works/${storyId}/write/${chapterId}`);
+    }).finally(() => {
+      setIsSubmit(false);
+
     });
 
 
@@ -160,19 +165,7 @@ const StoryForm = () => {
       setTag(val);
     }
   }
-  // if (isLoading)
-  //     return (
-  //         <Grid
-  //             sx={{
-  //                 display: 'flex',
-  //                 width: '100%',
-  //                 justifyContent: 'center',
-  //                 alignItems: 'center',
-  //                 height: "100vh"
-  //             }}>
-  //             <CircularProgress />
-  //         </Grid>
-  //     );
+
 
   return (
     <>
@@ -363,7 +356,7 @@ const StoryForm = () => {
           <Button
             fullWidth
             sx={{ mt: 3, mb: 3 }}
-            disabled={!formik.isValid}
+            disabled={!formik.isValid || isSubmit}
             type="submit"
             variant="contained"
             onClick={(e) => {
@@ -372,7 +365,7 @@ const StoryForm = () => {
             }
             }
           >
-            Tạo
+            {isSubmit ? 'Tạo truyện...' : "Tạo"}
           </Button>
 
         </form>

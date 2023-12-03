@@ -63,13 +63,30 @@ const MyStoryPage = () => {
   }, [storiesData]);
 
   const handleDelete = async ({ id }, title) => {
+    console.log('handle delete');
     try {
       await new StoryService(requestHeader).delete(id).then((res) => {
         console.log(res)
         toastSuccess('Xóa thành công truyện');
         refetch();
       });
-    } catch (error) { }
+    } catch (error) {
+      console.log(error);
+      toastSuccess('Xóa không thành công truyện');
+    }
+  };
+
+  const handleUnpublish = async (id) => {
+    try {
+      await new StoryService(requestHeader).unpublish(id).then((res) => {
+        console.log(res)
+        toastSuccess('Gỡ đăng thành công truyện');
+        refetch();
+      });
+    } catch (error) {
+      console.log(error);
+      toastSuccess('Gỡ đăng tải không thành công truyện');
+    }
   };
   const StoryOverViewCard = ({ story }) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -158,7 +175,7 @@ const MyStoryPage = () => {
                     }}
                   >
                     <Grid container direction="column">
-                      {story.is_draft === false && story.is_paywalled === false ? <Button variant="text" color="primary"> Gỡ đăng tải </Button> : <></>}
+                      {story.is_draft === false && story.is_paywalled === false ? <Button variant="text" color="primary" onClick={() => handleUnpublish(story.id)}> Gỡ đăng tải </Button> : <></>}
                       {story.is_paywalled ? <></> : <Button variant="text" color='secondary' onClick={handleDialogOpen}>
                         Xóa truyện
                       </Button>}
@@ -233,7 +250,7 @@ const MyStoryPage = () => {
                   color="sky.base"
                   sx={{ fontStyle: "italic" }}
                 >
-                  Cập nhật vào {countDiffenceFromNow(story?.updated_date ?? '_')}
+                  {countDiffenceFromNow(story?.updated_date ?? '_')}
                 </Typography>
                 <Button
                   sx={{
@@ -251,7 +268,7 @@ const MyStoryPage = () => {
               </Box>
             </Stack>
           </CardContent>
-        </Card>
+        </Card >
       </>
     );
   };
