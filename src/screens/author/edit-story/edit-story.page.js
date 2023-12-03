@@ -68,7 +68,7 @@ const EditStoryPage = () => {
 
     const { data: story = {}, isLoading, refetch, isRefetching } = useQuery(
         ['story', storyId],
-        async () => await new StoryService(requestHeader).getById(storyId),
+        async () => await new StoryService(requestHeader).getMyStoryById(storyId),
         { refetchOnMount: false, refetchOnWindowFocus: false }
     );
 

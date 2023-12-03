@@ -86,6 +86,7 @@ const NewChapterPage = () => {
   const [value, setValue] = useState('');
   const [contentSize, setContentSize] = useState(0);
   const [imageArr, setImageArr] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const handleClick = (event, storyData) => {
@@ -206,6 +207,7 @@ const NewChapterPage = () => {
   };
 
   const onSaveDraftChapter = async (isPreview, isPublish) => {
+
     if (value.split(' ').length < MIN_WORDS && imageArr.length === 0) {
       toastError(`Quá ngắn để lưu bản thảo`);
     } else {
@@ -227,8 +229,10 @@ const NewChapterPage = () => {
       console.log(contentSize);
 
       if (contentSize > MAX_CONTENT_SIZE) {
+
         toastError('Nội dung chương vượt quá 2MB');
       } else {
+        setIsSubmitting(true)
         // create chapter version
         const values = formik.values;
         const formData = new FormData();
@@ -265,8 +269,12 @@ const NewChapterPage = () => {
               } else {
                 toastError(res.message);
               }
+            }).finally(() => {
+              setIsSubmitting(false);
+
             });
         } catch (error) {
+          setIsSubmitting(false);
           console.log(error);
         }
       }
@@ -454,13 +462,13 @@ const NewChapterPage = () => {
               alignContent="flex-end"
               columnGap="0.2em">
               <Button
-                disabled={!formik.isValid}
+                disabled={!formik.isValid || isSubmitting}
                 variant="contained"
                 color="primary"
                 onClick={() => {
                   onSaveDraftChapter(false, true);
                 }}>
-                Đăng tải
+                {isSubmitting ? 'Đăng tải...' : ' Đăng tải'}
               </Button>
               <Button
                 disabled={!formik.isValid}
@@ -471,7 +479,7 @@ const NewChapterPage = () => {
                 }}>
                 Lưu bản thảo
               </Button>
-              <Button
+              {/* <Button
                 disabled={!formik.isValid}
                 variant="outlined"
                 color="inherit"
@@ -479,7 +487,7 @@ const NewChapterPage = () => {
                   onSaveDraftChapter(true, false);
                 }}>
                 Xem trước
-              </Button>
+              </Button> */}
             </Grid>
           </Grid>
 
