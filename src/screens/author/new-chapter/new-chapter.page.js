@@ -8,7 +8,12 @@ import {
   Card,
   CircularProgress,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
+  FormLabel,
   IconButton,
   MenuItem,
   Popover,
@@ -37,6 +42,10 @@ import {
   convertImageLinkToBase64,
   fileSizeFromBase64,
 } from '@/utils/filesize-counter';
+import dayjs from 'dayjs';
+import ReportService from '../../../services/report';
+import { useAuthContext } from '../../../contexts/auth-context';
+import { useAuth } from '../../../hooks/use-auth';
 
 const toolbarOptions = [
   ['bold', 'italic', 'underline'], // toggled buttons
@@ -71,22 +80,26 @@ const NewChapterPage = () => {
     { refetchOnWindowFocus: false },
   );
 
-  const {
-    data: chapterVersionsData = [],
-    isSucces2,
-    refetch: refetch2,
-  } = useQuery(
-    ['chapterVersionList'],
+  const { data: chapterVersionsData = [], refetch: refetch2 } = useQuery(
+    ['chapterVersionList', chapterId],
     async () =>
       await new ChapterVersionService(requestHeader).getAll({ chapterId }),
     { refetchOnWindowFocus: false },
   );
+
+  const {
+    user: { id: userId },
+  } = useAuth();
 
   const [currentChapterVersion, setCurrentChapterVersion] = useState({});
   const [value, setValue] = useState('');
   const [contentSize, setContentSize] = useState(0);
   const [imageArr, setImageArr] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [openReport, setOpenReport] = React.useState(false);
+  const [reportFormFile, setReportFormFile] = useState();
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const handleClick = (event, storyData) => {
@@ -96,22 +109,20 @@ const NewChapterPage = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
 
   const [storyData, setStoryData] = useState({});
 
   useEffect(() => {
     setCurrentChapterVersion(chapterData?.current_chapter_version);
   }, [chapterData, chapterVersionsData]);
-  useEffect(() => {
-    setCurrentChapterVersion(chapterData?.current_chapter_version);
-    refetch();
-    refetch2();
-  }, [router]);
+
+  // useEffect(() => {
+  //   setCurrentChapterVersion(chapterData?.current_chapter_version);
+  // }, []);
 
   const ReactQuill =
     typeof window === 'object' ? require('react-quill') : () => false;
+
   const formik = useFormik({
     initialValues: {
       chapter_id: chapterId,
@@ -119,7 +130,7 @@ const NewChapterPage = () => {
       content: chapterData?.current_chapter_version?.content ?? '',
       rich_text:
         chapterData?.current_chapter_version?.rich_text === '' ||
-          chapterData?.current_chapter_version?.rich_text === undefined
+        chapterData?.current_chapter_version?.rich_text === undefined
           ? '{}'
           : chapterData?.current_chapter_version?.rich_text,
       title: chapterData?.current_chapter_version?.title ?? '',
@@ -147,19 +158,6 @@ const NewChapterPage = () => {
   });
 
   const onEditorChange = (content, delta, source, editor) => {
-    // console.log('size', Blob(editor.getContents()))
-    // console.log('EDITor', editor.getContents().ops); // rich_text
-    // console.log('EDITor', JSON.stringify(editor.getContents().ops)); // rich_text
-    // console.log('Text', editor.getText()); // content
-    // console.log('content ', content);
-    // console.log('richtext', formik.values.rich_text);
-    // console.log('CHARACTERS COUNT', editor.getLength())
-
-    // count bytes
-    // console.log('TEXT', editor.getText())
-    // console.log('BYTES IN TEXT', byteSizeFromString(editor.getText()))
-    // console.log('COUNT', editor.getLength());
-
     var imagesArr = editor
       .getContents()
       .ops?.filter((ele) => ele.insert.image !== undefined)
@@ -206,8 +204,41 @@ const NewChapterPage = () => {
     );
   };
 
-  const onSaveDraftChapter = async (isPreview, isPublish) => {
+  const reportFormik = useFormik({
+    initialValues: {
+      title: '',
+      description: '',
+    },
+    enableReinitialize: true,
+    validationSchema: Yup.object({
+      title: Yup.string().required('Vui lòng nhập tiêu đề'),
+      description: Yup.string().required('Vui lòng nhập nội dung'),
+    }),
+    onSubmit: async (values, helpers) => {
+      try {
+        await new ReportService(requestHeader).createReport({
+          title: values.title,
+          description: values.description,
+          user_id: userId,
+          reported_id: currentChapterVersion.id,
+          report_type: 'CONTENT_VIOLATION_COMPLAINT',
+          form_file: reportFormFile,
+        });
+        setOpenReport(false);
 
+        toastSuccess('Tạo báo cáo thành công');
+      } catch (e) {
+        toastError(e.toString());
+      }
+      formik.handleReset();
+    },
+  });
+
+  const handleTurnOnMature = () => {
+    setOpenDialog(false);
+  };
+
+  const onSaveDraftChapter = async (isPreview, isPublish) => {
     if (value.split(' ').length < MIN_WORDS && imageArr.length === 0) {
       toastError(`Quá ngắn để lưu bản thảo`);
     } else {
@@ -229,10 +260,9 @@ const NewChapterPage = () => {
       console.log(contentSize);
 
       if (contentSize > MAX_CONTENT_SIZE) {
-
         toastError('Nội dung chương vượt quá 2MB');
       } else {
-        setIsSubmitting(true)
+        setIsSubmitting(true);
         // create chapter version
         const values = formik.values;
         const formData = new FormData();
@@ -246,7 +276,7 @@ const NewChapterPage = () => {
                 if (isPreview) {
                   refetch2().then((response) => {
                     console.log('preview');
-                    console.log(res.data)
+                    console.log(res.data);
                     router.replace(
                       `/my-works/${router.query?.id}/preview/${res.data?.id}`,
                     );
@@ -254,14 +284,28 @@ const NewChapterPage = () => {
                 } else if (isPublish) {
                   console.log('pub');
 
-                  new ChapterService(requestHeader).publish(chapterId).then((res) => {
-                    console.log('res', res);
-                    if (res.code === 200) {
-                      toastSuccess('Đăng tải thành công');
-                    } else {
-                      toastError(res.message);
-                    }
-                  });
+                  new ChapterService(requestHeader)
+                    .publish(chapterId)
+                    .then((res) => {
+                      console.log('res', res);
+                      if (res.code === 200) {
+                        router.push(`/my-works/${router.query?.id}`);
+                        toastSuccess('Đăng tải thành công');
+                      } else {
+                        toastError(res.message);
+                      }
+                    })
+                    .catch((e) => {
+                      console.log(e);
+                      if (
+                        e.response.data.message ===
+                        'Hãy gắn nhãn trưởng thành để đi tiếp'
+                      ) {
+                        setOpenDialog(true);
+                      } else {
+                        toastError('Không thể đăng tải chương');
+                      }
+                    });
                 } else {
                   toastSuccess('Lưu bản thảo thành công');
                   refetch2();
@@ -269,9 +313,9 @@ const NewChapterPage = () => {
               } else {
                 toastError(res.message);
               }
-            }).finally(() => {
+            })
+            .finally(() => {
               setIsSubmitting(false);
-
             });
         } catch (error) {
           setIsSubmitting(false);
@@ -310,8 +354,7 @@ const NewChapterPage = () => {
           )}
 
           <Popover
-            id={id}
-            open={open}
+            open={Boolean(anchorEl)}
             anchorEl={anchorEl}
             onBlur={handleClose}
             anchorOrigin={{
@@ -342,7 +385,7 @@ const NewChapterPage = () => {
                         `/my-works/${storyData?.id}/write/${chapter?.id}`,
                       );
                     }}>
-                    <Grid xs={10} container spacing={0}>
+                    <Grid item xs={10} container spacing={0}>
                       <Grid
                         container
                         spacing={0}
@@ -377,13 +420,15 @@ const NewChapterPage = () => {
                           variant="body1">
                           ({chapter?.is_draft ? 'Bản thảo' : 'Đã đăng tải'}){' '}
                         </Typography>
-                        <Typography variant="body1" color="sky.dark">{`${formatDateTime(
-                          chapter?.updated_date ?? chapter?.created_date,
-                        ).split(' ')[0]
-                          }`}</Typography>
+                        <Typography variant="body1" color="sky.dark">{`${
+                          formatDateTime(
+                            chapter?.updated_date ?? chapter?.created_date,
+                          ).split(' ')[0]
+                        }`}</Typography>
                       </Grid>
                     </Grid>
                     <Grid
+                      item
                       xs={2}
                       container
                       justifyContent="end"
@@ -396,7 +441,7 @@ const NewChapterPage = () => {
                     </Grid>
                   </Button>
                 ))}
-              <Grid xs={12} container spacing={0}>
+              <Grid item xs={12} container spacing={0}>
                 <Button
                   fullWidth
                   variant="contained"
@@ -421,7 +466,7 @@ const NewChapterPage = () => {
             justifyContent="space-between"
             alignItems="center"
             sx={{ margin: '1em 0' }}>
-            <Grid xs={5} container spacing={0}>
+            <Stack>
               {chapterVersionsData?.length !== 0 ? (
                 <>
                   <TextField
@@ -434,17 +479,19 @@ const NewChapterPage = () => {
                     value={currentChapterVersion?.id ?? ''}>
                     {chapterVersionsData &&
                       chapterVersionsData
-                        ?.sort((a, b) => a?.created_date > b?.created_date)
-                        .map((category, index) => (
+                        ?.sort((a, b) =>
+                          dayjs(b?.timestamp).diff(dayjs(a?.timestamp)),
+                        )
+                        .map((version, index) => (
                           <MenuItem
                             key={index}
-                            value={category.id}
+                            value={version.id}
                             onClick={() => {
                               router.push(
-                                `/my-works/${router.query?.id}/preview/${category.id}`,
+                                `/my-works/${router.query?.id}/preview/${version.id}`,
                               );
                             }}>
-                            {category.version_name}
+                            {version.version_name}
                           </MenuItem>
                         ))}
                   </TextField>
@@ -452,32 +499,32 @@ const NewChapterPage = () => {
               ) : (
                 <></>
               )}
-            </Grid>
-            <Grid
-              xs={7}
-              container
+            </Stack>
+            <Stack
               direction="row"
               alignItems="center"
               justifyContent="end"
               alignContent="flex-end"
-              columnGap="0.2em">
+              gap="8px">
               <Button
                 disabled={!formik.isValid || isSubmitting}
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  onSaveDraftChapter(false, true);
-                }}>
-                {isSubmitting ? 'Đăng tải...' : ' Đăng tải'}
-              </Button>
-              <Button
-                disabled={!formik.isValid}
                 variant="outlined"
                 color="inherit"
                 onClick={() => {
                   onSaveDraftChapter(false, false);
                 }}>
                 Lưu bản thảo
+              </Button>
+              <Button
+                disabled={
+                  (!chapterData.is_draft && !formik.isValid) || isSubmitting
+                }
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  onSaveDraftChapter(false, true);
+                }}>
+                {'Đăng tải'}
               </Button>
               {/* <Button
                 disabled={!formik.isValid}
@@ -488,7 +535,7 @@ const NewChapterPage = () => {
                 }}>
                 Xem trước
               </Button> */}
-            </Grid>
+            </Stack>
           </Grid>
 
           <Grid maxWidth="lg">
@@ -550,6 +597,120 @@ const NewChapterPage = () => {
           </Container>
         </Grid>
       </Stack>
+
+      <Dialog
+        open={openDialog}
+        onClose={() => {
+          setOpenDialog(false);
+        }}
+        PaperProps={{
+          sx: {
+            p: 1,
+            width: '400px',
+          },
+        }}>
+        <DialogTitle>Bạn phải bật nội dung trưởng thành để đi tiếp</DialogTitle>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenDialog(false);
+              setOpenReport(true);
+            }}>
+            Kháng cáo
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => handleTurnOnMature()}
+            autoFocus>
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openReport}
+        onClose={(e) => {
+          e.stopPropagation();
+          setOpenReport(false);
+        }}
+        PaperProps={{
+          sx: {
+            p: 1,
+            width: '400px',
+          },
+        }}>
+        <DialogTitle>Tạo một báo cáo</DialogTitle>
+        <DialogContent
+          sx={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
+          <Stack gap={1} alignItems="center">
+            <Box height={250} width="70%" p="8px">
+              <AppImageUpload onChange={(file) => setReportFormFile(file)} />
+            </Box>
+          </Stack>
+
+          <Stack>
+            <FormLabel>Tiêu đề</FormLabel>
+            <TextField
+              error={
+                !!(reportFormik.touched.title && reportFormik.errors.title)
+              }
+              fullWidth
+              helperText={
+                reportFormik.touched.title && reportFormik.errors.title
+              }
+              variant="outlined"
+              name="title"
+              onBlur={reportFormik.handleBlur}
+              onChange={reportFormik.handleChange}
+              value={reportFormik.values.title}
+              type="text"
+            />
+          </Stack>
+          <Stack>
+            <FormLabel>Nội dung</FormLabel>
+            <TextField
+              fullWidth
+              error={
+                !!(
+                  reportFormik.touched.description &&
+                  reportFormik.errors.description
+                )
+              }
+              helperText={
+                reportFormik.touched.description &&
+                reportFormik.errors.description
+              }
+              multiline
+              rows={5}
+              variant="outlined"
+              name="description"
+              onBlur={reportFormik.handleBlur}
+              onChange={reportFormik.handleChange}
+              type="text"
+              value={reportFormik.values.description}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenReport(false);
+            }}>
+            Hủy bỏ
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              reportFormik.handleSubmit();
+            }}>
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import EyeIcon from '@heroicons/react/24/solid/EyeIcon';
+import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
   Add,
   Comment,
@@ -37,7 +38,6 @@ import { useRequestHeader } from '@/hooks/use-request-header';
 import StoryService from '@/services/story';
 import { countDiffenceFromNow, formatStatistic } from '@/utils/formatters';
 import { toastSuccess } from '@/utils/notification';
-import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 
 const MyStoryPage = () => {
   const router = useRouter();
@@ -49,7 +49,6 @@ const MyStoryPage = () => {
     isLoading,
     isSuccess,
     refetch,
-    isError,
   } = useQuery(
     ['myStories'],
     async () => await new StoryService(requestHeader).getMyStories(),
@@ -133,7 +132,14 @@ const MyStoryPage = () => {
       );
     return (
       <>
-        <Card sx={{ display: 'flex', width: '100%', height: '14em' }}>
+        <Card
+          elevation={2}
+          sx={{
+            display: 'flex',
+            width: '100%',
+            height: '14em',
+            cursor: 'pointer',
+          }}>
           <CardMedia
             onClick={() => {
               router.push(`my-works/${story.id}`);
@@ -151,11 +157,15 @@ const MyStoryPage = () => {
             sx={{
               boxSizing: 'border-box',
               display: 'flex',
+              flexGrow: 1,
               flexDirection: 'column',
-              alignItems: 'stretch',
               padding: '24px',
             }}>
-            <Stack direction="column" justifyContent="space-between" gap="4px">
+            <Stack
+              direction="column"
+              justifyContent="space-between"
+              gap="4px"
+              height="100%">
               <Stack>
                 <Stack
                   direction="row"
@@ -301,8 +311,7 @@ const MyStoryPage = () => {
                 sx={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'end',
-                  alignContent: 'end',
+                  alignItems: 'center',
                 }}>
                 <Typography
                   component="div"
@@ -404,22 +413,14 @@ const MyStoryPage = () => {
                 </Button>
               </Stack>
 
-              <Grid container>
+              <Grid container spacing={2}>
                 {myStories.length === 0 && isSuccess ? (
                   <Grid xs={6} spacing={0}>
                     <Typography>Không tìm thấy truyện nào</Typography>
                   </Grid>
                 ) : (
                   myStories?.map((story, index) => (
-                    <Grid
-                      item
-                      lg={6}
-                      xs={12}
-                      key={story.id}
-                      sx={{
-                        paddingRight: index % 2 === 0 ? '1em' : '0em',
-                        paddingLeft: index % 2 !== 0 ? '1em' : '0em',
-                      }}>
+                    <Grid item lg={6} xs={12} key={story.id}>
                       <StoryOverViewCard story={story}></StoryOverViewCard>
                     </Grid>
                   ))

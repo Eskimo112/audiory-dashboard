@@ -1,12 +1,11 @@
 import NextLink from 'next/link';
 
 import { Typography } from '@mui/material';
-import { useAuthContext } from '@/contexts/auth-context';
 
-export default function AppIcon({ size = 26, sx }) {
+export default function AppIcon({ size = 26, sx, href = '/' }) {
   return (
     <Typography
-      href="/"
+      href={href}
       component={NextLink}
       variant="h1"
       sx={{

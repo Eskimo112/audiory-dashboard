@@ -19,7 +19,7 @@ export const formatStatistic = (value) => {
 };
 
 export const countDiffenceFromNow = (dateString) => {
-  console.log(dateString)
+  console.log(dateString);
   const date = new Date(dateString).getTime();
   const now = new Date().getTime();
   const diffTime = Math.abs(now - date);
@@ -31,7 +31,7 @@ export const countDiffenceFromNow = (dateString) => {
   } else if (diffInHours < 1) {
     return diffInHours + ' phút trước';
   } else if (diffInHours <= 23) return diffInHours + ' giờ trước';
-  console.log(formatDate(dateString))
+  console.log(formatDate(dateString));
   return formatDateTime(dateString).split(',')[1];
 };
 
@@ -63,11 +63,6 @@ export function timeAgo(dateString) {
     return 'Vừa xong';
   }
 }
-
-// Example usage:
-const dateTimeString = '2023-11-29T12:00:00Z'; // Replace this with your date string
-const relativeTime = timeAgo(dateTimeString);
-console.log(relativeTime);
 
 export function formatDateTime(dateString) {
   const date = new Date(dateString);
