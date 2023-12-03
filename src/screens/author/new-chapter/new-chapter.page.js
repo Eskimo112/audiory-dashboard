@@ -46,6 +46,7 @@ import dayjs from 'dayjs';
 import ReportService from '../../../services/report';
 import { useAuthContext } from '../../../contexts/auth-context';
 import { useAuth } from '../../../hooks/use-auth';
+import StoryService from '../../../services/story';
 
 const toolbarOptions = [
   ['bold', 'italic', 'underline'], // toggled buttons
@@ -234,7 +235,25 @@ const NewChapterPage = () => {
     },
   });
 
-  const handleTurnOnMature = () => {
+  const handleTurnOnMature = async () => {
+    try {
+      const body = new FormData();
+      body.append('is_mature', true);
+
+      await new StoryService(requestHeader)
+        .edit({ body, storyId: chapterData?.story_id })
+        .then((res) => {
+          if (res.code === 200) {
+            toastSuccess('Đã bật nội dung trưởng thành cho truyện');
+            refetch();
+            refetch2();
+          } else {
+            toastError(res.statusText);
+          }
+        });
+    } catch (error) {
+      console.log('error', error);
+    }
     setOpenDialog(false);
   };
 

@@ -4,7 +4,6 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import EyeIcon from '@heroicons/react/24/solid/EyeIcon';
-import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
   Add,
   Comment,
@@ -36,7 +35,7 @@ import { useQuery } from 'react-query';
 import ConfirmDialog from '@/components/dialog/reuse-confirm-dialog';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import StoryService from '@/services/story';
-import { countDiffenceFromNow, formatStatistic } from '@/utils/formatters';
+import { formatStatistic, timeAgo } from '@/utils/formatters';
 import { toastSuccess } from '@/utils/notification';
 
 const MyStoryPage = () => {
@@ -62,13 +61,30 @@ const MyStoryPage = () => {
   }, [storiesData]);
 
   const handleDelete = async ({ id }, title) => {
+    console.log('handle delete');
     try {
       await new StoryService(requestHeader).delete(id).then((res) => {
         console.log(res);
         toastSuccess('Xóa thành công truyện');
         refetch();
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      toastSuccess('Xóa không thành công truyện');
+    }
+  };
+
+  const handleUnpublish = async (id) => {
+    try {
+      await new StoryService(requestHeader).unpublish(id).then((res) => {
+        console.log(res);
+        toastSuccess('Gỡ đăng thành công truyện');
+        refetch();
+      });
+    } catch (error) {
+      console.log(error);
+      toastSuccess('Gỡ đăng tải không thành công truyện');
+    }
   };
   const StoryOverViewCard = ({ story }) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -318,8 +334,7 @@ const MyStoryPage = () => {
                   variant="body2"
                   color="sky.base"
                   sx={{ fontStyle: 'italic' }}>
-                  Cập nhật vào{' '}
-                  {countDiffenceFromNow(story?.updated_date ?? '_')}
+                  Cập nhật vào {timeAgo(story?.updated_date ?? '_')}
                 </Typography>
                 <Button
                   sx={{

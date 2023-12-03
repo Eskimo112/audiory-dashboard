@@ -60,7 +60,6 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
     }
   }, [criteriaData]);
 
-  console.log(story);
   const formik = useFormik({
     initialValues: {
       title: story.title,
