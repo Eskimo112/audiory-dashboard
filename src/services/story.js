@@ -49,6 +49,18 @@ export default class StoryService {
     return response.data;
   }
 
+  async getMyStoryById(storyId) {
+    const url = `stories/${storyId}/draft`;
+
+    const response = await request({
+      url,
+      method: 'get',
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return null;
+    return response.data;
+  }
+
   async deactivateById(storyId) {
     const url = `stories/${storyId}/deactivate`;
 

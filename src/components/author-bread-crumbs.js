@@ -5,9 +5,6 @@ import { useRouter } from 'next/router';
 
 import { ExpandMore } from '@mui/icons-material';
 import { Box, Breadcrumbs, Chip, Divider, Grid, IconButton, Typography } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { emphasize } from '@mui/system';
-import { bool } from 'prop-types';
 import { useQuery } from 'react-query';
 
 import { useRequestHeader } from '@/hooks/use-request-header';
@@ -29,7 +26,7 @@ const AuthorBreadCrumbs = ({ storyTitle, storyGenerator, chapterTitle, handleOpe
     const storyId = router.asPath.slice(1).split('/')[1];
     const { data: storyData = {}, isLoading, isSuccess } = useQuery(
         ['story', storyId],
-        async () => await new StoryService(requestHeader).getById(storyId),
+        async () => await new StoryService(requestHeader).getMyStoryById(storyId),
         { refetchOnWindowFocus: false, enabled: Boolean(storyId) }
     );
     useEffect(() => {
