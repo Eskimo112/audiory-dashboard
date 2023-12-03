@@ -39,7 +39,12 @@ export const TopStoriesChart = (props) => {
         dates[1],
         metricOption,
       ),
-    { enabled: Boolean(dates[0]) && Boolean(dates[1]) },
+    {
+      enabled: Boolean(dates[0]) && Boolean(dates[1]),
+      retryOnMount: false,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    },
   );
 
   const chartOptions = useMemo(() => {

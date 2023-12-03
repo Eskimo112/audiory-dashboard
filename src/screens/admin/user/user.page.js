@@ -282,7 +282,10 @@ const UserPage = () => {
                   }}>
                   <Dialog
                     open={openDialog}
-                    onClose={() => setOpenDialog(false)}
+                    onClose={(e) => {
+                      e.stopPropagation();
+                      setOpenDialog(false);
+                    }}
                     PaperProps={{
                       sx: {
                         p: 1,
@@ -299,7 +302,10 @@ const UserPage = () => {
                     <DialogActions>
                       <Button
                         variant="outlined"
-                        onClick={() => setOpenDialog(false)}>
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenDialog(false);
+                        }}>
                         Hủy bỏ
                       </Button>
                       <Button

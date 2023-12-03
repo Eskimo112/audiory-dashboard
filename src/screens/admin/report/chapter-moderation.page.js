@@ -25,6 +25,13 @@ import { useRequestHeader } from '../../../hooks/use-request-header';
 import ChapterVersionService from '../../../services/chapter-version';
 import LoadingPage from '../../loading';
 
+const MODERATION_MAP = {
+  Profanity: 'Thô tục',
+  Sexual: 'Tình dục',
+  Politics: 'Chính trị',
+  Violent: 'Bạo lực',
+};
+
 const ChapterModerationPage = ({ chapterVersionId }) => {
   const requestHeader = useRequestHeader();
   const router = useRouter();
@@ -194,7 +201,7 @@ const ChapterModerationPage = ({ chapterVersionId }) => {
                       justifyContent="space-between"
                       direction="row">
                       <Typography variant="body2">
-                        {item.criteria_id}
+                        {MODERATION_MAP[item.criteria_id]}
                       </Typography>
                       <Typography
                         variant="body2"

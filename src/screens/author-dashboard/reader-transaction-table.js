@@ -31,6 +31,7 @@ const ReaderTransactionsTable = () => {
         1,
         Number.MAX_SAFE_INTEGER,
       ),
+    { retryOnMount: false, refetchOnMount: false, refetchOnWindowFocus: false },
   );
 
   const columns = useMemo(
