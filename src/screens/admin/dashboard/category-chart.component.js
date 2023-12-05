@@ -26,20 +26,10 @@ import { useRequestHeader } from '../../../hooks/use-request-header';
 import { getBarChartCommonOptions } from './chart.util';
 import { SHARED_SELECT_PROPS, TIME_OPTIONS } from './constant';
 
-// const data = [
-//   {
-//     metric: 'revenue',
-//     values: {
-//       'Bí ẩn': 2500,
-//       'Hài huớc': 46000,
-//       'Hành động': 1000,
-//       'Khoa học viễn tưởng': 9000,
-//       'Ma cà rồng': 2500,
-//       'Tiểu thuyết thiếu niên': 7500,
-//       'Viễn tưởng': 1500,
-//     },
-//   },
-// ];
+const REVENUE_MAP = {
+  revenue: 'Doanh thu',
+  profit: 'Lợi nhuận',
+};
 
 export const CategoryChart = (props) => {
   const { sx } = props;
@@ -71,7 +61,7 @@ export const CategoryChart = (props) => {
       (a, b) => analytics[0].values[b] - analytics[0].values[a],
     );
     const formattedSeries = analytics.map((series) => ({
-      name: series.metric,
+      name: REVENUE_MAP[series.metric],
       data: Object.values(series.values).sort((a, b) => b - a),
     }));
     const result = getBarChartCommonOptions(theme, categories, formattedSeries);

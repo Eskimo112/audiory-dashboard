@@ -1,5 +1,5 @@
 // eslint-disable-next-line simple-import-sort/imports
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import 'react-quill/dist/quill.snow.css';
 
@@ -234,6 +234,18 @@ const NewChapterPage = () => {
     },
   });
 
+  const isChanged = useMemo(() => {
+    if (!formik.values) return false;
+    if (!chapterData.current_chapter_version) return false;
+    if (
+      formik.values.rich_text !== chapterData.current_chapter_version.rich_text
+    )
+      return true;
+    if (formik.values.title !== chapterData.current_chapter_version.title)
+      return true;
+    return false;
+  }, [chapterData, formik]);
+
   const handleTurnOnMature = async () => {
     try {
       const body = new FormData();
@@ -280,6 +292,41 @@ const NewChapterPage = () => {
         toastError('Nội dung chương vượt quá 2MB');
       } else {
         setIsSubmitting(true);
+
+        if (!isChanged) {
+          if (isPreview) {
+            router.push(
+              `/my-works/${router.query?.id}/preview/${chapterData?.current_chapter_version.id}`,
+            );
+          }
+          if (isPublish) {
+            await new ChapterService(requestHeader)
+              .publish(chapterId)
+              .then((res) => {
+                if (res.code === 200) {
+                  router.push(`/my-works/${router.query?.id}`);
+                  toastSuccess('Đăng tải thành công');
+                } else {
+                  toastError(res.message);
+                }
+              })
+              .catch((e) => {
+                if (
+                  e.response.data.message ===
+                  'Hãy gắn nhãn trưởng thành để đi tiếp'
+                ) {
+                  setBlockedVersionId(
+                    e.response.data.data.current_chapter_version.id,
+                  );
+                  setOpenDialog(true);
+                } else {
+                  toastError('Không thể đăng tải chương');
+                }
+              });
+          }
+          return;
+        }
+
         // create chapter version
         const values = formik.values;
         const formData = new FormData();
@@ -293,11 +340,11 @@ const NewChapterPage = () => {
                   router.push(
                     `/my-works/${router.query?.id}/preview/${res.data?.id}`,
                   );
-                } else if (isPublish) {
+                }
+                if (isPublish) {
                   new ChapterService(requestHeader)
                     .publish(chapterId)
                     .then((res) => {
-                      console.log('res', res);
                       if (res.code === 200) {
                         router.push(`/my-works/${router.query?.id}`);
                         toastSuccess('Đăng tải thành công');

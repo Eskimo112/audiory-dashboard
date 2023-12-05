@@ -151,21 +151,21 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
 
     // body.append('form_file', values.formFile);
 
-    try {
-      await new StoryService(requestHeader)
-        .edit({ body, storyId: story.id })
-        .then((res) => {
-          console.log(res);
-          if (res.code === 200) {
-            toastSuccess('Sửa thành công truyện ');
-            handleRefetch();
-          } else {
-            toastError(res.statusText);
-          }
-        });
-    } catch (error) {
-      console.log('error', error);
-    }
+    await new StoryService(requestHeader)
+      .edit({ body, storyId: story.id })
+      .then((res) => {
+        console.log(res);
+        if (res.code === 200) {
+          toastSuccess('Sửa thành công truyện ');
+          handleRefetch();
+        } else {
+          toastError(res.statusText);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        toastError(err.response.data.message);
+      });
   };
 
   const handleAddTag = (event) => {

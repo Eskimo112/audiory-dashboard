@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 
 import {
+  Box,
   Card,
   CardContent,
   CardHeader,
@@ -18,7 +19,7 @@ import {
 import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import AuthorDashboardService from '@/services/author-dashboard';
-import { formatDateTime } from '@/utils/formatters';
+import { formatDateTime, timeAgo } from '@/utils/formatters';
 
 import UserInfo from '../admin/report/user-info.component';
 
@@ -78,32 +79,28 @@ const ReaderTransactionsTable = () => {
           );
         },
       },
-      // {
-      //   accessorKey: 'coin.image_url',
-      //   header: 'Loại xu',
-      //   size: 80,
-      //   Cell: ({ cell }) => {
-      //     return (
-      //       <Box display="flex" alignItems="center">
-      //         <Box
-      //           component="img"
-      //           src={cell.getValue()}
-      //           alt={cell.getValue()}
-      //           width={30}
-      //           height={30}></Box>
-      //       </Box>
-      //     );
-      //   },
-      // },
+
       {
-        accessorKey: 'coin.value',
-        header: 'Số lượng',
+        accessorKey: 'coin_value',
+        header: 'Giá trị',
         size: 80,
+        Cell: ({ cell, row }) => {
+          return (
+            <Box display="flex" alignItems="center" gap="4px">
+              {cell.getValue()}
+              <Box
+                component="img"
+                src={row.original.coin.image_url}
+                width={20}
+                height={20}></Box>
+            </Box>
+          );
+        },
       },
       {
         accessorKey: 'created_date',
-        header: 'Ngày tạo',
-        accessorFn: (row) => formatDateTime(row.created_date),
+        header: 'Thời gian',
+        accessorFn: (row) => timeAgo(row.created_date),
       },
       {
         accessorKey: 'transaction_status',
@@ -151,7 +148,7 @@ const ReaderTransactionsTable = () => {
 
   return (
     <Card sx={{ p: 2 }}>
-      <CardHeader title="Giao dịch gần đây" />
+      <CardHeader title="Giao dịch độc giả" />
       <CardContent sx={{ paddingTop: 0, paddingBottom: 0 }}>
         {isLoading ? (
           <CircularProgress />
