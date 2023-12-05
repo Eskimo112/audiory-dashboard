@@ -47,6 +47,7 @@ import ReportService from '../../../services/report';
 import { useAuthContext } from '../../../contexts/auth-context';
 import { useAuth } from '../../../hooks/use-auth';
 import StoryService from '../../../services/story';
+import ModerationModal from './moderation-modal';
 
 const toolbarOptions = [
   ['bold', 'italic', 'underline'], // toggled buttons
@@ -98,10 +99,12 @@ const NewChapterPage = () => {
   const [imageArr, setImageArr] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [moderationModal, setModerationModal] = React.useState(false);
   const [openDialog, setOpenDialog] = React.useState(false);
   const [openReport, setOpenReport] = React.useState(false);
   const [reportFormFile, setReportFormFile] = useState();
 
+  const [blockedVersionId, setBlockedVersionId] = React.useState(null);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const handleClick = (event, storyData) => {
     setStoryData(storyData);
@@ -315,11 +318,13 @@ const NewChapterPage = () => {
                       }
                     })
                     .catch((e) => {
-                      console.log(e);
                       if (
                         e.response.data.message ===
                         'Hãy gắn nhãn trưởng thành để đi tiếp'
                       ) {
+                        setBlockedVersionId(
+                          e.response.data.data.current_chapter_version.id,
+                        );
                         setOpenDialog(true);
                       } else {
                         toastError('Không thể đăng tải chương');
@@ -357,7 +362,6 @@ const NewChapterPage = () => {
         <CircularProgress />
       </Card>
     );
-
   return (
     <>
       <Stack direction="column" justifyContent="center" alignItems="center">
@@ -632,12 +636,21 @@ const NewChapterPage = () => {
         <DialogActions>
           <Button
             variant="outlined"
+            color="error"
             onClick={(e) => {
               e.stopPropagation();
               setOpenDialog(false);
               setOpenReport(true);
             }}>
             Kháng cáo
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={(e) => {
+              e.stopPropagation();
+              setModerationModal(true);
+            }}>
+            Xem chi tiết
           </Button>
           <Button
             variant="contained"
@@ -648,6 +661,13 @@ const NewChapterPage = () => {
         </DialogActions>
       </Dialog>
 
+      {moderationModal && blockedVersionId && (
+        <ModerationModal
+          chapterVersionId={blockedVersionId}
+          handleClose={() => setModerationModal(false)}
+        />
+      )}
+      {/* REPORT DIALOG */}
       <Dialog
         open={openReport}
         onClose={(e) => {
@@ -665,7 +685,10 @@ const NewChapterPage = () => {
           sx={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
           <Stack gap={1} alignItems="center">
             <Box height={250} width="70%" p="8px">
-              <AppImageUpload onChange={(file) => setReportFormFile(file)} />
+              <AppImageUpload
+                id={'report-file'}
+                onChange={(file) => setReportFormFile(file)}
+              />
             </Box>
           </Stack>
 

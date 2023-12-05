@@ -25,15 +25,15 @@ import { useRequestHeader } from '@/hooks/use-request-header';
 import ReportService from '@/services/report';
 import { formatDateTime } from '@/utils/formatters';
 
-import UserInfo from './user-info.component';
 import CommentDetailDialog from '../story/comment-detail-dialog';
+import UserInfo from './user-info.component';
 
 export const REPORT_TYPE_MAP = {
   USER: 'Người dùng',
   STORY: 'Truyện',
   COMMENT: 'Bình luận',
-  REVENUE_COMPLAINT: 'Khiếu nại doanh thu',
-  CONTENT_VIOLATION_COMPLAINT: 'Nội dung vi phạm',
+  REVENUE_COMPLAINT: 'Doanh thu',
+  CONTENT_VIOLATION_COMPLAINT: 'Vi phạm nội dung',
 };
 export const REPORT_STATUS_MAP = {
   APPROVED: 'Chấp nhận',

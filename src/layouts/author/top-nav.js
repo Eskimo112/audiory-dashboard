@@ -2,9 +2,14 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { BarChart, Edit, NotificationsNone } from '@mui/icons-material';
+import {
+  BarChart,
+  Edit,
+  FlagOutlined,
+  NotificationsNone,
+} from '@mui/icons-material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { Avatar, Box, Button, Grid, IconButton } from '@mui/material';
+import { Avatar, Box, Button, Grid, IconButton, Tooltip } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { usePopover } from 'src/hooks/use-popover';
@@ -93,9 +98,17 @@ export const TopNav = (props) => {
             justifyContent="end"
             columnGap={1}>
             <Grid item xs="auto">
-              <IconButton aria-label="delete" size="medium" color="inherit">
-                <NotificationsNone color="primary" />
-              </IconButton>
+              <Tooltip title="Danh sách báo cáo">
+                <IconButton
+                  aria-label="delete"
+                  size="medium"
+                  color="inherit"
+                  onClick={() => {
+                    router.push('/report-list');
+                  }}>
+                  <FlagOutlined color="primary" />
+                </IconButton>
+              </Tooltip>
             </Grid>
 
             <Grid item xs="auto">

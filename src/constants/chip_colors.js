@@ -8,5 +8,5 @@ export const CHIP_FONT_COLORS = [
   'ink.main',
   'ink.main',
   'ink.main',
-  'ink.mai n',
+  'ink.main',
 ];
