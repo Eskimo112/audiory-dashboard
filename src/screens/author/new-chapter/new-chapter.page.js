@@ -12,9 +12,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
   FormLabel,
-  IconButton,
   MenuItem,
   Popover,
   Skeleton,
@@ -44,7 +42,6 @@ import {
 } from '@/utils/filesize-counter';
 import dayjs from 'dayjs';
 import ReportService from '../../../services/report';
-import { useAuthContext } from '../../../contexts/auth-context';
 import { useAuth } from '../../../hooks/use-auth';
 import StoryService from '../../../services/story';
 import ModerationModal from './moderation-modal';
@@ -73,7 +70,6 @@ const NewChapterPage = () => {
   const {
     data: chapterData = {},
     isLoading,
-    isSuccess,
     refetch,
     isRefetching,
   } = useQuery(
@@ -152,12 +148,12 @@ const NewChapterPage = () => {
         .required('Bắt buộc nhập tiêu đề'),
     }),
     onSubmit: async (values, helpers) => {
-      try {
-      } catch (error) {
-        helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: error.message });
-        helpers.setSubmitting(false);
-      }
+      // try {
+      // } catch (error) {
+      //   helpers.setStatus({ success: false });
+      //   helpers.setErrors({ submit: error.message });
+      //   helpers.setSubmitting(false);
+      // }
     },
   });
 
@@ -279,7 +275,6 @@ const NewChapterPage = () => {
         }
       });
       setContentSize(byteSizeFromString(value) + imagesInBytes);
-      console.log(contentSize);
 
       if (contentSize > MAX_CONTENT_SIZE) {
         toastError('Nội dung chương vượt quá 2MB');
@@ -294,18 +289,11 @@ const NewChapterPage = () => {
             .create({ body: formData })
             .then((res) => {
               if (res.code === 200) {
-                console.log('res for create ', res);
                 if (isPreview) {
-                  refetch2().then((response) => {
-                    console.log('preview');
-                    console.log(res.data);
-                    router.replace(
-                      `/my-works/${router.query?.id}/preview/${res.data?.id}`,
-                    );
-                  });
+                  router.push(
+                    `/my-works/${router.query?.id}/preview/${res.data?.id}`,
+                  );
                 } else if (isPublish) {
-                  console.log('pub');
-
                   new ChapterService(requestHeader)
                     .publish(chapterId)
                     .then((res) => {
@@ -542,6 +530,17 @@ const NewChapterPage = () => {
                 disabled={
                   (!chapterData.is_draft && !formik.isValid) || isSubmitting
                 }
+                variant="outlined"
+                color="primary"
+                onClick={() => {
+                  onSaveDraftChapter(true, false);
+                }}>
+                Xem trước
+              </Button>
+              <Button
+                disabled={
+                  (!chapterData.is_draft && !formik.isValid) || isSubmitting
+                }
                 variant="contained"
                 color="primary"
                 onClick={() => {
@@ -549,15 +548,6 @@ const NewChapterPage = () => {
                 }}>
                 {'Đăng tải'}
               </Button>
-              {/* <Button
-                disabled={!formik.isValid}
-                variant="outlined"
-                color="inherit"
-                onClick={() => {
-                  onSaveDraftChapter(true, false);
-                }}>
-                Xem trước
-              </Button> */}
             </Stack>
           </Grid>
 
