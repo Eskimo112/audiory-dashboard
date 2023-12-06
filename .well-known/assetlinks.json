@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.example.flutter_justaudio",
+      "sha256_cert_fingerprints": [
+        "11:73:2E:48:59:FB:87:8A:DD:8A:58:19:85:7C:9B:B4:94:53:1E:F2:77:A1:90:CE:9A:70:F8:BA:B1:5B:DA:D5"
+      ]
+    }
+  }
+]
