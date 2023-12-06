@@ -18,6 +18,7 @@ const ERROR_OPTION = {
 const SUCCESS_OPTION = {
   variant: 'custom',
   autoHideDuration: AUTO_HIDE_DURATION_MS,
+
   icon: (
     <CheckCircle
       name="toast-success"

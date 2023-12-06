@@ -28,6 +28,7 @@ const ReaderRankingTable = () => {
     ['author', 'ranking-reader'],
     async () =>
       await new AuthorDashboardService(requestHeader).getReaderRanking(),
+    { retryOnMount: false, refetchOnMount: false, refetchOnWindowFocus: false },
   );
 
   const columns = useMemo(

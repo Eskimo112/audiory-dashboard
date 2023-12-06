@@ -8,7 +8,6 @@ export default class StoryService {
     this.requestHeader = requestHeader ?? undefined;
   }
 
-
   async getAll() {
     const url = 'stories';
 
@@ -85,14 +84,18 @@ export default class StoryService {
     return response.data;
   }
 
-  async getMyStories() {
+  async getMyStories(offset = 0, limit = 10) {
     const url = 'users/me/stories';
     const response = await request({
       url,
       method: 'get',
+      params: {
+        offset,
+        limit,
+      },
       requestHeaders: this.requestHeader,
     });
-    console.log(response)
+    console.log(response);
     if (!response.data) return [];
     return response.data;
   }
@@ -150,7 +153,12 @@ export default class StoryService {
 
   async paywall({ storyId, price }) {
     const url = `stories/${storyId}/paywalled/apply`;
-    const response = await request({ url, method: 'post', payload: { 'chapter_price': price }, requestHeaders: this.requestHeader });
+    const response = await request({
+      url,
+      method: 'post',
+      payload: { chapter_price: price },
+      requestHeaders: this.requestHeader,
+    });
 
     if (!response.code) return response.data;
     return response.data;

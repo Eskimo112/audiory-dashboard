@@ -31,7 +31,7 @@ import { toastError, toastSuccess } from '../../../utils/notification';
 const MyProfilePage = () => {
   const requestHeader = useRequestHeader();
   const { data: user = {}, isLoading } = useQuery(
-    ['users', 'my-profile'],
+    ['users', 'my-profile', requestHeader.Authorization],
     async () => await new UserService(requestHeader).getById('me'),
   );
   const [selectedFile, setSelectedFile] = useState();
@@ -265,7 +265,10 @@ const MyProfilePage = () => {
                         Người theo dõi: <b>{user?.number_of_followers ?? 0} </b>
                       </Typography>
                       <Typography variant="subtitle1" fontWeight={400}>
-                        Tác giả: <b> cấp {user?.author_level_id ?? 0} </b>
+                        Tác giả: <b> {user?.author_level.name ?? 0} </b>
+                      </Typography>
+                      <Typography variant="subtitle1" fontWeight={400}>
+                        Thành viên: <b> {user?.level.name ?? 0} </b>
                       </Typography>
                     </Stack>
 
@@ -299,26 +302,6 @@ const MyProfilePage = () => {
               </Grid>
             </Grid>
           </Stack>
-          {/* <Grid container spacing={2}>
-            <Grid xs={12} lg={6}>
-              <Card sx={{ padding: 2 }}>
-                <CardHeader
-                  sx={{ padding: 0, pb: '16px' }}
-                  title={`Truyện của ${user.username}`}
-                />
-                <UserStoriesTable userId={userId} />
-              </Card>
-            </Grid>
-            <Grid xs={12} lg={6}>
-              <Card sx={{ padding: 2 }}>
-                <CardHeader
-                  sx={{ padding: 0, pb: '16px' }}
-                  title={`Giao dịch của ${user.username}`}
-                />
-                <UserTransactionsTable userId={userId} />
-              </Card>
-            </Grid>
-          </Grid> */}
         </Container>
       </Box>
     </>

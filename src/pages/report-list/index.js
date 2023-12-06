@@ -1,8 +1,8 @@
 import { Layout as AuthorLayout } from 'src/layouts/author/layout';
 
-import PreviewChapterPage from '../../../../screens/author/preview-chapter/preview-chapter.page';
+import ReportListPage from '@/screens/author/report-list/report-list.page';
 
-const Page = () => <PreviewChapterPage />;
+const Page = () => <ReportListPage />;
 
 Page.getLayout = (page) => <AuthorLayout>{page}</AuthorLayout>;
 

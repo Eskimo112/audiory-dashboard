@@ -24,6 +24,11 @@ import { getRecentDates } from '@/utils/get-recent-dates';
 import { SHARED_SELECT_PROPS, TIME_OPTIONS } from '../admin/dashboard/constant';
 import { getAuthorChartCommonOptions } from './chart.utils';
 
+const REVENUE_MAP = {
+  revenue: 'Doanh thu',
+  profit: 'Lợi nhuận',
+};
+
 export const AuthorRevenueChart = (props) => {
   const theme = useTheme();
   const requestHeader = useRequestHeader();
@@ -33,7 +38,12 @@ export const AuthorRevenueChart = (props) => {
     ['author', 'dashboard', 'revenue', dates[0], dates[1]],
     () =>
       new AuthorDashboardService(requestHeader).getRevenue(dates[0], dates[1]),
-    { enabled: Boolean(dates[0]) && Boolean(dates[1]) },
+    {
+      enabled: Boolean(dates[0]) && Boolean(dates[1]),
+      retryOnMount: false,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    },
   );
 
   const chartOptions = useMemo(() => {
@@ -42,7 +52,7 @@ export const AuthorRevenueChart = (props) => {
     if (!analytics) return null;
     const categories = Object.keys(analytics[0].values).reverse();
     const formattedSeries = analytics.map((series) => ({
-      name: series.metric,
+      name: REVENUE_MAP[series.metric],
       data: Object.values(series.values).reverse(),
     }));
     const result = getAuthorChartCommonOptions(

@@ -65,6 +65,22 @@ export default class UserService {
     return response.data;
   }
 
+  async getReportsByUserId(userId, page) {
+    const url = `users/${userId}/reports`;
+
+    const response = await request({
+      url,
+      method: 'get',
+      params: {
+        page,
+        page_size: 10,
+      },
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return [];
+    return response.data;
+  }
+
   async getTransactionsByUserId(userId) {
     const url = `users/${userId}/transactions`;
 

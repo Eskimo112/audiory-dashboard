@@ -48,6 +48,7 @@ const AuthorStatCards = () => {
       console.log(pastResponse);
       return { current: response, past: pastResponse };
     },
+    { retryOnMount: false, refetchOnMount: false, refetchOnWindowFocus: false },
   );
 
   if (isError) {

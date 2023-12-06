@@ -13,9 +13,10 @@ import {
 } from '@mui/material';
 
 export const AppImageUpload = (props) => {
-  const { defaultUrl, onChange, disabled } = props;
+  const { defaultUrl, onChange, disabled, id = 'file-upload' } = props;
   const [selectedFile, setSelectedFile] = useState();
   const [preview, setPreview] = useState(defaultUrl);
+
   // create a preview as a side effect, whenever selected file is changed
   useEffect(() => {
     if (!selectedFile) {
@@ -52,7 +53,7 @@ export const AppImageUpload = (props) => {
         bgcolor: 'sky.lightest',
       }}>
       <FormLabel
-        for="file-upload"
+        for={id}
         sx={{
           position: 'absolute',
           zIndex: 100,
@@ -75,7 +76,7 @@ export const AppImageUpload = (props) => {
         )}
       </FormLabel>
       <Input
-        id="file-upload"
+        id={id}
         type="file"
         disabled={disabled}
         sx={{ display: 'none' }}

@@ -21,7 +21,7 @@ const AuthorDashboardPage = () => {
   return (
     <>
       <Head>
-        <title>Author | Audiory</title>
+        <title>Tác giả | Audiory</title>
       </Head>
       <Box component="main" sx={SHARED_PAGE_SX}>
         <Container
@@ -36,11 +36,11 @@ const AuthorDashboardPage = () => {
             <AppBreadCrumbs />
           </Stack>
           <Grid container spacing={3}>
-            <Grid xs={12} sm={12} lg={6}>
+            <Grid xs={12} lg={6}>
               <AuthorRevenueChart />
             </Grid>
 
-            <Grid xs={12} sm={12} lg={6} container spacing={3}>
+            <Grid xs={12} lg={6} container spacing={3}>
               <AuthorStatCards />
             </Grid>
           </Grid>

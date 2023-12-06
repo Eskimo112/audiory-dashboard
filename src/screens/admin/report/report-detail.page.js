@@ -33,7 +33,6 @@ import { useQuery } from 'react-query';
 import * as Yup from 'yup';
 
 import AppBreadCrumbs from '@/components/app-bread-crumbs';
-import AppImage from '@/components/app-image';
 import { AppImageUpload } from '@/components/app-image-upload';
 import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '@/constants/chip_colors';
 import { SHARED_PAGE_SX } from '@/constants/page_sx';
@@ -43,6 +42,7 @@ import ReportService from '@/services/report';
 import { formatDateTime } from '@/utils/formatters';
 import { toastError, toastSuccess } from '@/utils/notification';
 
+import ChapterVersionService from '../../../services/chapter-version';
 import CommentService from '../../../services/comment';
 import CommentDetailDialog from '../story/comment-detail-dialog';
 import ChapterInfo from './chapter-info.component';
@@ -100,14 +100,10 @@ const ReportDetailPage = ({ reportId }) => {
                 response_message: values.content,
                 form_file: imageFile,
               });
-              // await .updateReport({
-              //   reportId,
-              //   approved_date: new Date().toISOString(),
-              //   aprroved_by: user.id,
-              //   report_status: 'APPROVED',
-              //   response_message: values.content,
-              //   form_file: imageFile,
-              // });
+              await new ChapterVersionService(requestHeaders).updateModeration(
+                report.reported_id,
+                { is_mature: false },
+              );
               setConfirmDialog(false);
               refetch();
               toastSuccess('Xử lý báo cáo thành công');
@@ -555,7 +551,7 @@ const ReportDetailPage = ({ reportId }) => {
               <DialogContent>
                 <DialogContentText>
                   {report.report_type === 'CONTENT_VIOLATION_COMPLAINT'
-                    ? 'Khi bạn chấp nhận báo cáo này, chương của người dùng sẽ được xuất bản'
+                    ? 'Khi bạn chấp nhận báo cáo này, bạn sẽ gỡ chặn đăng tải cho người dùng'
                     : 'Khi bạn chấp nhận báo cáo này, bình luận của người dùng sẽ bị xóa'}
                 </DialogContentText>
               </DialogContent>

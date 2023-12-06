@@ -39,6 +39,18 @@ export default class ChapterVersionService {
     return response.data;
   }
 
+  async updateModeration(chapterVersionId, body) {
+    const url = `chapter-version/${chapterVersionId}/content-moderations`;
+    const response = await request({
+      url,
+      method: 'put',
+      payload: body,
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return null;
+    return response.data;
+  }
+
   async create({ body }) {
     const url = `chapter-version`;
     const response = await request({
