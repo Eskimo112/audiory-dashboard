@@ -19,7 +19,7 @@ import {
 import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import AuthorDashboardService from '@/services/author-dashboard';
-import { formatDateTime, timeAgo } from '@/utils/formatters';
+import { timeAgo } from '@/utils/formatters';
 
 import UserInfo from '../admin/report/user-info.component';
 

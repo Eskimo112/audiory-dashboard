@@ -43,17 +43,17 @@ export const createTypography = () => {
     },
     h1: {
       fontFamily: "'Source Sans 3', sans-serif",
-      fontWeight: 700,
+      fontWeight: 600,
       fontSize: '3.5rem',
     },
     h2: {
       fontFamily: "'Source Sans 3', sans-serif",
-      fontWeight: 700,
+      fontWeight: 600,
       fontSize: '3rem',
     },
     h3: {
       fontFamily: "'Source Sans 3', sans-serif",
-      fontWeight: 700,
+      fontWeight: 600,
       fontSize: '2.25rem',
     },
     h4: {
@@ -63,12 +63,12 @@ export const createTypography = () => {
     },
     h5: {
       fontFamily: "'Source Sans 3', sans-serif",
-      fontWeight: 700,
+      fontWeight: 600,
       fontSize: '1.5rem',
     },
     h6: {
       fontFamily: "'Source Sans 3', sans-serif",
-      fontWeight: 700,
+      fontWeight: 600,
       fontSize: '1.125rem',
     },
   };

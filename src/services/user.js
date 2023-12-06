@@ -60,6 +60,22 @@ export default class UserService {
       url,
       method: 'get',
       requestHeaders: this.requestHeader,
+      params: {
+        offset: 0,
+        limit: 1000,
+      },
+    });
+    if (!response.data) return [];
+    return response.data;
+  }
+
+  async getReadingListByUserId(userId) {
+    const url = `users/${userId}/reading-lists`;
+
+    const response = await request({
+      url,
+      method: 'get',
+      requestHeaders: this.requestHeader,
     });
     if (!response.data) return [];
     return response.data;
