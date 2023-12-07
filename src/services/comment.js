@@ -38,4 +38,17 @@ export default class CommentService {
     if (!response.data) return [];
     return response.data;
   }
+
+  async create(body) {
+    const url = `comments/`;
+
+    const response = await request({
+      url,
+      method: 'post',
+      payload: body,
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return [];
+    return response.data;
+  }
 }

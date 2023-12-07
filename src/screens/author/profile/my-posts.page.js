@@ -26,6 +26,8 @@ import { useRequestHeader } from '../../../hooks/use-request-header';
 import UserService from '../../../services/user';
 import { timeAgo } from '../../../utils/formatters';
 import LoadingPage from '../../loading';
+import CommentService from '../../../services/comment';
+import { toastError, toastSuccess } from '../../../utils/notification';
 
 const MyPostsPage = () => {
   const router = useRouter();
@@ -63,9 +65,19 @@ const MyPostsPage = () => {
   const [value, setValue] = useState('');
   const [isSubmitting, setIsSubmiting] = useState(false);
 
-  const handleSubmitPost = () => {
-    refetch();
-    setValue('');
+  const handleSubmitPost = async () => {
+    setIsSubmiting(true);
+    await new CommentService(requestHeader)
+      .create({ text: value })
+      .then(() => {
+        toastSuccess('Tạo bài đăng thành công');
+        refetch();
+        setValue('');
+      })
+      .catch(() => {
+        toastError('Đã có lỗi xảy ra. Vui lòng thử lại sau');
+      })
+      .finally(() => setIsSubmiting(false));
   };
 
   if (postsLoading) return <LoadingPage />;
