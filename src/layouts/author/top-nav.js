@@ -27,7 +27,6 @@ export const TopNav = (props) => {
   const router = useRouter();
   const accountPopover = usePopover();
   const auth = useAuth();
-  console.log(auth);
   const [user, setUser] = useState(auth?.user);
   return (
     <>
