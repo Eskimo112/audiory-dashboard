@@ -60,6 +60,22 @@ export default class UserService {
       url,
       method: 'get',
       requestHeaders: this.requestHeader,
+      params: {
+        offset: 0,
+        limit: 1000,
+      },
+    });
+    if (!response.data) return [];
+    return response.data;
+  }
+
+  async getReadingListByUserId(userId) {
+    const url = `users/${userId}/reading-lists`;
+
+    const response = await request({
+      url,
+      method: 'get',
+      requestHeaders: this.requestHeader,
     });
     if (!response.data) return [];
     return response.data;
@@ -74,6 +90,22 @@ export default class UserService {
       params: {
         page,
         page_size: 10,
+      },
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return [];
+    return response.data;
+  }
+
+  async getWallById(userId) {
+    const url = `users/${userId}/wall`;
+
+    const response = await request({
+      url,
+      method: 'get',
+      params: {
+        offset: 0,
+        limit: 100,
       },
       requestHeaders: this.requestHeader,
     });

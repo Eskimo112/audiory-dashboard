@@ -7,6 +7,7 @@ import {
   Edit,
   FlagOutlined,
   NotificationsNone,
+  Person,
 } from '@mui/icons-material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Avatar, Box, Button, Grid, IconButton, Tooltip } from '@mui/material';
@@ -36,7 +37,7 @@ export const TopNav = (props) => {
         sx={{
           px: 2,
           // backdropFilter: 'blur(6px)',
-          backgroundColor: (theme) => alpha(theme.palette.sky.lightest, 0.5),
+          backgroundColor: (theme) => alpha('#FFF', 0.5),
           position: 'sticky',
           top: 0,
           borderBottom: 0.5,
@@ -87,6 +88,17 @@ export const TopNav = (props) => {
                 router.push('/my-works');
               }}>
               Sáng tác
+            </Button>
+            <Button
+              startIcon={<Person />}
+              variant={
+                router.pathname.startsWith('/profile') ? 'contained' : 'text'
+              }
+              color="primary"
+              onClick={() => {
+                router.push('/profile/me');
+              }}>
+              Hồ sơ
             </Button>
           </Grid>
           <Grid

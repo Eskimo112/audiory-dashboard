@@ -46,6 +46,22 @@ export const AccountPopover = (props) => {
           {auth?.user?.username ?? ''}
         </Typography>
       </Box>
+      <MenuList
+        disablePadding
+        dense
+        sx={{
+          p: '8px',
+          '& > *': {
+            borderRadius: 1,
+          },
+        }}>
+        <MenuItem
+          onClick={() => {
+            router.push('/profile/me');
+          }}>
+          Hồ sơ của tôi
+        </MenuItem>
+      </MenuList>
       <Divider />
       <MenuList
         disablePadding

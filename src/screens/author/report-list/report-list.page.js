@@ -156,7 +156,7 @@ const ReportListPage = () => {
                               }
                               fontWeight={600}
                               fontStyle="italic">
-                              {status}
+                              {REPORT_STATUS_MAP[status]}
                             </Typography>
                           </Stack>
                         </Stack>
