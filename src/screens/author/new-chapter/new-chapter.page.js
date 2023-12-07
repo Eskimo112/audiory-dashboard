@@ -136,7 +136,6 @@ const NewChapterPage = () => {
       title: chapterData?.current_chapter_version?.title ?? '',
       version_name: '',
       form_file: '',
-
       isSubmit: null,
     },
     enableReinitialize: true,
@@ -291,6 +290,7 @@ const NewChapterPage = () => {
       const values = formik.values;
       const formData = new FormData();
       Object.keys(values).forEach((key) => formData.append(key, values[key]));
+      formData.append('banner_url', chapterData.banner_url);
       if (contentSize > MAX_CONTENT_SIZE) {
         toastError('Nội dung chương vượt quá 2MB');
       } else {
@@ -337,8 +337,6 @@ const NewChapterPage = () => {
           setIsSubmitting(false);
           return;
         }
-
-        // create chapter version
 
         try {
           await new ChapterVersionService(requestHeader)
@@ -583,9 +581,7 @@ const NewChapterPage = () => {
                 Lưu bản thảo
               </Button>
               <Button
-                disabled={
-                  (!chapterData.is_draft && !formik.isValid) || isSubmitting
-                }
+                disabled={!formik.isValid || isSubmitting}
                 variant="outlined"
                 color="primary"
                 onClick={() => {
