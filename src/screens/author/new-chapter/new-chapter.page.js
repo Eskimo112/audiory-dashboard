@@ -290,6 +290,7 @@ const NewChapterPage = () => {
 
       const values = formik.values;
       const formData = new FormData();
+      Object.keys(values).forEach((key) => formData.append(key, values[key]));
       if (contentSize > MAX_CONTENT_SIZE) {
         toastError('Nội dung chương vượt quá 2MB');
       } else {
@@ -339,7 +340,6 @@ const NewChapterPage = () => {
 
         // create chapter version
 
-        Object.keys(values).forEach((key) => formData.append(key, values[key]));
         try {
           await new ChapterVersionService(requestHeader)
             .create({ body: formData })
