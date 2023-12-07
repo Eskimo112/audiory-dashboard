@@ -288,11 +288,12 @@ const NewChapterPage = () => {
       });
       setContentSize(byteSizeFromString(value) + imagesInBytes);
 
+      const values = formik.values;
+      const formData = new FormData();
       if (contentSize > MAX_CONTENT_SIZE) {
         toastError('Nội dung chương vượt quá 2MB');
       } else {
         setIsSubmitting(true);
-
         if (!isChanged) {
           if (isPreview) {
             router.push(
@@ -324,12 +325,20 @@ const NewChapterPage = () => {
                 }
               });
           }
+          if (!isPreview && !isPublish) {
+            await new ChapterVersionService(requestHeader)
+              .create({ body: formData })
+              .then((res) => {
+                toastSuccess('Lưu bản thảo thành công');
+                refetch2();
+              });
+          }
+          setIsSubmitting(false);
           return;
         }
 
         // create chapter version
-        const values = formik.values;
-        const formData = new FormData();
+
         Object.keys(values).forEach((key) => formData.append(key, values[key]));
         try {
           await new ChapterVersionService(requestHeader)

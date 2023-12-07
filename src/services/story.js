@@ -95,7 +95,7 @@ export default class StoryService {
       },
       requestHeaders: this.requestHeader,
     });
-    console.log(response);
+
     if (!response.data) return [];
     return response.data;
   }
@@ -137,7 +137,11 @@ export default class StoryService {
 
   async delete(storyId) {
     const url = `stories/${storyId}`;
-    const response = await request({ url, method: 'delete', requestHeaders: this.requestHeader });
+    const response = await request({
+      url,
+      method: 'delete',
+      requestHeaders: this.requestHeader,
+    });
 
     if (!response.code) return response.data;
     return response.data;
@@ -145,7 +149,11 @@ export default class StoryService {
 
   async unpublish(storyId) {
     const url = `stories/unpublish/${storyId}`;
-    const response = await request({ url, method: 'post', requestHeaders: this.requestHeader });
+    const response = await request({
+      url,
+      method: 'post',
+      requestHeaders: this.requestHeader,
+    });
 
     if (!response.code) return response.data;
     return response.data;
