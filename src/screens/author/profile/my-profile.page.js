@@ -2,6 +2,7 @@ import React from 'react';
 
 import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 
 import { ArrowForward } from '@mui/icons-material';
 import {
@@ -9,6 +10,7 @@ import {
   Box,
   Button,
   Container,
+  Divider,
   Stack,
   SvgIcon,
   Typography,
@@ -24,6 +26,7 @@ import { UserReadingList } from './user-reading-lists';
 import { UserStories } from './user-stories';
 
 const MyProfilePage = () => {
+  const router = useRouter();
   const requestHeader = useRequestHeader();
   const { user: authUser } = useAuth();
   const { data: user = {}, isLoading } = useQuery(
@@ -129,6 +132,10 @@ const MyProfilePage = () => {
                   position="relative">
                   <Typography variant="h6">Giới thiệu</Typography>
                   <Button
+                    onClick={() => {
+                      console.log('haha');
+                      router.push('/profile/posts');
+                    }}
                     variant="contained"
                     size="small"
                     sx={{ position: 'absolute', right: 0 }}
@@ -155,6 +162,7 @@ const MyProfilePage = () => {
                   {user.description}
                 </Stack>
               </Stack>
+              <Divider sx={{ mb: '24px' }} />
               <Grid item xs={12} md={7}>
                 <UserStories userId={authUser.id} />
               </Grid>

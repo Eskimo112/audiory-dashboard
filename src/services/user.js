@@ -97,6 +97,22 @@ export default class UserService {
     return response.data;
   }
 
+  async getWallById(userId) {
+    const url = `users/${userId}/wall`;
+
+    const response = await request({
+      url,
+      method: 'get',
+      params: {
+        offset: 0,
+        limit: 100,
+      },
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return [];
+    return response.data;
+  }
+
   async getTransactionsByUserId(userId) {
     const url = `users/${userId}/transactions`;
 
