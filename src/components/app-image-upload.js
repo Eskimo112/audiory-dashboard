@@ -51,6 +51,7 @@ export const AppImageUpload = (props) => {
         overflow: 'hidden',
         padding: '6px',
         bgcolor: 'sky.lightest',
+        borderRadius: '8px',
       }}>
       <FormLabel
         for={id}
@@ -118,7 +119,7 @@ export const AppImageUpload = (props) => {
             src={preview}
             width="100%"
             height="100%"
-            sx={{ objectFit: 'cover' }}
+            sx={{ objectFit: 'cover', borderRadius: '6px' }}
           />
         </Box>
       ) : (
@@ -134,7 +135,7 @@ export const AppImageUpload = (props) => {
               src={defaultUrl}
               width="100%"
               height="100%"
-              sx={{ objectFit: 'cover' }}
+              sx={{ objectFit: 'cover', borderRadius: '6px' }}
             />
           </Box>
         )

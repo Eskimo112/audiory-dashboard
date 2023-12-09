@@ -87,10 +87,10 @@ const DashboardPage = () => {
             <Grid xs={12} md={6} lg={4}>
               <PaidRateChart />
             </Grid>
-            <Grid xs={12} md={6} lg={5}>
+            <Grid xs={12} md={6} lg={6}>
               <TopStoriesTable />
             </Grid>
-            <Grid xs={12} md={6} lg={7}>
+            <Grid xs={12} md={6} lg={6}>
               <RecentTransactionsTable />
             </Grid>
           </Grid>

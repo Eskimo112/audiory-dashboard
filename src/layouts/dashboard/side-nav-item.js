@@ -4,7 +4,7 @@ import { Box, ButtonBase } from '@mui/material';
 import PropTypes from 'prop-types';
 
 export const SideNavItem = (props) => {
-  const { active = false, disabled, external, icon, path, title } = props;
+  const { active = false, disabled, external, icon, path, title, open } = props;
 
   const linkProps = path
     ? external
@@ -27,8 +27,8 @@ export const SideNavItem = (props) => {
           borderRadius: 1,
           display: 'flex',
           justifyContent: 'flex-start',
-          pl: '16px',
-          pr: '16px',
+          pl: open ? '16px' : '8px',
+          pr: open ? '16px' : '8px',
           py: '10px',
           textAlign: 'left',
           width: '100%',
@@ -56,25 +56,27 @@ export const SideNavItem = (props) => {
             {icon}
           </Box>
         )}
-        <Box
-          component="span"
-          sx={{
-            color: 'ink.lighter',
-            flexGrow: 1,
-            fontFamily: (theme) => theme.typography.fontFamily,
-            fontSize: 14,
-            fontWeight: 600,
-            lineHeight: '24px',
-            whiteSpace: 'nowrap',
-            ...(active && {
-              color: 'primary.main',
-            }),
-            ...(disabled && {
+        {open && (
+          <Box
+            component="span"
+            sx={{
               color: 'ink.lighter',
-            }),
-          }}>
-          {title}
-        </Box>
+              flexGrow: 1,
+              fontFamily: (theme) => theme.typography.fontFamily,
+              fontSize: 14,
+              fontWeight: 600,
+              lineHeight: '24px',
+              whiteSpace: 'nowrap',
+              ...(active && {
+                color: 'primary.main',
+              }),
+              ...(disabled && {
+                color: 'ink.lighter',
+              }),
+            }}>
+            {title}
+          </Box>
+        )}
       </ButtonBase>
     </li>
   );

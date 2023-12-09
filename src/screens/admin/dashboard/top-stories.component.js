@@ -3,6 +3,8 @@ import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
+import EyeIcon from '@heroicons/react/24/solid/EyeIcon';
+import { FavoriteOutlined } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -11,10 +13,10 @@ import {
   CardHeader,
   CircularProgress,
   MenuItem,
+  Pagination,
   Select,
   Stack,
   SvgIcon,
-  TablePagination,
   Typography,
 } from '@mui/material';
 import { useQuery } from 'react-query';
@@ -38,11 +40,14 @@ const RankingStoryCard = ({ index, story }) => {
       //   sx={{ bgcolor: 'primary.alpha10', p: '6px', borderRadius: '8px' }}
     >
       <Stack
-        sx={{ cursor: 'pointer' }}
+        sx={{
+          cursor: 'pointer',
+          flexGrow: 1,
+          overflow: 'hidden',
+        }}
         alignItems="center"
         direction="row"
         spacing={1}
-        maxWidth="100px"
         onClick={() => {
           router.push(`/admin/stories/${story.id}`);
         }}>
@@ -54,33 +59,41 @@ const RankingStoryCard = ({ index, story }) => {
           src={story.cover_url}
           minWidth={45}
           height={65}
-          sx={{ objectFit: 'cover' }}></Box>
-        <Stack maxWidth={200}>
-          <Typography
-            variant="subtitle2"
-            overflow="hidden"
-            textOverflow="ellipsis"
-            whiteSpace="nowrap"
-            fontWeight={600}>
+          sx={{ objectFit: 'cover', borderRadius: '4px' }}></Box>
+        <Stack
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}>
+          <Typography variant="subtitle2" fontWeight={600} whiteSpace="normal">
             {story.title ?? 'Không có tên'}
           </Typography>
-          <Typography
-            variant="subtitle2"
-            overflow="hidden"
-            textOverflow="ellipsis"
-            whiteSpace="nowrap"
-            fontWeight={400}
-            fontStyle="italic">
+          <Typography variant="subtitle2" fontWeight={400} fontStyle="italic">
             {story.author.full_name ?? 'Không có tên'}
           </Typography>
         </Stack>
       </Stack>
-      <Stack alignItems="flex-end">
-        <Typography variant="body2" fontWeight={600} color="primary.main">
-          {formatStatistic(story.total_read)} lượt đọc
+      <Stack flexShrink={0} alignItems="flex-end">
+        <Typography
+          variant="body2"
+          fontWeight={600}
+          color="primary.main"
+          sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          {formatStatistic(story.total_read) + ' '}
+          <SvgIcon fontSize="14px">
+            <EyeIcon />
+          </SvgIcon>
         </Typography>
-        <Typography variant="body2" fontWeight={600} color="secondary.main">
-          {formatStatistic(story.total_vote)} bình chọn
+        <Typography
+          variant="body2"
+          fontWeight={600}
+          color="secondary.main"
+          sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          {formatStatistic(story.total_vote) + ' '}
+          <SvgIcon fontSize="14px">
+            <FavoriteOutlined />
+          </SvgIcon>
         </Typography>
       </Stack>
     </Stack>
@@ -89,7 +102,7 @@ const RankingStoryCard = ({ index, story }) => {
 
 const TopStoriesTable = () => {
   const requestHeader = useRequestHeader();
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [option, setOption] = useState('7_recent_days');
   const [dates, setDates] = useState(getRecentDates(7));
   const {
@@ -177,20 +190,17 @@ const TopStoriesTable = () => {
         {isLoading ? (
           <CircularProgress />
         ) : (
-          <Stack gap="8px">
+          <Stack gap="8px" justifyContent="center" alignItems="center">
             {paginatedStories.map((story, index) => (
               <RankingStoryCard
                 index={index + 1}
                 story={story}
                 key={story.id}></RankingStoryCard>
             ))}
-            <TablePagination
-              component="div"
-              count={stories.length}
+            <Pagination
+              count={Math.ceil(stories.length / 5)}
               page={page}
-              onPageChange={(_, page) => setPage(page)}
-              rowsPerPage={5}
-              labelRowsPerPage={null}
+              onChange={(_, page) => setPage(page)}
             />
           </Stack>
         )}

@@ -45,6 +45,14 @@ import ReportService from '../../../services/report';
 import { useAuth } from '../../../hooks/use-auth';
 import StoryService from '../../../services/story';
 import ModerationModal from './moderation-modal';
+import dynamic from 'next/dynamic';
+
+const ReactQuill = dynamic(
+  () => import('react-quill').then((mod) => mod.default),
+  {
+    ssr: false,
+  },
+);
 
 const toolbarOptions = [
   ['bold', 'italic', 'underline'], // toggled buttons
@@ -56,7 +64,6 @@ const toolbarOptions = [
   // [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
   ['image'], // add's image support
 
-  // [{ 'font': [] }],
   [{ align: [] }],
 ];
 const MIN_WORDS = 5;
@@ -75,7 +82,7 @@ const NewChapterPage = () => {
   } = useQuery(
     ['chapter', chapterId],
     async () => await new ChapterService(requestHeader).getById(chapterId),
-    { refetchOnWindowFocus: false },
+    { refetchOnWindowFocus: false, refetchOnMount: false },
   );
 
   const { data: chapterVersionsData = [], refetch: refetch2 } = useQuery(
@@ -89,7 +96,6 @@ const NewChapterPage = () => {
     user: { id: userId },
   } = useAuth();
 
-  const [currentChapterVersion, setCurrentChapterVersion] = useState({});
   const [value, setValue] = useState('');
   const [contentSize, setContentSize] = useState(0);
   const [imageArr, setImageArr] = useState([]);
@@ -111,17 +117,6 @@ const NewChapterPage = () => {
   };
 
   const [storyData, setStoryData] = useState({});
-
-  useEffect(() => {
-    setCurrentChapterVersion(chapterData?.current_chapter_version);
-  }, [chapterData, chapterVersionsData]);
-
-  // useEffect(() => {
-  //   setCurrentChapterVersion(chapterData?.current_chapter_version);
-  // }, []);
-
-  const ReactQuill =
-    typeof window === 'object' ? require('react-quill') : () => false;
 
   const formik = useFormik({
     initialValues: {
@@ -298,6 +293,7 @@ const NewChapterPage = () => {
       const formData = new FormData();
       Object.keys(values).forEach((key) => formData.append(key, values[key]));
       formData.append('banner_url', chapterData.banner_url);
+
       if (contentSize > MAX_CONTENT_SIZE) {
         toastError('Nội dung chương vượt quá 2MB');
       } else {
@@ -338,6 +334,7 @@ const NewChapterPage = () => {
               .create({ body: formData })
               .then((res) => {
                 toastSuccess('Lưu bản thảo thành công');
+                refetch();
                 refetch2();
               });
           }
@@ -381,6 +378,7 @@ const NewChapterPage = () => {
                     });
                 } else {
                   toastSuccess('Lưu bản thảo thành công');
+                  refetch();
                   refetch2();
                 }
               } else {
@@ -398,7 +396,11 @@ const NewChapterPage = () => {
     }
   };
 
-  if (isLoading)
+  const currentChapterVersion = chapterData
+    ? chapterData.current_chapter_version
+    : null;
+
+  if (isLoading || isRefetching)
     return (
       <Card
         sx={{
@@ -452,7 +454,6 @@ const NewChapterPage = () => {
                       borderRadius: '0px',
                     }}
                     onClick={(e) => {
-                      console.log(`/my-works/${storyId}/write/${chapterId}`);
                       router.push(
                         `/my-works/${storyData?.id}/write/${chapter?.id}`,
                       );
@@ -614,7 +615,7 @@ const NewChapterPage = () => {
               {isRefetching ? (
                 <Skeleton />
               ) : (
-                <Box height="300px">
+                <Box height="250px">
                   <AppImageUpload
                     defaultUrl={currentChapterVersion?.banner_url}
                     onChange={(file) => {
@@ -646,13 +647,17 @@ const NewChapterPage = () => {
             </form>
           </Grid>
 
-          <Container sx={{ marginTop: '2em' }}>
+          <Container
+            sx={{
+              marginTop: '2em',
+              '.ql-container': {
+                fontSize: '18px',
+              },
+            }}>
             {formik.values.rich_text === '' ? (
               <></>
             ) : (
               <ReactQuill
-
-                sx={{ border: 'none' }}
                 modules={{
                   toolbar: toolbarOptions,
                 }}

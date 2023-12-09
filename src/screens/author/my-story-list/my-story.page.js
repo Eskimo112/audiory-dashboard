@@ -141,7 +141,7 @@ const MyStoryPage = () => {
             minWidth: '20em',
             justifyContent: 'center',
             alignItems: 'center',
-            height: '14em',
+            height: '12em',
           }}>
           <CircularProgress />
         </Card>
@@ -153,15 +153,15 @@ const MyStoryPage = () => {
           sx={{
             display: 'flex',
             width: '100%',
-            height: '14em',
+            height: '12em',
             cursor: 'pointer',
+          }}
+          onClick={() => {
+            router.push(`my-works/${story.id}`);
           }}>
           <CardMedia
-            onClick={() => {
-              router.push(`my-works/${story.id}`);
-            }}
             component="img"
-            sx={{ width: '10em', objectFit: 'cover' }}
+            sx={{ width: '8em', objectFit: 'cover' }}
             src={
               story.cover_url !== ''
                 ? story.cover_url
@@ -175,14 +175,15 @@ const MyStoryPage = () => {
               display: 'flex',
               flexGrow: 1,
               flexDirection: 'column',
-              padding: '24px',
+              px: '16px',
+              py: '16px',
             }}>
             <Stack
               direction="column"
               justifyContent="space-between"
-              gap="4px"
+              gap="6px"
               height="100%">
-              <Stack>
+              <Stack gap="4px">
                 <Stack
                   direction="row"
                   justifyContent="space-between"
@@ -197,12 +198,9 @@ const MyStoryPage = () => {
                       whiteSpace: 'wrap',
                       textOverflow: 'ellipsis',
                       overflow: 'hidden',
-                      fontSize: '20px',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                    }}
-                    noWrap>
+                      fontSize: '18px',
+                      lineHeight: '24px',
+                    }}>
                     {story.title}
                   </Typography>
                   <Box>
@@ -210,6 +208,7 @@ const MyStoryPage = () => {
                       color="inherit"
                       aria-describedby={id}
                       variant="text"
+                      sx={{ padding: '4px' }}
                       onClick={handleClick}>
                       <MoreVert />
                     </IconButton>
@@ -279,6 +278,7 @@ const MyStoryPage = () => {
                   component="div"
                   fontStyle="italic"
                   variant="subtitle1"
+                  lineHeight="16px"
                   color={
                     story.is_draft === false ? 'primary.main' : 'secondary.main'
                   }>
@@ -428,7 +428,7 @@ const MyStoryPage = () => {
                 </Button>
               </Stack>
 
-              <Grid container spacing={2}>
+              <Grid container spacing={3}>
                 {myStories.length === 0 && isSuccess ? (
                   <Grid xs={6} spacing={0}>
                     <Typography>Không tìm thấy truyện nào</Typography>

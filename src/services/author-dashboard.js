@@ -72,7 +72,7 @@ export default class AuthorDashboardService {
     const response = await request({
       url,
       method: 'get',
-      param: {
+      params: {
         page,
         page_size: pageSize,
       },
