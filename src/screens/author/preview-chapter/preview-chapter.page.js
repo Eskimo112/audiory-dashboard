@@ -39,7 +39,7 @@ const PreviewChapterPage = ({ chapterVersionId }) => {
   const [html, setHtml] = useState('<p></p>');
 
   const {
-    data: chapterVersionData = [],
+    data: chapterVersionData = {},
     isLoading,
     isSucces,
   } = useQuery(
@@ -50,7 +50,7 @@ const PreviewChapterPage = ({ chapterVersionId }) => {
   );
 
   const { data: chapterData = [], isLoading: isLoading2 } = useQuery(
-    ['chapterData', chapterVersionData.chapter_id],
+    ['chapter', chapterVersionData.chapter_id],
     async () =>
       await new ChapterService(requestHeader).getById(
         chapterVersionData?.chapter_id,
@@ -116,10 +116,41 @@ const PreviewChapterPage = ({ chapterVersionId }) => {
               />
             )}
 
-            {isLoading ? (
-              <Skeleton />
-            ) : (
-              <Card>
+            <Stack
+              width="100%"
+              justifyContent="center"
+              alignItems="center"
+              gap="12px">
+              <Stack direction="row" justifyContent="space-around" gap="12px">
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  startIcon={
+                    <SvgIcon>
+                      <ArrowBack></ArrowBack>
+                    </SvgIcon>
+                  }
+                  onClick={navigateToWrite}>
+                  Quay trở lại viết
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  endIcon={
+                    <SvgIcon>
+                      <RefreshRounded></RefreshRounded>
+                    </SvgIcon>
+                  }
+                  onClick={() => {
+                    // e.preventDefault();
+                    handleRevertChapterVersion();
+                  }}>
+                  Khôi phục
+                </Button>
+              </Stack>
+              {isLoading ? (
+                <Skeleton width="100%" height="200px" />
+              ) : (
                 <Box
                   component={'img'}
                   alt="Banner"
@@ -133,70 +164,43 @@ const PreviewChapterPage = ({ chapterVersionId }) => {
                   sx={{ objectFit: 'cover' }}
                   // loading="lazy"
                 />
-              </Card>
-            )}
-            <Stack width="100%" justifyContent="center" alignItems="center">
-              <Typography variant="h6" color="initial">
-                {isLoading2 ? (
-                  <Skeleton />
-                ) : (
-                  `Chương ${chapterData?.position ?? 1}`
-                )}{' '}
-                <Typography variant="overline" color="initial">
-                  ({chapterData?.is_draft ? 'Bản thảo' : 'Đă đăng tải'})
-                </Typography>
-              </Typography>
-              <Typography variant="h6" color="initial">
-                {isLoading2 ? <Skeleton /> : chapterData?.title ?? 'Tiêu đề'}{' '}
-              </Typography>
+              )}
+              {isLoading2 ? (
+                <Skeleton />
+              ) : (
+                <>
+                  <Typography variant="h6" lineHeight="20px" color="initial">
+                    {`Chương ${chapterData?.position ?? 1}`}
+                    <Typography variant="overline" color="initial">
+                      ({chapterData?.is_draft ? 'Bản thảo' : 'Đă đăng tải'})
+                    </Typography>
+                  </Typography>
+                  <Typography variant="h6" lineHeight="20px" color="initial">
+                    {isLoading2 ? (
+                      <Skeleton />
+                    ) : (
+                      chapterData?.title ?? 'Tiêu đề'
+                    )}{' '}
+                  </Typography>{' '}
+                </>
+              )}
             </Stack>
-            <Stack direction="row" justifyContent="space-around" gap="12px">
-              <Button
-                variant="outlined"
-                color="primary"
-                startIcon={
-                  <SvgIcon>
-                    <ArrowBack></ArrowBack>
-                  </SvgIcon>
-                }
-                onClick={navigateToWrite}>
-                Quay trở lại viết
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                endIcon={
-                  <SvgIcon>
-                    <RefreshRounded></RefreshRounded>
-                  </SvgIcon>
-                }
-                onClick={() => {
-                  // e.preventDefault();
-                  handleRevertChapterVersion();
-                }}>
-                Khôi phục
-              </Button>
-            </Stack>
-            {/* {isLoading ? <Skeleton /> : <MediaControlCard />} */}
-
-            {isLoading ? (
-              <Skeleton
-                sx={{ bgcolor: 'sky.light' }}
-                variant="rectangular"
-                width="100%"
-                height={118}
-              />
-            ) : (
+            <Box
+              sx={{
+                '.ql-container': {
+                  fontSize: '18px',
+                },
+              }}>
               <ReactQuill
                 readOnly
                 theme="bubble"
                 value={JSON.parse(
-                  chapterVersionData?.rich_text === ''
+                  !chapterVersionData?.rich_text
                     ? '{}'
                     : chapterVersionData?.rich_text,
                 )}
               />
-            )}
+            </Box>
           </Stack>
         </Grid>
         <Grid

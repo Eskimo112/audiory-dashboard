@@ -1,6 +1,7 @@
 import { usePathname } from 'next/navigation';
 
-import { Box, Drawer, Stack, useMediaQuery } from '@mui/material';
+import { ArrowBack, ArrowForward } from '@mui/icons-material';
+import { Box, Drawer, IconButton, Stack, useMediaQuery } from '@mui/material';
 import PropTypes from 'prop-types';
 import { Scrollbar } from 'src/components/scrollbar';
 
@@ -10,9 +11,8 @@ import { items } from './config';
 import { SideNavItem } from './side-nav-item';
 
 export const SideNav = (props) => {
-  const { open, onClose } = props;
+  const { open, onSwitch } = props;
   const pathname = usePathname();
-  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
 
   const content = (
     <Scrollbar
@@ -25,16 +25,17 @@ export const SideNav = (props) => {
           background: 'sky.main',
         },
       }}>
-      <Box sx={{}}>
-        <Box sx={{ p: 3 }}>
-          <AppIcon />
-        </Box>
+      <Box sx={{ height: '100%' }}>
+        <Box sx={{ p: open ? 3 : 1 }}>{open && <AppIcon />}</Box>
         <Box
           component="nav"
           sx={{
             flexGrow: 1,
-            px: 2,
+            px: 1,
             py: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px',
           }}>
           <Stack
             component="ul"
@@ -49,6 +50,7 @@ export const SideNav = (props) => {
 
               return (
                 <SideNavItem
+                  open={open}
                   active={active}
                   disabled={item.disabled}
                   external={item.external}
@@ -60,45 +62,32 @@ export const SideNav = (props) => {
               );
             })}
           </Stack>
+          <IconButton onClick={() => onSwitch()} sx={{ borderRadius: '4px' }}>
+            {open ? <ArrowBack /> : <ArrowForward />}
+          </IconButton>
         </Box>
       </Box>
     </Scrollbar>
   );
 
-  if (lgUp) {
-    return (
-      <Drawer
-        anchor="left"
-        open
-        PaperProps={{
-          sx: {
-            width: 280,
-          },
-        }}
-        variant="permanent">
-        {content}
-      </Drawer>
-    );
-  }
-
   return (
     <Drawer
       anchor="left"
-      onClose={onClose}
-      open={open}
+      open={true}
       PaperProps={{
         sx: {
-          width: 280,
+          width: open ? 260 : 54,
+          transition: 'width 0.5s',
         },
       }}
       sx={{ zIndex: (theme) => theme.zIndex.appBar + 100 }}
-      variant="temporary">
+      variant="permanent">
       {content}
     </Drawer>
   );
 };
 
 SideNav.propTypes = {
-  onClose: PropTypes.func,
+  onSwitch: PropTypes.func,
   open: PropTypes.bool,
 };

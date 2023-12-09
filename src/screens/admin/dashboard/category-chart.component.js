@@ -61,9 +61,10 @@ export const CategoryChart = (props) => {
       (a, b) => analytics[0].values[b] - analytics[0].values[a],
     );
     const formattedSeries = analytics.map((series) => ({
-      name: REVENUE_MAP[series.metric],
+      name: REVENUE_MAP[series.metric] + '(VNĐ)',
       data: Object.values(series.values).sort((a, b) => b - a),
     }));
+    console.log(formattedSeries);
     const result = getBarChartCommonOptions(theme, categories, formattedSeries);
     return result;
   }, [data, theme]);

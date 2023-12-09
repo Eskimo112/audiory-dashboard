@@ -85,7 +85,7 @@ const UserStoriesTable = ({ userId }) => {
               }}
               variant="outlined"
               onClick={() => {
-                router.push(`/stories/${row.original.id}`);
+                router.push(`/admin/stories/${row.original.id}`);
               }}>
               Xem chi tiết
             </Button>

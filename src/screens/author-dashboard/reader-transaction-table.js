@@ -28,10 +28,7 @@ const ReaderTransactionsTable = () => {
   const { data: transactions = [], isLoading } = useQuery(
     ['author', 'reader-tranactions'],
     () =>
-      new AuthorDashboardService(requestHeader).getReaderTransactions(
-        1,
-        Number.MAX_SAFE_INTEGER,
-      ),
+      new AuthorDashboardService(requestHeader).getReaderTransactions(1, 1000),
     { retryOnMount: false, refetchOnMount: false, refetchOnWindowFocus: false },
   );
 
@@ -102,38 +99,6 @@ const ReaderTransactionsTable = () => {
         header: 'Thời gian',
         accessorFn: (row) => timeAgo(row.created_date),
       },
-      {
-        accessorKey: 'transaction_status',
-        header: 'Trạng thái',
-        size: 80,
-        accessorFn: (row) => {
-          if (!row.transaction_status) return 'Không xác định';
-          return TRANSACTION_STATUS_MAP[row.transaction_status];
-        },
-        filterFn: 'equals',
-        filterSelectOptions: Object.values(TRANSACTION_STATUS_MAP).map(
-          (value) => ({
-            text: value,
-            value,
-          }),
-        ),
-        filterVariant: 'select',
-        Cell: ({ cell }) => {
-          if (!cell.getValue()) return <></>;
-          const idx = Object.values(TRANSACTION_STATUS_MAP).indexOf(
-            cell.getValue(),
-          );
-          return (
-            <Chip
-              label={cell.getValue()}
-              sx={{
-                backgroundColor: CHIP_BG_COLORS[idx],
-                color: CHIP_FONT_COLORS[idx],
-              }}
-            />
-          );
-        },
-      },
     ],
     [],
   );
@@ -143,7 +108,7 @@ const ReaderTransactionsTable = () => {
       id: false,
     },
     showGlobalFilter: true,
-    pagination: { pageIndex: 0, pageSize: 10 },
+    pagination: { pageIndex: 0, pageSize: 5 },
   };
 
   return (
