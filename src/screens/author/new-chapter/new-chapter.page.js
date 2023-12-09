@@ -125,7 +125,7 @@ const NewChapterPage = () => {
       content: chapterData?.current_chapter_version?.content ?? '',
       rich_text:
         chapterData?.current_chapter_version?.rich_text === '' ||
-        chapterData?.current_chapter_version?.rich_text === undefined
+          chapterData?.current_chapter_version?.rich_text === undefined
           ? '{}'
           : chapterData?.current_chapter_version?.rich_text,
       title: chapterData?.current_chapter_version?.title ?? '',
@@ -152,23 +152,30 @@ const NewChapterPage = () => {
   });
 
   const onEditorChange = (content, delta, source, editor) => {
-    var imagesArr = editor
-      .getContents()
-      .ops?.filter((ele) => ele.insert.image !== undefined)
-      ?.map((image) => image?.insert?.image);
-    setImageArr(imagesArr);
-    setValue(editor.getText().trim());
-    formik.setFieldValue('rich_text', JSON.stringify(editor.getContents()));
-    formik.setFieldValue(
-      'images',
-      JSON.stringify(
-        editor
-          .getContents()
-          .ops?.filter((ele) => ele.insert.image !== undefined)
-          ?.map((image) => image?.insert?.image),
-      ),
-    );
-    formik.setFieldValue('content', editor.getText());
+    // content
+    console.log('CONTENT');
+    console.log(editor.getText());
+
+    console.log('DELTA');
+    console.log(editor.getContents());
+
+    // var imagesArr = editor
+    //   .getContents()
+    //   .ops?.filter((ele) => ele.insert.image !== undefined)
+    //   ?.map((image) => image?.insert?.image);
+    // setImageArr(imagesArr);
+    // setValue(editor.getText().trim());
+    // formik.setFieldValue('rich_text', JSON.stringify(editor.getContents()));
+    // formik.setFieldValue(
+    //   'images',
+    //   JSON.stringify(
+    //     editor
+    //       .getContents()
+    //       .ops?.filter((ele) => ele.insert.image !== undefined)
+    //       ?.map((image) => image?.insert?.image),
+    //   ),
+    // );
+    // formik.setFieldValue('content', editor.getText());
   };
 
   const handleCreateChapter = async () => {
@@ -486,11 +493,10 @@ const NewChapterPage = () => {
                           variant="body1">
                           ({chapter?.is_draft ? 'Bản thảo' : 'Đã đăng tải'}){' '}
                         </Typography>
-                        <Typography variant="body1" color="sky.dark">{`${
-                          formatDateTime(
-                            chapter?.updated_date ?? chapter?.created_date,
-                          ).split(' ')[0]
-                        }`}</Typography>
+                        <Typography variant="body1" color="sky.dark">{`${formatDateTime(
+                          chapter?.updated_date ?? chapter?.created_date,
+                        ).split(' ')[0]
+                          }`}</Typography>
                       </Grid>
                     </Grid>
                     <Grid
