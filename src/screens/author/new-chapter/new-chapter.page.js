@@ -85,11 +85,15 @@ const NewChapterPage = () => {
     { refetchOnWindowFocus: false, refetchOnMount: false },
   );
 
-  const { data: chapterVersionsData = [], refetch: refetch2 } = useQuery(
+  const {
+    data: chapterVersionsData = [],
+    isLoading: listLoading,
+    refetch: refetch2,
+  } = useQuery(
     ['chapterVersionList', chapterId],
     async () =>
       await new ChapterVersionService(requestHeader).getAll({ chapterId }),
-    { refetchOnWindowFocus: false },
+    { refetchOnWindowFocus: false, refetchOnMount: false },
   );
 
   const {
@@ -125,7 +129,7 @@ const NewChapterPage = () => {
       content: chapterData?.current_chapter_version?.content ?? '',
       rich_text:
         chapterData?.current_chapter_version?.rich_text === '' ||
-          chapterData?.current_chapter_version?.rich_text === undefined
+        chapterData?.current_chapter_version?.rich_text === undefined
           ? '{}'
           : chapterData?.current_chapter_version?.rich_text,
       title: chapterData?.current_chapter_version?.title ?? '',
@@ -400,7 +404,7 @@ const NewChapterPage = () => {
     ? chapterData.current_chapter_version
     : null;
 
-  if (isLoading || isRefetching)
+  if (isLoading || listLoading)
     return (
       <Card
         sx={{
@@ -493,10 +497,11 @@ const NewChapterPage = () => {
                           variant="body1">
                           ({chapter?.is_draft ? 'Bản thảo' : 'Đã đăng tải'}){' '}
                         </Typography>
-                        <Typography variant="body1" color="sky.dark">{`${formatDateTime(
-                          chapter?.updated_date ?? chapter?.created_date,
-                        ).split(' ')[0]
-                          }`}</Typography>
+                        <Typography variant="body1" color="sky.dark">{`${
+                          formatDateTime(
+                            chapter?.updated_date ?? chapter?.created_date,
+                          ).split(' ')[0]
+                        }`}</Typography>
                       </Grid>
                     </Grid>
                     <Grid
