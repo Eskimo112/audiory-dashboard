@@ -81,7 +81,7 @@ const AuthorBreadCrumbs = ({
           break;
         case 2:
           accumulativeRoute =
-            paths.length === 3 ? cTitle ?? '' : paths[2] === 'write' ? '' : '';
+            paths.length === 3 ? cTitle ?? '' : paths[2] === 'write' ? 'Viết' : 'Xem trước';
           break;
         case 3:
           accumulativeRoute = cTitle;

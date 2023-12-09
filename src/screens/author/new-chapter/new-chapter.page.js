@@ -163,8 +163,6 @@ const NewChapterPage = () => {
     console.log('DELTA');
     console.log(editor.getContents());
 
-    // formik.setFieldValue('rich_text', content);
-
     var imagesArr = editor
       .getContents()
       .ops?.filter((ele) => ele.insert.image !== undefined)

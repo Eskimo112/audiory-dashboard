@@ -327,7 +327,7 @@ const StoryForm = () => {
                   {COPYRIGHTS_LIST.find((e) => e.value === formik.values.isCopyright)?.content}
                 </Typography>
               </Grid>
-              <Grid xs={3} >
+              <Grid xs={4} >
                 <Box container justifyContent="center"
                   direction="row"
                   alignItems="center"
