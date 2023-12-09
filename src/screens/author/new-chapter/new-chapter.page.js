@@ -163,23 +163,25 @@ const NewChapterPage = () => {
     console.log('DELTA');
     console.log(editor.getContents());
 
-    // var imagesArr = editor
-    //   .getContents()
-    //   .ops?.filter((ele) => ele.insert.image !== undefined)
-    //   ?.map((image) => image?.insert?.image);
-    // setImageArr(imagesArr);
-    // setValue(editor.getText().trim());
-    // formik.setFieldValue('rich_text', JSON.stringify(editor.getContents()));
-    // formik.setFieldValue(
-    //   'images',
-    //   JSON.stringify(
-    //     editor
-    //       .getContents()
-    //       .ops?.filter((ele) => ele.insert.image !== undefined)
-    //       ?.map((image) => image?.insert?.image),
-    //   ),
-    // );
-    // formik.setFieldValue('content', editor.getText());
+    // formik.setFieldValue('rich_text', content);
+
+    var imagesArr = editor
+      .getContents()
+      .ops?.filter((ele) => ele.insert.image !== undefined)
+      ?.map((image) => image?.insert?.image);
+    setImageArr(imagesArr);
+    setValue(editor.getText().trim());
+    formik.setFieldValue('rich_text', JSON.stringify(editor.getContents()));
+    formik.setFieldValue(
+      'images',
+      JSON.stringify(
+        editor
+          .getContents()
+          .ops?.filter((ele) => ele.insert.image !== undefined)
+          ?.map((image) => image?.insert?.image),
+      ),
+    );
+    formik.setFieldValue('content', editor.getText());
   };
 
   const handleCreateChapter = async () => {

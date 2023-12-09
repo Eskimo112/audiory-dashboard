@@ -23,11 +23,11 @@ import { useQuery } from 'react-query';
 
 import { useAuth } from '../../../hooks/use-auth';
 import { useRequestHeader } from '../../../hooks/use-request-header';
+import CommentService from '../../../services/comment';
 import UserService from '../../../services/user';
 import { timeAgo } from '../../../utils/formatters';
-import LoadingPage from '../../loading';
-import CommentService from '../../../services/comment';
 import { toastError, toastSuccess } from '../../../utils/notification';
+import LoadingPage from '../../loading';
 
 const MyPostsPage = () => {
   const router = useRouter();
