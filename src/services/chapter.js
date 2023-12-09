@@ -56,6 +56,7 @@ export default class ChapterService {
     const response = await request({
       url,
       method: 'delete',
+      requestHeaders: this.requestHeader,
     });
     return response;
   }

@@ -164,23 +164,23 @@ const NewChapterPage = () => {
     console.log('DELTA');
     console.log(editor.getContents());
 
-    // var imagesArr = editor
-    //   .getContents()
-    //   .ops?.filter((ele) => ele.insert.image !== undefined)
-    //   ?.map((image) => image?.insert?.image);
-    // setImageArr(imagesArr);
-    // setValue(editor.getText().trim());
-    // formik.setFieldValue('rich_text', JSON.stringify(editor.getContents()));
-    // formik.setFieldValue(
-    //   'images',
-    //   JSON.stringify(
-    //     editor
-    //       .getContents()
-    //       .ops?.filter((ele) => ele.insert.image !== undefined)
-    //       ?.map((image) => image?.insert?.image),
-    //   ),
-    // );
-    // formik.setFieldValue('content', editor.getText());
+    var imagesArr = editor
+      .getContents()
+      .ops?.filter((ele) => ele.insert.image !== undefined)
+      ?.map((image) => image?.insert?.image);
+    setImageArr(imagesArr);
+    setValue(editor.getText().trim());
+    formik.setFieldValue('rich_text', JSON.stringify(editor.getContents()));
+    formik.setFieldValue(
+      'images',
+      JSON.stringify(
+        editor
+          .getContents()
+          .ops?.filter((ele) => ele.insert.image !== undefined)
+          ?.map((image) => image?.insert?.image),
+      ),
+    );
+    formik.setFieldValue('content', editor.getText());
   };
 
   const handleCreateChapter = async () => {
@@ -651,10 +651,12 @@ const NewChapterPage = () => {
               <></>
             ) : (
               <ReactQuill
+
                 sx={{ border: 'none' }}
                 modules={{
                   toolbar: toolbarOptions,
                 }}
+
                 value={JSON.parse(
                   formik.values.rich_text === ''
                     ? '{}'

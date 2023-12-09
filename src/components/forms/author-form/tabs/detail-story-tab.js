@@ -21,7 +21,8 @@ import CategoryService from '@/services/category';
 import StoryService from '@/services/story';
 import { toastError, toastSuccess } from '@/utils/notification';
 
-const DetailStoryTab = ({ story, handleRefetch }) => {
+const DetailStoryTab = ({ story, handleRefetch, file }) => {
+  console.log('file', file);
   // console.log(story?.tags?.map(a => a.name))
   const requestHeader = useRequestHeader();
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -143,6 +144,8 @@ const DetailStoryTab = ({ story, handleRefetch }) => {
     body.append('is_mature', values.isMature);
     body.append('is_copyright', values.isCopyright);
     body.append('is_completed', values.isComplete);
+
+    body.append('form_file', file);
     // body.append('is_draft', true);
 
     if (values.isPaywalled) {

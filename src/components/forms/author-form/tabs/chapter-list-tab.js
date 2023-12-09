@@ -41,14 +41,12 @@ const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
 
   const [isOpen, setIsOpen] = React.useState(false);
   const handleDialogOpen = () => {
-    console.log('open');
     setIsOpen(true);
   };
-  const handleDialogClose = (isConfirm, id) => {
-    console.log('confirm ', isConfirm);
+  const handleDialogClose = (isConfirm) => {
     setIsOpen(false);
     if (isConfirm === true) {
-      onDeleteChapter({ chapterId: id });
+      onDeleteChapter({ chapterId: chapter.id });
     }
   };
 
@@ -290,8 +288,7 @@ const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
                 }
                 isOpen={isOpen}
                 handleClose={(isConfirm) => {
-                  console.log(isConfirm);
-                  handleDialogClose(isConfirm, chapter.id);
+                  handleDialogClose(isConfirm);
                 }}
                 actionContent="Xác nhận xóa"
                 cancelContent="Hủy thao tác"

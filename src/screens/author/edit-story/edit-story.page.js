@@ -186,7 +186,7 @@ const EditStoryPage = () => {
                                 </Tabs>
                             </Container>
                             <CustomTabPanel value={tabValue} index={0}>
-                                {isRefetching ? <Skeleton /> : <DetailStoryTab story={story} handleRefetch={refetch} />}
+                                {isRefetching ? <Skeleton /> : <DetailStoryTab story={story} handleRefetch={refetch} file={imageFile} />}
                             </CustomTabPanel>
                             <CustomTabPanel value={tabValue} index={1}>
                                 {isLoading || isRefetching ? <div>
