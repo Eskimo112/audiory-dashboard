@@ -102,6 +102,7 @@ const MyStoryPage = () => {
     const handleDialogOpen = () => {
       setIsOpen(true);
     };
+
     const handleDialogClose = (isConfirm, id) => {
       setIsOpen(false);
       if (isConfirm === true) {

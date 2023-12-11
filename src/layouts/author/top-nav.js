@@ -7,6 +7,7 @@ import {
   Edit,
   FlagOutlined,
   NotificationsNone,
+  NotificationsOutlined,
   Person,
 } from '@mui/icons-material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -108,6 +109,19 @@ export const TopNav = (props) => {
             alignItems="center"
             justifyContent="end"
             columnGap={1}>
+            <Grid item xs="auto">
+              <Tooltip title="Danh sách báo cáo">
+                <IconButton
+                  aria-label="delete"
+                  size="medium"
+                  color="inherit"
+                  onClick={() => {
+                    router.push('/notification-list');
+                  }}>
+                  <NotificationsOutlined color="primary" />
+                </IconButton>
+              </Tooltip>
+            </Grid>
             <Grid item xs="auto">
               <Tooltip title="Danh sách báo cáo">
                 <IconButton

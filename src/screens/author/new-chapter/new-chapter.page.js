@@ -169,17 +169,17 @@ const NewChapterPage = () => {
       .ops?.filter((ele) => ele.insert.image !== undefined)
       ?.map((image) => image?.insert?.image);
     setImageArr(imagesArr);
+
     setValue(editor.getText().trim());
     formik.setFieldValue('rich_text', JSON.stringify(editor.getContents()));
-    formik.setFieldValue(
-      'images',
-      JSON.stringify(
-        editor
-          .getContents()
-          .ops?.filter((ele) => ele.insert.image !== undefined)
-          ?.map((image) => image?.insert?.image),
-      ),
-    );
+
+    const base64Result = [];
+    imagesArr.forEach((image) => {
+      base64Result.push(convertImageLinkToBase64(image));
+    });
+
+    formik.setFieldValue('images', base64Result);
+    console.log(base64Result);
     formik.setFieldValue('content', editor.getText());
   };
 
@@ -293,6 +293,7 @@ const NewChapterPage = () => {
           imagesInBytes += fileSizeFromBase64({ base64String: image });
         }
       });
+      console.log(imageArr);
       setContentSize(byteSizeFromString(value) + imagesInBytes);
 
       const values = formik.values;
