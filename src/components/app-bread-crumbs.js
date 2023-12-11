@@ -76,6 +76,7 @@ const AppBreadCrumbs = ({ name1, name2 }) => {
 
     result.push(
       <Typography
+        key={'last'}
         variant="subtitle1"
         sx={{ fontSize: '16px', fontWeight: 400, color: 'ink.lighter' }}>
         {ROUTE_NAME_MAP(name1, name2)[accumulativeRoute]}

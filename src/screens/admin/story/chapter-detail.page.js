@@ -27,17 +27,19 @@ import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import ChapterService from '@/services/chapter';
 import StoryService from '@/services/story';
 
+import { useRequestHeader } from '../../../hooks/use-request-header';
 import LoadingPage from '../../loading';
 import ParaCommentDialog from './comment-dialog';
 
 const ChapterDetailPage = ({ chapterId, storyId }) => {
-  // const requestHeader = useRequestHeader();
+  const requestHeader = useRequestHeader();
   const router = useRouter();
   // for comment dialog
   const [currentParaId, setCurrentParaId] = useState(null);
   const { data: chapter = {}, isLoading } = useQuery(
     ['chapter', chapterId],
-    async () => await new ChapterService(requestHeader).getById(chapterId),
+    async () =>
+      await new ChapterService(requestHeader).getChapterById(chapterId),
     { refetchOnWindowFocus: false },
   );
   const { data: story = {}, isLoading: storyLoading } = useQuery(

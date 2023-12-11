@@ -242,6 +242,7 @@ const NewChapterPage = () => {
   const isChanged = useMemo(() => {
     if (!formik.values) return false;
     if (!chapterData.current_chapter_version) return false;
+    if (formik.values.form_file) return true;
     if (
       formik.values.rich_text !== chapterData.current_chapter_version.rich_text
     )
@@ -296,7 +297,10 @@ const NewChapterPage = () => {
       const values = formik.values;
       const formData = new FormData();
       Object.keys(values).forEach((key) => formData.append(key, values[key]));
-      formData.append('banner_url', chapterData.banner_url);
+      formData.append(
+        'banner_url',
+        chapterData.current_chapter_version.banner_url,
+      );
 
       if (contentSize > MAX_CONTENT_SIZE) {
         toastError('Nội dung chương vượt quá 2MB');
@@ -305,7 +309,7 @@ const NewChapterPage = () => {
         if (!isChanged) {
           if (isPreview) {
             router.push(
-              `/my-works/${router.query?.id}/preview/${chapterData?.current_chapter_version.id}`,
+              `/my-works/${router.query?.id}/preview/${chapterData?.current_chapter_version.id}?is_preview=true`,
             );
           }
           if (isPublish) {
@@ -342,6 +346,7 @@ const NewChapterPage = () => {
                 refetch2();
               });
           }
+          formik.setFieldValue('form_file', undefined);
           setIsSubmitting(false);
           return;
         }
@@ -353,7 +358,7 @@ const NewChapterPage = () => {
               if (res.code === 200) {
                 if (isPreview) {
                   router.push(
-                    `/my-works/${router.query?.id}/preview/${res.data?.id}`,
+                    `/my-works/${router.query?.id}/preview/${res.data?.id}?is_preview=true`,
                   );
                 }
                 if (isPublish) {
@@ -393,6 +398,7 @@ const NewChapterPage = () => {
               setIsSubmitting(false);
             });
         } catch (error) {
+          formik.setFieldValue('form_file', undefined);
           setIsSubmitting(false);
           console.log(error);
         }
@@ -584,7 +590,7 @@ const NewChapterPage = () => {
               alignContent="flex-end"
               gap="8px">
               <Button
-                disabled={!formik.isValid || isSubmitting}
+                disabled={!formik.isValid || !isChanged || isSubmitting}
                 variant="outlined"
                 color="inherit"
                 onClick={() => {

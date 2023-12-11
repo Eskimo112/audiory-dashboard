@@ -27,6 +27,7 @@ import {
   CHIP_FONT_COLORS,
 } from '../../../constants/chip_colors';
 import { useAuth } from '../../../hooks/use-auth';
+import ChapterVersionService from '../../../services/chapter-version';
 import { formatDate } from '../../../utils/formatters';
 import LoadingPage from '../../loading';
 
@@ -55,6 +56,20 @@ const ReportListPage = () => {
       await new UserService(requestHeader).getReportsByUserId(user.id, page),
     { refetchOnWindowFocus: false, enabled: Boolean(user.id) },
   );
+
+  // const { data: chapterVersionData = {} } = useQuery(
+  //   ['chapterVersion', currentReport.reported_id],
+  //   async () =>
+  //     await new ChapterVersionService(requestHeader).getById(
+  //       currentReport.reported_id,
+  //     ),
+  //   {
+  //     enabled:
+  //       currentReport.report_type === 'CONTENT_VIOLATION_COMPLAINT' &&
+  //       currentReport.report_status === 'APPROVED',
+  //     refetchOnWindowFocus: false,
+  //   },
+  // );
 
   if (isLoading) return <LoadingPage />;
 
@@ -181,7 +196,7 @@ const ReportListPage = () => {
             onClose={() => setCurrentReport(null)}
             PaperProps={{
               sx: {
-                width: '500px',
+                width: '100%',
                 maxHeight: '90%',
                 borderRadius: 3,
                 overflow: 'auto',
@@ -300,6 +315,16 @@ const ReportListPage = () => {
                     </Typography>
                   </Stack>
                 )}
+                {/* {currentReport.report_type === 'CONTENT_VIOLATION_COMPLAINT' &&
+                  currentReport.report_status === 'APPROVED' && (
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        chapterVersionData;
+                      }}>
+                      Chi tiết chương
+                    </Button>
+                  )} */}
               </Stack>
             </DialogContent>
           </Dialog>

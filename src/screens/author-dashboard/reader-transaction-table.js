@@ -78,7 +78,7 @@ const ReaderTransactionsTable = () => {
       },
 
       {
-        accessorKey: 'coin_value',
+        accessorKey: 'total_price',
         header: 'Giá trị',
         size: 80,
         Cell: ({ cell, row }) => {

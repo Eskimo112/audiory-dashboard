@@ -21,13 +21,12 @@ const ParaCommentDialog = ({ paraId, onClose, open }) => {
     error,
     fetchNextPage,
     hasNextPage,
-    isFetching,
     isFetchingNextPage,
-    status,
   } = useInfiniteQuery(
     ['comments', paraId],
-    ({ pageParam }) =>
-      new CommentService().getByParaId(paraId, pageParam, 10, sortBy),
+    ({ pageParam }) => [
+      ...new CommentService().getByParaId(paraId, pageParam, 10, sortBy),
+    ],
     {
       enabled: !!paraId,
       getNextPageParam: (lastPage, pages) => {
@@ -42,11 +41,10 @@ const ParaCommentDialog = ({ paraId, onClose, open }) => {
       );
     if (!comments.pages || comments.pages.length === 0)
       return <Typography variant="body1">Không có bình luận</Typography>;
-
     return (
       <>
-        {comments &&
-          comments.map((cmt, index) => (
+        {comments.pages &&
+          comments.pages.map((cmt, index) => (
             <AppComment comment={cmt} key={index} />
           ))}
         {!hasNextPage ||
@@ -73,7 +71,7 @@ const ParaCommentDialog = ({ paraId, onClose, open }) => {
       <DialogTitle sx={{ m: 0, p: 2 }}>Bình luận đoạn</DialogTitle>
       <IconButton
         aria-label="close"
-        onClick={(onClose = { onClose })}
+        onClick={onClose}
         sx={{
           position: 'absolute',
           right: 8,

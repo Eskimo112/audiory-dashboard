@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
+import dynamic from 'next/dynamic';
+
 import 'react-quill/dist/quill.snow.css';
 
 import { ArrowBack, CheckCircle, RefreshRounded } from '@mui/icons-material';
 import {
   Box,
   Button,
-  Card,
-  CardMedia,
   Grid,
   Popover,
   Skeleton,
@@ -27,10 +27,14 @@ import { toastError, toastSuccess } from '@/utils/notification';
 
 const { useRouter } = require('next/router');
 
-const ReactQuill =
-  typeof window === 'object' ? require('react-quill') : () => false;
+const ReactQuill = dynamic(
+  () => import('react-quill').then((mod) => mod.default),
+  {
+    ssr: false,
+  },
+);
 
-const PreviewChapterPage = ({ chapterVersionId }) => {
+const PreviewChapterPage = ({ chapterVersionId, isPreview }) => {
   const router = useRouter();
   const storyId = router.query.id;
   const requestHeader = useRequestHeader();
@@ -120,34 +124,36 @@ const PreviewChapterPage = ({ chapterVersionId }) => {
               width="100%"
               justifyContent="center"
               alignItems="center"
-              gap="12px">
-              <Stack direction="row" justifyContent="space-around" gap="12px">
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  startIcon={
-                    <SvgIcon>
-                      <ArrowBack></ArrowBack>
-                    </SvgIcon>
-                  }
-                  onClick={navigateToWrite}>
-                  Quay trở lại viết
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  endIcon={
-                    <SvgIcon>
-                      <RefreshRounded></RefreshRounded>
-                    </SvgIcon>
-                  }
-                  onClick={() => {
-                    // e.preventDefault();
-                    handleRevertChapterVersion();
-                  }}>
-                  Khôi phục
-                </Button>
-              </Stack>
+              gap="16px">
+              {!isPreview && (
+                <Stack direction="row" justifyContent="space-around" gap="12px">
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={
+                      <SvgIcon>
+                        <ArrowBack></ArrowBack>
+                      </SvgIcon>
+                    }
+                    onClick={navigateToWrite}>
+                    Quay trở lại viết
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    endIcon={
+                      <SvgIcon>
+                        <RefreshRounded></RefreshRounded>
+                      </SvgIcon>
+                    }
+                    onClick={() => {
+                      // e.preventDefault();
+                      handleRevertChapterVersion();
+                    }}>
+                    Khôi phục
+                  </Button>
+                </Stack>
+              )}
               {isLoading ? (
                 <Skeleton width="100%" height="200px" />
               ) : (
@@ -160,15 +166,15 @@ const PreviewChapterPage = ({ chapterVersionId }) => {
                       : chapterVersionData?.banner_url ?? ''
                   }
                   width="100%"
-                  height="200px"
-                  sx={{ objectFit: 'cover' }}
+                  height="250px"
+                  sx={{ objectFit: 'cover', borderRadius: '8px' }}
                   // loading="lazy"
                 />
               )}
               {isLoading2 ? (
                 <Skeleton />
               ) : (
-                <>
+                <Stack justifyContent="center" alignItems="center">
                   <Typography variant="h6" lineHeight="20px" color="initial">
                     {`Chương ${chapterData?.position ?? 1}`}
                     <Typography variant="overline" color="initial">
@@ -182,7 +188,7 @@ const PreviewChapterPage = ({ chapterVersionId }) => {
                       chapterData?.title ?? 'Tiêu đề'
                     )}{' '}
                   </Typography>{' '}
-                </>
+                </Stack>
               )}
             </Stack>
             <Box
