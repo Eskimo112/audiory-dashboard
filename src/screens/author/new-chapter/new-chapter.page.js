@@ -46,6 +46,8 @@ import { useAuth } from '../../../hooks/use-auth';
 import StoryService from '../../../services/story';
 import ModerationModal from './moderation-modal';
 import dynamic from 'next/dynamic';
+import useNextNavigateAway from '../../../hooks/use-navigate-away';
+import { useConfirmDialog } from '../../../hooks/use-confirm-dialog';
 
 const ReactQuill = dynamic(
   () => import('react-quill').then((mod) => mod.default),
@@ -157,28 +159,24 @@ const NewChapterPage = () => {
 
   const onEditorChange = (content, delta, source, editor) => {
     // content
-    console.log('CONTENT');
-    console.log(editor.getText());
-
-    console.log('DELTA');
-    console.log(editor.getContents());
 
     var imagesArr = editor
       .getContents()
       .ops?.filter((ele) => ele.insert.image !== undefined)
       ?.map((image) => image?.insert?.image);
+    console.log(imageArr);
     setImageArr(imagesArr);
+
     setValue(editor.getText().trim());
     formik.setFieldValue('rich_text', JSON.stringify(editor.getContents()));
-    formik.setFieldValue(
-      'images',
-      JSON.stringify(
-        editor
-          .getContents()
-          .ops?.filter((ele) => ele.insert.image !== undefined)
-          ?.map((image) => image?.insert?.image),
-      ),
-    );
+
+    const base64Result = [];
+    imagesArr.forEach((image) => {
+      base64Result.push(convertImageLinkToBase64(image));
+    });
+
+    formik.setFieldValue('images', base64Result);
+    console.log(base64Result);
     formik.setFieldValue('content', editor.getText());
   };
 
@@ -241,7 +239,8 @@ const NewChapterPage = () => {
 
   const isChanged = useMemo(() => {
     if (!formik.values) return false;
-    if (!chapterData.current_chapter_version) return false;
+    if (formik.values.form_file) return true;
+    if (!chapterData.current_chapter_version) return true;
     if (
       formik.values.rich_text !== chapterData.current_chapter_version.rich_text
     )
@@ -304,12 +303,18 @@ const NewChapterPage = () => {
           imagesInBytes += fileSizeFromBase64({ base64String: image });
         }
       });
+      console.log(imageArr);
       setContentSize(byteSizeFromString(value) + imagesInBytes);
 
       const values = formik.values;
       const formData = new FormData();
       Object.keys(values).forEach((key) => formData.append(key, values[key]));
-      formData.append('banner_url', chapterData.banner_url);
+
+      if (chapterData.current_chapter_version)
+        formData.append(
+          'banner_url',
+          chapterData.current_chapter_version.banner_url,
+        );
 
       if (contentSize > MAX_CONTENT_SIZE) {
         toastError('Nội dung chương vượt quá 2MB');
@@ -318,7 +323,7 @@ const NewChapterPage = () => {
         if (!isChanged) {
           if (isPreview) {
             router.push(
-              `/my-works/${router.query?.id}/preview/${chapterData?.current_chapter_version.id}`,
+              `/my-works/${router.query?.id}/preview/${chapterData?.current_chapter_version.id}?is_preview=true`,
             );
           }
           if (isPublish) {
@@ -355,6 +360,7 @@ const NewChapterPage = () => {
                 refetch2();
               });
           }
+          formik.setFieldValue('form_file', undefined);
           setIsSubmitting(false);
           return;
         }
@@ -366,7 +372,7 @@ const NewChapterPage = () => {
               if (res.code === 200) {
                 if (isPreview) {
                   router.push(
-                    `/my-works/${router.query?.id}/preview/${res.data?.id}`,
+                    `/my-works/${router.query?.id}/preview/${res.data?.id}?is_preview=true`,
                   );
                 }
                 if (isPublish) {
@@ -406,12 +412,30 @@ const NewChapterPage = () => {
               setIsSubmitting(false);
             });
         } catch (error) {
+          formik.setFieldValue('form_file', undefined);
           setIsSubmitting(false);
           console.log(error);
         }
       }
     }
   };
+  const [userConfirmToLeave, setUserConfirmToLeave] = useState(false);
+
+  const {
+    confirmCbRef: continueRouterPushRef,
+    show: warningDialog,
+    setShow: setWarningDialog,
+  } = useConfirmDialog();
+
+  // useNextNavigateAway(isChanged, (routerPush) => {
+  //   continueRouterPushRef.current = async () => {
+  //     await routerPush();
+  //   };
+  //   if (!userConfirmToLeave) {
+  //     setWarningDialog(true);
+  //   }
+  //   return userConfirmToLeave;
+  // });
 
   const currentChapterVersion = chapterData
     ? chapterData.current_chapter_version
@@ -546,7 +570,6 @@ const NewChapterPage = () => {
           </Popover>
         </Grid>
       </Stack>
-
       <Stack direction="column" justifyContent="center" alignItems="center">
         <Grid width={1 / 2}>
           <Grid
@@ -596,7 +619,7 @@ const NewChapterPage = () => {
               alignContent="flex-end"
               gap="8px">
               <Button
-                disabled={!formik.isValid || isSubmitting}
+                disabled={!formik.isValid || !isChanged || isSubmitting}
                 variant="outlined"
                 color="inherit"
                 onClick={() => {
@@ -691,7 +714,6 @@ const NewChapterPage = () => {
           </Container>
         </Grid>
       </Stack>
-
       <Dialog
         open={openDialog}
         onClose={() => {
@@ -731,7 +753,6 @@ const NewChapterPage = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
       {moderationModal && blockedVersionId && (
         <ModerationModal
           chapterVersionId={blockedVersionId}
@@ -820,6 +841,43 @@ const NewChapterPage = () => {
             onClick={() => {
               reportFormik.handleSubmit();
             }}>
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* conirm dialog */}
+      <Dialog
+        open={warningDialog}
+        onClose={() => {
+          setUserConfirmToLeave(false);
+          setWarningDialog(false);
+        }}
+        PaperProps={{
+          sx: {
+            p: 1,
+            width: '400px',
+          },
+        }}>
+        <DialogTitle>Rời đi mà không lưu?</DialogTitle>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            onClick={(e) => {
+              setUserConfirmToLeave(false);
+              setWarningDialog(false);
+            }}>
+            Hủy bỏ
+          </Button>
+
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => {
+              setUserConfirmToLeave(true);
+              setWarningDialog(false);
+              continueRouterPushRef.current?.();
+            }}
+            autoFocus>
             Xác nhận
           </Button>
         </DialogActions>

@@ -89,6 +89,7 @@ const MyStoryPage = () => {
   const StoryOverViewCard = ({ story }) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const handleClick = (event) => {
+      event.stopPropagation();
       setAnchorEl(event.currentTarget);
     };
     const handleClose = () => {
@@ -101,6 +102,7 @@ const MyStoryPage = () => {
     const handleDialogOpen = () => {
       setIsOpen(true);
     };
+
     const handleDialogClose = (isConfirm, id) => {
       setIsOpen(false);
       if (isConfirm === true) {

@@ -79,7 +79,7 @@ const UserTransactionsTable = ({ userId }) => {
         },
       },
       {
-        accessorKey: 'coin.value',
+        accessorKey: 'total_price',
         header: 'Số lượng',
         size: 80,
       },
