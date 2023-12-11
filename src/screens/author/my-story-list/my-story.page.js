@@ -97,6 +97,7 @@ const MyStoryPage = () => {
       setAnchorEl(event.currentTarget);
     };
     const handleClose = (event) => {
+      event.preventDefault();
       event.stopPropagation();
       setAnchorEl(null);
     };
@@ -248,7 +249,12 @@ const MyStoryPage = () => {
                       <Grid container direction="column">
                         {story.is_draft === false &&
                           story.is_paywalled === false ? (
-                          <Button onClick={() => { handleUnpublish({ id: story.id }); }} variant="text" color="primary">
+                          <Button onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            handleUnpublish({ id: story.id });
+                          }} variant="text" color="primary">
                             {' '}
                             Gỡ đăng tải{' '}
                           </Button>
@@ -261,7 +267,11 @@ const MyStoryPage = () => {
                           <Button
                             variant="text"
                             color="secondary"
-                            onClick={handleDialogOpen}>
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleDialogOpen();
+                            }}>
                             Xóa truyện
                           </Button>
                         )}
