@@ -129,7 +129,7 @@ const NewChapterPage = () => {
       content: chapterData?.current_chapter_version?.content ?? '',
       rich_text:
         chapterData?.current_chapter_version?.rich_text === '' ||
-        chapterData?.current_chapter_version?.rich_text === undefined
+          chapterData?.current_chapter_version?.rich_text === undefined
           ? '{}'
           : chapterData?.current_chapter_version?.rich_text,
       title: chapterData?.current_chapter_version?.title ?? '',
@@ -273,6 +273,19 @@ const NewChapterPage = () => {
     setOpenDialog(false);
   };
 
+  useEffect(() => {
+    router.beforePopState(({ as }) => {
+      if (as !== router.asPath) {
+
+        prompt('before back')
+      }
+      return true;
+    });
+
+    return () => {
+      router.beforePopState(() => true);
+    };
+  }, [router]); // A
   const onSaveDraftChapter = async (isPreview, isPublish) => {
     if (value.split(' ').length < MIN_WORDS && imageArr.length === 0) {
       toastError(`Quá ngắn để lưu bản thảo`);
@@ -497,11 +510,10 @@ const NewChapterPage = () => {
                           variant="body1">
                           ({chapter?.is_draft ? 'Bản thảo' : 'Đã đăng tải'}){' '}
                         </Typography>
-                        <Typography variant="body1" color="sky.dark">{`${
-                          formatDateTime(
-                            chapter?.updated_date ?? chapter?.created_date,
-                          ).split(' ')[0]
-                        }`}</Typography>
+                        <Typography variant="body1" color="sky.dark">{`${formatDateTime(
+                          chapter?.updated_date ?? chapter?.created_date,
+                        ).split(' ')[0]
+                          }`}</Typography>
                       </Grid>
                     </Grid>
                     <Grid
