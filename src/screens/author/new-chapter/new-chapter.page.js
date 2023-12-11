@@ -157,10 +157,6 @@ const NewChapterPage = () => {
     },
   });
 
-  // useEffect(() => {
-  //   formik.validateForm();
-  // }, [formik]);
-
   const onEditorChange = (content, delta, source, editor) => {
     // content
 
@@ -168,6 +164,7 @@ const NewChapterPage = () => {
       .getContents()
       .ops?.filter((ele) => ele.insert.image !== undefined)
       ?.map((image) => image?.insert?.image);
+    console.log(imageArr);
     setImageArr(imagesArr);
 
     setValue(editor.getText().trim());
@@ -417,15 +414,15 @@ const NewChapterPage = () => {
     setShow: setWarningDialog,
   } = useConfirmDialog();
 
-  useNextNavigateAway(isChanged, (routerPush) => {
-    continueRouterPushRef.current = async () => {
-      await routerPush();
-    };
-    if (!userConfirmToLeave) {
-      setWarningDialog(true);
-    }
-    return userConfirmToLeave;
-  });
+  // useNextNavigateAway(isChanged, (routerPush) => {
+  //   continueRouterPushRef.current = async () => {
+  //     await routerPush();
+  //   };
+  //   if (!userConfirmToLeave) {
+  //     setWarningDialog(true);
+  //   }
+  //   return userConfirmToLeave;
+  // });
 
   const currentChapterVersion = chapterData
     ? chapterData.current_chapter_version
