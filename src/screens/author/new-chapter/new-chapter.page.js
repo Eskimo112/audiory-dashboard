@@ -272,19 +272,7 @@ const NewChapterPage = () => {
     setOpenDialog(false);
   };
 
-  useEffect(() => {
-    router.beforePopState(({ as }) => {
-      if (as !== router.asPath) {
 
-        prompt('before back')
-      }
-      return true;
-    });
-
-    return () => {
-      router.beforePopState(() => true);
-    };
-  }, [router]); // A
   const onSaveDraftChapter = async (isPreview, isPublish) => {
     if (value.split(' ').length < MIN_WORDS && imageArr.length === 0) {
       toastError(`Quá ngắn để lưu bản thảo`);
