@@ -89,6 +89,7 @@ const MyStoryPage = () => {
   const StoryOverViewCard = ({ story }) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const handleClick = (event) => {
+      event.stopPropagation();
       setAnchorEl(event.currentTarget);
     };
     const handleClose = () => {
