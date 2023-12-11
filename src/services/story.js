@@ -84,7 +84,7 @@ export default class StoryService {
     return response.data;
   }
 
-  async getMyStories(offset = 0, limit = 10) {
+  async getMyStories(offset = 0, limit = 30) {
     const url = 'users/me/stories';
     const response = await request({
       url,
