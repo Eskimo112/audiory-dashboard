@@ -157,13 +157,12 @@ const NewChapterPage = () => {
     },
   });
 
+  // useEffect(() => {
+  //   formik.validateForm();
+  // }, [formik]);
+
   const onEditorChange = (content, delta, source, editor) => {
     // content
-    console.log('CONTENT');
-    console.log(editor.getText());
-
-    console.log('DELTA');
-    console.log(editor.getContents());
 
     var imagesArr = editor
       .getContents()
@@ -243,8 +242,8 @@ const NewChapterPage = () => {
 
   const isChanged = useMemo(() => {
     if (!formik.values) return false;
-    if (!chapterData.current_chapter_version) return false;
     if (formik.values.form_file) return true;
+    if (!chapterData.current_chapter_version) return true;
     if (
       formik.values.rich_text !== chapterData.current_chapter_version.rich_text
     )
@@ -299,10 +298,12 @@ const NewChapterPage = () => {
       const values = formik.values;
       const formData = new FormData();
       Object.keys(values).forEach((key) => formData.append(key, values[key]));
-      formData.append(
-        'banner_url',
-        chapterData.current_chapter_version.banner_url,
-      );
+
+      if (chapterData.current_chapter_version)
+        formData.append(
+          'banner_url',
+          chapterData.current_chapter_version.banner_url,
+        );
 
       if (contentSize > MAX_CONTENT_SIZE) {
         toastError('Nội dung chương vượt quá 2MB');
