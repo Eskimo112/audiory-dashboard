@@ -85,7 +85,6 @@ const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
   };
   const onDeleteChapter = async ({ chapterId, isLast = false }) => {
     await new ChapterService(requestHeader).delete(chapterId).then((res) => {
-      console.log(res);
       if (res.code === 200) {
         toastSuccess('Xóa thành công');
         refetch();
@@ -95,7 +94,6 @@ const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
     });
     if (isLast) {
       await new ChapterService(requestHeader).delete(chapterId).then((res) => {
-        console.log(res);
         if (res.code === 200) {
           toastSuccess('Xóa thành công');
           refetch();
