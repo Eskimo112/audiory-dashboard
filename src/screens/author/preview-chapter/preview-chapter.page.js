@@ -108,8 +108,8 @@ const PreviewChapterPage = ({ chapterVersionId, isPreview }) => {
   return (
     <>
       <Stack width={'100%'} direction="column" alignItems="center" gap="24px">
-        <Grid xs={12} md={8} lg={6} container>
-          <Stack gap="24px">
+        <Grid width={1 / 2}>
+          <Stack gap="24px" width="100%">
             {isLoading2 ? (
               <></>
             ) : (
@@ -126,7 +126,11 @@ const PreviewChapterPage = ({ chapterVersionId, isPreview }) => {
               alignItems="center"
               gap="16px">
               {!isPreview && (
-                <Stack direction="row" justifyContent="space-around" gap="12px">
+                <Stack
+                  width="100%"
+                  direction="row"
+                  justifyContent="space-around"
+                  gap="12px">
                   <Button
                     variant="outlined"
                     color="primary"
@@ -196,6 +200,7 @@ const PreviewChapterPage = ({ chapterVersionId, isPreview }) => {
                 '.ql-container': {
                   fontSize: '18px',
                 },
+                width: '100%',
               }}>
               <ReactQuill
                 readOnly
@@ -208,14 +213,13 @@ const PreviewChapterPage = ({ chapterVersionId, isPreview }) => {
               />
             </Box>
           </Stack>
-        </Grid>
-        <Grid
-          xs={2}
-          spacing={0}
-          container
-          justifyContent="center"
-          direction="column">
-          {/* <Container maxWidth="2em">
+          <Grid
+            xs={2}
+            spacing={0}
+            container
+            justifyContent="center"
+            direction="column">
+            {/* <Container maxWidth="2em">
                             <IconButton aria-label="" size="medium" color="sky" sx={{ backgroundColor: 'ink.base' }}>
                                 <SettingsOutlined />
                             </IconButton>
@@ -235,6 +239,7 @@ const PreviewChapterPage = ({ chapterVersionId, isPreview }) => {
                                 <GifBoxOutlined />
                             </IconButton>
                         </Container> */}
+          </Grid>
         </Grid>
       </Stack>
 
