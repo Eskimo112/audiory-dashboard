@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -9,6 +9,7 @@ import {
   Button,
   Grid,
   IconButton,
+  Pagination,
   Popover,
   Stack,
   Typography,
@@ -17,7 +18,7 @@ import {
 import ConfirmDialog from '@/components/dialog/reuse-confirm-dialog';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import ChapterService from '@/services/chapter';
-import { countDiffenceFromNow, formatDate, timeAgo } from '@/utils/formatters';
+import { formatDate, timeAgo } from '@/utils/formatters';
 import { toastError, toastSuccess } from '@/utils/notification';
 
 const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
@@ -40,9 +41,11 @@ const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
   const id = open ? 'simple-popover' : undefined;
 
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isPaywallOpen, setIsPaywallOpen] = React.useState(false);
   const handleDialogOpen = () => {
     setIsOpen(true);
   };
+
   const handleDialogClose = (isConfirm) => {
     setIsOpen(false);
     if (isConfirm === true) {
@@ -50,21 +53,33 @@ const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
     }
   };
 
+
+  const handlePaywallDialogOpen = () => {
+    setIsPaywallOpen(true);
+  };
+  const handlePaywallDialogClose = () => {
+    setIsPaywallOpen(false);
+
+  };
+
   const isDraft = chapter.is_draft;
   const isLast = length === 1;
   // chapter handler
   const onPublishChapter = async ({ chapterId, isPublish = true }) => {
-    console.log('chapterId', chapterId);
-    console.log('isPublish', isPublish);
+
     if (isPublish) {
-      await new ChapterService(requestHeader).publish(chapterId).then((res) => {
-        if (res.code === 200) {
-          toastSuccess('Đăng tải thành công');
-          refetch();
-        } else {
-          toastError('Không thể đăng tải chương trống');
-        }
-      });
+      try {
+        await new ChapterService(requestHeader).publish(chapterId).then((res) => {
+          if (res.code === 200) {
+            toastSuccess('Đăng tải thành công');
+            refetch();
+          } else if (res.code === 500) {
+            toastError('Không thể đăng tải chương trống');
+          }
+        });
+      } catch (error) {
+        toastError('Không thể đăng tải chương trống');
+      }
     } else {
       try {
         await new ChapterService(requestHeader)
@@ -199,6 +214,8 @@ const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
               vertical: 'top',
               horizontal: 'left',
             }}>
+
+
             <Grid container direction="column">
               {/* <Button variant="text" color="primary" onClick={() => { handleNavigate() }
                             }>
@@ -214,41 +231,50 @@ const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
                       chapterId: chapter.id,
                       isPublish: true,
                     });
-                  }}>
+                  }}
+
+                >
                   Đăng tải
                 </Button>
-              ) : !chapter.is_paywalled ? (
+              ) : (
                 <Button
                   variant="text"
                   color="primary"
                   onClick={(e) => {
+
                     e.stopPropagation();
                     e.preventDefault();
-                    onPublishChapter({
-                      chapterId: chapter.id,
-                      isPublish: false,
-                    });
+                    if (chapter.is_paywalled === true) {
+                      handlePaywallDialogOpen();
+                    } else {
+                      onPublishChapter({
+                        chapterId: chapter.id,
+                        isPublish: false,
+                      });
+                    }
+
                   }}>
                   Gỡ đăng tải
                 </Button>
-              ) : (
-                <></>
               )}
-              {!chapter.is_paywalled ? (
-                <Button
-                  variant="text"
-                  color="secondary"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
 
+              <Button
+                variant="text"
+                color="secondary"
+
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+
+                  if (chapter.is_paywalled === true) {
+                    handlePaywallDialogOpen();
+                  } else {
                     handleDialogOpen();
-                  }}>
-                  Xóa chương
-                </Button>
-              ) : (
-                <></>
-              )}
+                  }
+                }}>
+                Xóa chương
+              </Button>
+
               <ConfirmDialog
                 width={'30%'}
                 title={`Xác nhận xóa chương ${chapter.title}`}
@@ -291,11 +317,33 @@ const ChapterCard = ({ chapter, index, storyId, length, refetch }) => {
                 actionContent="Xác nhận xóa"
                 cancelContent="Hủy thao tác"
               />
+
+              <ConfirmDialog
+                width={'30%'}
+                title={`Không thể thực hiện hành động này trên chương ${chapter.title}`}
+                actionBgColor="secondary"
+                content={
+                  <Grid container direction="column">
+                    <Typography>
+                      <strong>Không thể gỡ đăng tải</strong> chương trả phí
+                    </Typography>
+                    <Typography>
+                      <strong>Không thể xóa</strong> chương trả phí
+                    </Typography>
+                  </Grid>
+                }
+                isOpen={isPaywallOpen}
+                handleClose={() => {
+                  handlePaywallDialogClose();
+                }}
+                actionContent="Tôi đã hiểu"
+                cancelContent="Bỏ qua"
+              />
             </Grid>
           </Popover>
         </Grid>
       </Grid>
-    </Button>
+    </Button >
   );
 };
 const ChapterListTab = ({ list, storyId, refetch }) => {
@@ -318,6 +366,12 @@ const ChapterListTab = ({ list, storyId, refetch }) => {
       toastError('Tạo chương không thành công');
     }
   };
+
+  const [page, setPage] = useState(1);
+
+  const chapters = useMemo(() => {
+    return list.slice((page - 1) * 10, page * 10);
+  }, [page, list]);
   return (
     <>
       <Button
@@ -332,17 +386,23 @@ const ChapterListTab = ({ list, storyId, refetch }) => {
         <Typography variant="subtitle1">Tạo chương mới</Typography>
       </Button>
       <Stack width={'100%'} gap={'8px'}>
-        {list.map((chapter, index) => (
+        {chapters.map((chapter, index) => (
           <Stack width={'100%'} key={index}>
             <ChapterCard
               chapter={chapter}
-              index={index}
+              index={page !== 1 ? (page - 1) * 10 + index : index}
               storyId={storyId}
               refetch={refetch}
               length={list.length}
             />
           </Stack>
         ))}
+      </Stack>
+      <Stack alignItems="center" width="100%" sx={{ marginTop: 1 }}>
+        <Pagination
+          page={page}
+          onChange={(e, page) => setPage(page)}
+          count={Math.ceil(list.length / 10)}></Pagination>
       </Stack>
     </>
   );

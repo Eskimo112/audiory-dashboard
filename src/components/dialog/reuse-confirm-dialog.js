@@ -7,7 +7,15 @@ const ConfirmDialog = ({ title, content, isOpen, handleClose, actionContent = 'X
         <React.Fragment>
             <Dialog
                 open={isOpen}
-                onClose={handleClose}
+                onClose={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleClose();
+                }}
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
                 sx={{
