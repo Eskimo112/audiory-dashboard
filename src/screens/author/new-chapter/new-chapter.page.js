@@ -188,11 +188,15 @@ const NewChapterPage = () => {
 
     try {
       await new ChapterService(requestHeader).create(body).then((res) => {
+        console.log(res);
+        router.push(
+          `/my-works/${storyData?.id}/write/${res?.id}`,
+        );
         toastSuccess('Tạo chương mới thành công');
       });
-      chapterData.refetch();
-      storyData.refetch();
+      refetch();
     } catch (error) {
+      console.log(error)
       toastError('Tạo chương không thành công');
     }
   };
