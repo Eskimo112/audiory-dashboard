@@ -21,7 +21,7 @@ export const AppSnackBar = React.forwardRef(function AppSnackBar(
         // width="100%"
         margin="0 auto"
         sx={{
-          bgcolor: 'neutral.7',
+          bgcolor: 'white',
           boxShadow:
             '2px 6px 12px rgba(0, 0, 0, 0.12), 0px 0px 4px rgba(5, 43, 97, 0.12)',
         }}>

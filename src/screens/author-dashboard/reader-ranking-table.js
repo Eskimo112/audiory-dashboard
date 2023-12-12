@@ -104,19 +104,6 @@ const ReaderRankingTable = () => {
               }>
               Làm mới
             </Button>
-            {/* <Button color="inherit" size="small" sx={{ padding: 0 }}>
-              <Select
-                {...SHARED_SELECT_PROPS}
-                value={option}
-                label="Thời gian"
-                onChange={handleChange}>
-                {TIME_OPTIONS.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </Button> */}
           </Stack>
         }
         title="Xếp hạng độc giả"
@@ -136,6 +123,7 @@ const ReaderRankingTable = () => {
             initialState={initialState}
             muiTableHeadCellProps={{
               sx: {
+                align: 'center',
                 height: '48px!important',
                 fontSize: '14px!important',
               },
@@ -149,6 +137,9 @@ const ReaderRankingTable = () => {
               placeholder: 'Nhập từ khóa để tìm kiếm',
               sx: { width: '200px', padding: 0 },
               variant: 'outlined',
+            }}
+            muiTableBodyCellProps={{
+              align: 'center',
             }}
           />
         )}

@@ -13,6 +13,7 @@ import { signInWithGooglePopup } from '@/Firebase';
 
 import AuthService from '../services/auth';
 import UserService from '../services/user';
+import { toastError } from '../utils/notification';
 
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
@@ -152,34 +153,42 @@ export const AuthProvider = (props) => {
     //   throw new Error('Please check your email and password');
     // }
 
-    const response = await AuthService.signIn(email, password);
-    if (!response) {
-      throw new Error('Please check your email and password');
-    }
-    const requestHeader = {
-      Authorization: `Bearer ${response}`,
-    };
+    await AuthService.signIn(email, password)
+      .then(async (response) => {
+        if (!response) {
+          throw new Error('Please check your email and password');
+        }
+        const requestHeader = {
+          Authorization: `Bearer ${response}`,
+        };
+        const userInfo = await new UserService(requestHeader).getById('me');
 
-    const userInfo = await new UserService(requestHeader).getById('me');
-    try {
-      Cookies.set('authenticated', 'true');
-      Cookies.set('token', response);
+        Cookies.set('authenticated', 'true');
+        Cookies.set('token', response);
+        const user = {
+          ...userInfo,
+          token: response,
+        };
 
-      // window.sessionStorage.setItem('authenticated', 'true');
-      // window.sessionStorage.setItem('token', response);
-    } catch (err) {
-      console.error(err);
-    }
+        dispatch({
+          type: HANDLERS.SIGN_IN,
+          payload: user,
+        });
+      })
+      .catch((error) => {
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.message
+        ) {
+          toastError(error.response.data.message);
+          return;
+        }
+        toastError('Đã xảy ra lỗi, thử lại sau');
+      });
 
-    const user = {
-      ...userInfo,
-      token: response,
-    };
-
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user,
-    });
+    // window.sessionStorage.setItem('authenticated', 'true');
+    // window.sessionStorage.setItem('token', response);
   };
 
   const signInWithGoogle = async () => {

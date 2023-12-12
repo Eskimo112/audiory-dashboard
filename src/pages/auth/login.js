@@ -25,17 +25,20 @@ const Page = () => {
     }),
 
     onSubmit: async (values, helpers) => {
-      try {
-        await auth.signInWithPassword(values.email, values.password);
-        router.push('/my-works');
-      } catch (err) {
-        helpers.setStatus({ success: false });
-        helpers.setErrors({
-          submit: err.response.data.message ?? 'Tài khoản hoặc mật khẩu sai',
+      await auth
+        .signInWithPassword(values.email, values.password)
+        .then(() => {
+          router.push('/my-works');
+        })
+        .catch((error) => {
+          helpers.setStatus({ success: false });
+          helpers.setErrors({
+            submit:
+              error.response.data.message ?? 'Tài khoản hoặc mật khẩu sai',
+          });
+          helpers.setSubmitting(false);
+          toastError('Đăng nhập không thành công');
         });
-        helpers.setSubmitting(false);
-        toastError('Đăng nhập không thành công');
-      }
     },
   });
 

@@ -80,7 +80,7 @@ const MyPostsPage = () => {
       .finally(() => setIsSubmiting(false));
   };
 
-  if (postsLoading) return <LoadingPage />;
+  if (postsLoading || isLoading) return <LoadingPage />;
   if (!user) throw PageNotFoundError;
 
   return (
@@ -213,7 +213,7 @@ const MyPostsPage = () => {
                           handleSubmitPost();
                         }}
                         variant="contained"
-                        color="primary"
+                        color="info"
                         fullWidth
                         sx={{
                           borderRadius: 1,
@@ -329,7 +329,7 @@ const MyPostsPage = () => {
                                 <Typography variant="body2">
                                   {comment.text}
                                 </Typography>
-                                <Stack direction="row" gap="8px">
+                                {/* <Stack direction="row" gap="8px">
                                   <Button
                                     variant="text"
                                     sx={{
@@ -363,7 +363,7 @@ const MyPostsPage = () => {
                                     }}>
                                     Báo cáo
                                   </Button>
-                                </Stack>
+                                </Stack> */}
                               </Stack>
                             ))}
                           </Stack>

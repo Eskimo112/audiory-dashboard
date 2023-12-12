@@ -72,4 +72,15 @@ export default class ChapterVersionService {
 
     return response;
   }
+
+  async publish(chapterVersionId) {
+    const url = `chapter-version/publish/${chapterVersionId}`;
+    const response = await request({
+      url,
+      method: 'post',
+      requestHeaders: this.requestHeader,
+    });
+
+    return response;
+  }
 }

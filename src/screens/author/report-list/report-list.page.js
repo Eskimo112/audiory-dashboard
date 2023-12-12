@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Head from 'next/head';
 
@@ -27,9 +27,10 @@ import {
   CHIP_FONT_COLORS,
 } from '../../../constants/chip_colors';
 import { useAuth } from '../../../hooks/use-auth';
-import ChapterVersionService from '../../../services/chapter-version';
 import { formatDate } from '../../../utils/formatters';
 import LoadingPage from '../../loading';
+import ChapterVersionService from '../../../services/chapter-version';
+import { toastError, toastSuccess } from '../../../utils/notification';
 
 const REPORT_TYPE_MAP = {
   USER: 'Người dùng',
@@ -45,10 +46,10 @@ const REPORT_STATUS_MAP = {
   REJECTED: 'Bị từ chối',
 };
 
-const ReportListPage = () => {
+const ReportListPage = ({ reportId }) => {
   const requestHeader = useRequestHeader();
   const { user } = useAuth();
-  const [currentReport, setCurrentReport] = useState(null);
+  const [currentReport, setCurrentReport] = useState(reportId);
   const [page, setPage] = useState(1);
   const { data: reports = [], isLoading } = useQuery(
     ['user', user.id, 'reports', page],
@@ -70,6 +71,12 @@ const ReportListPage = () => {
   //     refetchOnWindowFocus: false,
   //   },
   // );
+
+  useEffect(() => {
+    if (!reports) return;
+    const matchedReport = reports.find((report) => report.id === reportId);
+    if (matchedReport) setCurrentReport(matchedReport);
+  }, [reportId, reports]);
 
   if (isLoading) return <LoadingPage />;
 
@@ -315,16 +322,32 @@ const ReportListPage = () => {
                     </Typography>
                   </Stack>
                 )}
-                {/* {currentReport.report_type === 'CONTENT_VIOLATION_COMPLAINT' &&
+                {currentReport.report_type === 'CONTENT_VIOLATION_COMPLAINT' &&
                   currentReport.report_status === 'APPROVED' && (
                     <Button
                       variant="contained"
-                      onClick={() => {
-                        chapterVersionData;
+                      onClick={async () => {
+                        await new ChapterVersionService(requestHeader)
+                          .publish(currentReport.reported_id)
+                          .then(() => {
+                            toastSuccess('Đăng tải chương thành công');
+                          })
+                          .catch((error) => {
+                            if (
+                              error.response &&
+                              error.response.data &&
+                              error.response.data.message
+                            ) {
+                              toastError(error.response.data.message);
+                              return;
+                            }
+                            toastError('Đã xảy ra lỗi, thử lại sau');
+                          })
+                          .finally(() => setCurrentReport(null));
                       }}>
-                      Chi tiết chương
+                      Đăng tải chương
                     </Button>
-                  )} */}
+                  )}
               </Stack>
             </DialogContent>
           </Dialog>

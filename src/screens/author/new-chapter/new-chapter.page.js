@@ -1,5 +1,5 @@
 // eslint-disable-next-line simple-import-sort/imports
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import 'react-quill/dist/quill.snow.css';
 
@@ -272,40 +272,40 @@ const NewChapterPage = () => {
     setOpenDialog(false);
   };
 
-  const onSaveDraftChapter = async (isPreview, isPublish) => {
-    if (value.split(' ').length < MIN_WORDS && imageArr.length === 0) {
-      toastError(`Quá ngắn để lưu bản thảo`);
-    } else {
-      // content size (text+image) handler
-      // calculate link images and file images size
-      var imagesInBytes = 0;
-      imageArr.forEach((image) => {
-        if (image.includes('http')) {
-          console.log('link');
-          console.log(image);
-          convertImageLinkToBase64(image, function (base64String) {
-            imagesInBytes += fileSizeFromBase64({ base64String });
-          });
-        } else {
-          imagesInBytes += fileSizeFromBase64({ base64String: image });
-        }
-      });
-      console.log(imageArr);
-      setContentSize(byteSizeFromString(value) + imagesInBytes);
-
-      const values = formik.values;
-      const formData = new FormData();
-      Object.keys(values).forEach((key) => formData.append(key, values[key]));
-
-      if (chapterData.current_chapter_version)
-        formData.append(
-          'banner_url',
-          chapterData.current_chapter_version.banner_url,
-        );
-
-      if (contentSize > MAX_CONTENT_SIZE) {
-        toastError('Nội dung chương vượt quá 2MB');
+  const onSaveDraftChapter = useCallback(
+    async (isPreview, isPublish) => {
+      if (value.split(' ').length < MIN_WORDS && imageArr.length === 0) {
+        toastError(`Quá ngắn để lưu bản thảo`);
       } else {
+        // content size (text+image) handler
+        // calculate link images and file images size
+        let imagesInBytes = 0;
+        imageArr.forEach((image) => {
+          if (image.includes('http')) {
+            convertImageLinkToBase64(image, function (base64String) {
+              imagesInBytes += fileSizeFromBase64({ base64String });
+            });
+          } else {
+            imagesInBytes += fileSizeFromBase64({ base64String: image });
+          }
+        });
+        setContentSize(byteSizeFromString(value) + imagesInBytes);
+
+        const values = formik.values;
+        const formData = new FormData();
+        Object.keys(values).forEach((key) => formData.append(key, values[key]));
+
+        if (chapterData.current_chapter_version)
+          formData.append(
+            'banner_url',
+            chapterData.current_chapter_version.banner_url,
+          );
+
+        if (contentSize > MAX_CONTENT_SIZE) {
+          toastError('Nội dung chương vượt quá 2MB');
+          return;
+        }
+
         setIsSubmitting(true);
         if (!isChanged) {
           if (isPreview) {
@@ -352,61 +352,77 @@ const NewChapterPage = () => {
           return;
         }
 
-        try {
-          await new ChapterVersionService(requestHeader)
-            .create({ body: formData })
-            .then((res) => {
-              if (res.code === 200) {
-                if (isPreview) {
-                  router.push(
-                    `/my-works/${router.query?.id}/preview/${res.data?.id}?is_preview=true`,
-                  );
-                }
-                if (isPublish) {
-                  new ChapterService(requestHeader)
-                    .publish(chapterId)
-                    .then((res) => {
-                      if (res.code === 200) {
-                        router.push(`/my-works/${router.query?.id}`);
-                        toastSuccess('Đăng tải thành công');
-                      } else {
-                        toastError(res.message);
-                      }
-                    })
-                    .catch((e) => {
-                      if (
-                        e.response.data.message ===
-                        'Hãy gắn nhãn trưởng thành để đi tiếp'
-                      ) {
-                        setBlockedVersionId(
-                          e.response.data.data.current_chapter_version.id,
-                        );
-                        setOpenDialog(true);
-                      } else {
-                        toastError('Không thể đăng tải chương');
-                      }
-                    });
-                } else {
-                  toastSuccess('Lưu bản thảo thành công');
-                  refetch();
-                  refetch2();
-                }
-              } else {
-                toastError(res.message);
+        await new ChapterVersionService(requestHeader)
+          .create({ body: formData })
+          .then((res) => {
+            if (res.code === 200) {
+              if (isPreview) {
+                router.push(
+                  `/my-works/${router.query?.id}/preview/${res.data?.id}?is_preview=true`,
+                );
               }
-            })
-            .finally(() => {
-              setIsSubmitting(false);
-            });
-        } catch (error) {
-          formik.setFieldValue('form_file', undefined);
-          setIsSubmitting(false);
-          console.log(error);
-        }
+              if (isPublish) {
+                new ChapterService(requestHeader)
+                  .publish(chapterId)
+                  .then((res) => {
+                    if (res.code === 200) {
+                      router.push(`/my-works/${router.query?.id}`);
+                      toastSuccess('Đăng tải thành công');
+                    } else {
+                      toastError(res.message);
+                    }
+                  })
+                  .catch((e) => {
+                    if (
+                      e.response.data.message ===
+                      'Hãy gắn nhãn trưởng thành để đi tiếp'
+                    ) {
+                      setBlockedVersionId(
+                        e.response.data.data.current_chapter_version.id,
+                      );
+                      setOpenDialog(true);
+                    } else {
+                      toastError('Không thể đăng tải chương');
+                    }
+                  });
+              } else {
+                toastSuccess('Lưu bản thảo thành công');
+                refetch();
+                refetch2();
+              }
+            } else {
+              toastError(res.message);
+            }
+          })
+          .finally(() => {
+            formik.setFieldValue('form_file', undefined);
+            setIsSubmitting(false);
+          });
       }
-    }
-  };
+    },
+    [
+      chapterData.current_chapter_version,
+      chapterId,
+      contentSize,
+      formik,
+      imageArr,
+      isChanged,
+      refetch,
+      refetch2,
+      requestHeader,
+      router,
+      value,
+    ],
+  );
   const [userConfirmToLeave, setUserConfirmToLeave] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isChanged) return;
+      onSaveDraftChapter(false, false);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isChanged, onSaveDraftChapter]);
 
   const {
     confirmCbRef: continueRouterPushRef,
@@ -445,7 +461,7 @@ const NewChapterPage = () => {
     <>
       <Stack direction="column" justifyContent="center" alignItems="center">
         <Grid width={1 / 2}>
-          {isRefetching ? (
+          {listLoading ? (
             <Skeleton />
           ) : (
             <AuthorBreadCrumbs
@@ -640,8 +656,8 @@ const NewChapterPage = () => {
 
           <Grid maxWidth="lg">
             <form noValidate onSubmit={formik.handleSubmit}>
-              {isRefetching ? (
-                <Skeleton />
+              {isLoading ? (
+                <Skeleton height="250px" />
               ) : (
                 <Box height="250px">
                   <AppImageUpload

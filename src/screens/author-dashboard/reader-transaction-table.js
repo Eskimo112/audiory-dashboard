@@ -79,7 +79,7 @@ const ReaderTransactionsTable = () => {
 
       {
         accessorKey: 'total_price',
-        header: 'Giá trị',
+        header: 'Tổng xu',
         size: 80,
         Cell: ({ cell, row }) => {
           return (

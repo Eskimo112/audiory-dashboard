@@ -4,7 +4,18 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { Clear, HelpOutline } from '@mui/icons-material';
-import { Box, Button, Container, Grid, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Container,
+  Grid,
+  MenuItem,
+  Stack,
+  SvgIcon,
+  Switch,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useFormik } from 'formik';
 import { useQuery } from 'react-query';
 import * as Yup from 'yup';
@@ -26,7 +37,6 @@ const StoryForm = () => {
   const [tag, setTag] = useState('');
   const [tagList, setTagList] = useState([]);
   const [isSubmit, setIsSubmit] = useState(false);
-
 
   const {
     data: categoriesData = [],
@@ -113,9 +123,8 @@ const StoryForm = () => {
     setIsSubmit(true);
     var actualList = [];
     for (let index = 0; index < tagList.length; index++) {
-      const element = { 'name': tagList[index] };
+      const element = { name: tagList[index] };
       actualList.push(element);
-
     }
     const values = formik.values;
     const body = new FormData();
@@ -130,25 +139,24 @@ const StoryForm = () => {
     body.append('is_draft', true);
     body.append('form_file', values.formFile);
     console.log(body);
-    await new StoryService(requestHeader).create({ body, jwt }).then(res => {
-      console.log('body', body)
-      console.log('data', res);
-      const storyId = res.id;
-      const chapterId = res.chapters[0].id;
+    await new StoryService(requestHeader)
+      .create({ body, jwt })
+      .then((res) => {
+        console.log('body', body);
+        console.log('data', res);
+        const storyId = res.id;
+        const chapterId = res.chapters[0].id;
 
-      router.push(`/my-works/${storyId}/write/${chapterId}`);
-    }).finally(() => {
-      setIsSubmit(false);
-
-    });
-
-
+        router.push(`/my-works/${storyId}/write/${chapterId}`);
+      })
+      .finally(() => {
+        setIsSubmit(false);
+      });
   };
 
   const handleAddTag = (event) => {
-    var val = event.target.value.trim();
-    if (event.keyCode === 32 && val.trim() !== '') {
-      console.log(val)
+    let val = event.target.value.trim();
+    if ((event.keyCode === 32 || event.keyCode === 13) && val.trim() !== '') {
       if (val.trim().length >= 2) {
         const isDuplicate = tagList.find((ele) => ele === val.trim());
         if (isDuplicate) {
@@ -156,192 +164,235 @@ const StoryForm = () => {
         } else {
           setTagList([...tagList, val.trim()]);
           formik.setFieldValue('tags', tagList);
-          console.log(tagList)
+          console.log(tagList);
         }
       } else {
-        toastError('Thẻ ít nhất 2 ký tự')
+        toastError('Thẻ ít nhất 2 ký tự');
       }
       val = '';
       setTag(val);
     }
-  }
-
+  };
 
   return (
     <>
       <div>
-        <form noValidate >
-          <Stack spacing={3} >
-            <Grid container spacing={0} sx={{ paddingTop: '2em' }} justifyContent="space-between">
-              <Grid xs={8} >
-                <TextFieldLabel label='Tiêu đề truyện' isRequired={true} />
-                <TextField
-                  variant="outlined"
-                  placeholder='Chưa đặt tên'
-                  error={!!(formik.touched.title && formik.errors.title)}
-                  fullWidth
-                  helperText={formik.touched.title && formik.errors.title}
-                  name="title"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="text"
-                  size="small"
-                  value={formik.values.title}
-                />
-                <TextFieldLabel label='Miêu tả truyện' isRequired={true} />
-                <TextField
-                  multiline={true}
-                  minRows={5}
-                  maxRows={10}
-                  variant="outlined"
-                  error={
-                    !!(formik.touched.description && formik.errors.description)
-                  }
-                  fullWidth
-                  helperText={
-                    formik.touched.description && formik.errors.description
-                  }
-                  name="description"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  value={formik.values.description}
-                />
-                <TextFieldLabel label='Thể loại' isRequired={true} />
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  select
-                  helperText={formik.touched.category && formik.errors.category}
-                  name="category"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="text"
-                  size="small"
-                  value={formik.values.category || ''}
+        <form noValidate>
+          <Stack spacing={3}>
+            <Grid
+              container
+              spacing={0}
+              sx={{ paddingTop: '2em' }}
+              justifyContent="space-between">
+              <Grid xs={8}>
+                <Stack gap="8px">
+                  <Stack>
+                    <TextFieldLabel label="Tiêu đề truyện" isRequired={true} />
+                    <TextField
+                      variant="outlined"
+                      placeholder="Chưa đặt tên"
+                      error={!!(formik.touched.title && formik.errors.title)}
+                      fullWidth
+                      helperText={formik.touched.title && formik.errors.title}
+                      name="title"
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      type="text"
+                      size="small"
+                      value={formik.values.title}
+                    />
+                  </Stack>
+                  <Stack>
+                    <TextFieldLabel label="Miêu tả truyện" isRequired={true} />
+                    <TextField
+                      multiline={true}
+                      minRows={5}
+                      maxRows={10}
+                      variant="outlined"
+                      error={
+                        !!(
+                          formik.touched.description &&
+                          formik.errors.description
+                        )
+                      }
+                      fullWidth
+                      helperText={
+                        formik.touched.description && formik.errors.description
+                      }
+                      name="description"
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      value={formik.values.description}
+                    />
+                  </Stack>
+                  <Stack>
+                    <TextFieldLabel label="Thể loại" isRequired={true} />
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      select
+                      helperText={
+                        formik.touched.category && formik.errors.category
+                      }
+                      name="category"
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      type="text"
+                      size="small"
+                      value={formik.values.category || ''}>
+                      {categoriesData &&
+                        categoriesData?.map((category) => (
+                          <MenuItem key={category.id} value={category.id}>
+                            {category.name}
+                          </MenuItem>
+                        ))}
+                    </TextField>
+                  </Stack>
+                  <Stack>
+                    <TextFieldLabel label="Thẻ" isRequired={true} />
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      placeholder="Ngăn cách thẻ bởi dấu cách"
+                      type="text"
+                      size="small"
+                      name="currentTag"
+                      value={tag}
+                      onChange={(e) => setTag(e.target.value)}
+                      onKeyDown={(e) => handleAddTag(e)}
+                      helperText={
+                        formik.touched.currentTag && formik.errors.tags
+                      }
+                      onError={formik.errors.tags}
+                    />
+                  </Stack>
+                  <Stack direction="row" gap="4px">
+                    {tagList.length > 0 &&
+                      tagList?.map((tag, index) => (
+                        <Stack
+                          key={index}
+                          direction="row"
+                          gap="4px"
+                          sx={{
+                            bgcolor: 'primary.main',
+                            borderRadius: '16px',
+                            padding: '4px 8px',
+                            color: 'white',
+                            alignItems: 'center',
+                          }}>
+                          <Typography
+                            variant="body2"
+                            color="inherit"
+                            fontWeight={600}
+                            fontSize="14px">
+                            {tag}
+                          </Typography>
+                          <SvgIcon
+                            onClick={() => {
+                              setTagList(tagList.filter((ele) => ele !== tag));
+                            }}
+                            sx={{ width: '14px', cursor: 'pointer' }}>
+                            <Clear />
+                          </SvgIcon>
+                        </Stack>
+                      ))}
+                  </Stack>
 
-                >
-                  {categoriesData && categoriesData?.map((category) => (
-                    <MenuItem key={category.id} value={category.id}>
-                      {category.name}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <TextFieldLabel label='Thẻ' isRequired={true} />
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  placeholder='Ngăn cách thẻ bởi dấu cách'
-                  type="text"
-                  size="small"
-                  name='currentTag'
-                  value={tag}
-                  onChange={(e) => setTag(e.target.value)}
-                  onKeyDown={(e) => handleAddTag(e)}
-                  helperText={formik.touched.currentTag && formik.errors.tags}
-                  onError={formik.errors.tags}
+                  <Grid container spacing={0}>
+                    <Grid
+                      container
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      alignContent="stretch"
+                      wrap="wrap">
+                      <Grid xs={8}>
+                        <TextFieldLabel
+                          label="Gắn mác truyện trưởng thành"
+                          isRequired={true}
+                        />
+                      </Grid>
+                      <Grid xs={1}>
+                        <Switch
+                          name="isMature"
+                          checked={formik.values.isMature}
+                          value={formik.values.isMature}
+                          onChange={formik.handleChange}
+                          inputProps={{ 'aria-label': '' }}
+                        />
+                      </Grid>
+                    </Grid>
+                    <Typography
+                      sx={{ backgroundColor: 'secondary' }}
+                      variant="subtitle2"
+                      color="ink.main">
+                      {
+                        MATURE_OPTIONS.find(
+                          (e) => e.value === formik.values.isMature,
+                        )?.content
+                      }
+                    </Typography>
+                  </Grid>
 
-                />
-                <Grid container direction="row" sx={{ marginTop: 1 }}>
-                  {tagList.length > 0 && tagList?.map((tag, index) => (
-                    <Box color="secondary" key={index} >
-                      <Button sx={{ height: "2em", marginRight: 1 }} variant='contained' type="button" size='small'  >
-                        {tag}  <Clear onClick={() => {
-                          setTagList(tagList.filter((ele) => ele !== tag))
-                        }} fontSize="1em" sx={{ marginLeft: "2em" }} />
-                      </Button>
-                    </Box>
-                  ))}
-                </Grid>
-
-                <Grid container spacing={0}>
                   <Grid
                     container
-                    direction="row"
+                    direction="column"
                     justifyContent="space-between"
-                    alignItems="center"
+                    alignItems="flex-start"
                     alignContent="stretch"
                     wrap="wrap">
-                    <Grid xs={8}>
-                      <TextFieldLabel
-                        label="Gắn mác truyện trưởng thành"
-                        isRequired={true}
-                      />
-                    </Grid>
-                    <Grid xs={1}>
-                      <Switch
-                        name="isMature"
-                        checked={formik.values.isMature}
-                        value={formik.values.isMature}
-                        onChange={formik.handleChange}
-                        inputProps={{ 'aria-label': '' }}
-                      />
+                    <Grid>
+                      <TextFieldLabel label="Bản quyền" isRequired={true} />
                     </Grid>
                   </Grid>
-                  <Typography
-                    sx={{ backgroundColor: 'secondary' }}
-                    variant="subtitle2"
-                    color="ink.main">
-                    {
-                      MATURE_OPTIONS.find(
-                        (e) => e.value === formik.values.isMature,
-                      )?.content
-                    }
-                  </Typography>
-                </Grid>
-
-                <Grid
-                  container
-                  direction="column"
-                  justifyContent="space-between"
-                  alignItems="flex-start"
-                  alignContent="stretch"
-                  wrap="wrap"
-                >
-                  <Grid >
-                    <TextFieldLabel label='Bản quyền' isRequired={true} />
+                  <Grid container spacing={0}>
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      select
+                      name="isCopyright"
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      type="text"
+                      size="small"
+                      value={formik.values.isCopyright}>
+                      {COPYRIGHTS_LIST.map((item) => (
+                        <MenuItem key={item.value} value={item.value}>
+                          {item.title}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                    <Typography
+                      sx={{ marginTop: 1, backgroundColor: 'secondary' }}
+                      variant="subtitle2"
+                      color="secondary">
+                      {
+                        COPYRIGHTS_LIST.find(
+                          (e) => e.value === formik.values.isCopyright,
+                        )?.content
+                      }
+                    </Typography>
                   </Grid>
-                </Grid>
-                <Grid container spacing={0}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    select
-                    name="isCopyright"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    type="text"
-                    size="small"
-                    value={formik.values.isCopyright}
-
-                  >
-                    {COPYRIGHTS_LIST.map((item) => (
-                      <MenuItem key={item.value} value={item.value}>
-                        {item.title}
-                      </MenuItem>
-                    ))}
-
-
-                  </TextField>
-                </Grid>
-                <Typography sx={{ marginTop: 1, backgroundColor: "secondary" }} variant="subtitle2" color="secondary">
-                  {COPYRIGHTS_LIST.find((e) => e.value === formik.values.isCopyright)?.content}
-                </Typography>
+                </Stack>
               </Grid>
-              <Grid xs={4} >
-                <Box container justifyContent="center"
+              <Grid xs={4}>
+                <Box
+                  container
+                  justifyContent="center"
                   direction="row"
                   alignItems="center"
                   alignContent="center"
                   wrap="wrap">
-                  <Container sx={{ width: "100%", height: "20em" }}>
-                    <AppImageUpload onChange={(file) => { formik.setFieldValue('formFile', file) }} />
+                  <Container sx={{ width: '100%', height: '20em' }}>
+                    <AppImageUpload
+                      onChange={(file) => {
+                        formik.setFieldValue('formFile', file);
+                      }}
+                    />
                   </Container>
                 </Box>
-
               </Grid>
             </Grid>
-
-
           </Stack>
           {formik.errors.submit && (
             <Typography color="error" sx={{ mt: 3 }} variant="body2">
@@ -362,18 +413,13 @@ const StoryForm = () => {
             onClick={(e) => {
               e.preventDefault();
               handleCreate();
-            }
-            }
-          >
-            {isSubmit ? 'Tạo truyện...' : "Tạo"}
+            }}>
+            {isSubmit ? 'Tạo truyện...' : 'Tạo'}
           </Button>
-
         </form>
-
-      </div >
+      </div>
     </>
-  )
-
+  );
 };
 
 export default StoryForm;

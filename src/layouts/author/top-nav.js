@@ -34,8 +34,8 @@ export const TopNav = (props) => {
     <>
       <Box
         component="header"
-        xs={{ flexGrow: 1 }}
         sx={{
+          flexGrow: 1,
           px: 2,
           // backdropFilter: 'blur(6px)',
           backgroundColor: (theme) => alpha('#FFF', 0.5),
