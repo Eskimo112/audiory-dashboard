@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import EyeIcon from '@heroicons/react/24/solid/EyeIcon';
 import {
   Add,
+  CleaningServices,
   Comment,
   EditNote,
   Favorite,
@@ -18,12 +19,13 @@ import {
   Button,
   CircularProgress,
   Container,
+  Pagination,
   Popover,
   Stack,
   SvgIcon,
   TextField,
   Typography,
-  Unstable_Grid2 as Grid,
+  Unstable_Grid2 as Grid
 } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -36,7 +38,7 @@ import ConfirmDialog from '@/components/dialog/reuse-confirm-dialog';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import StoryService from '@/services/story';
 import { formatStatistic, timeAgo } from '@/utils/formatters';
-import { toastSuccess } from '@/utils/notification';
+import { toastError, toastSuccess } from '@/utils/notification';
 
 const MyStoryPage = () => {
   const router = useRouter();
@@ -55,6 +57,12 @@ const MyStoryPage = () => {
   );
 
   const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+
+  const stories = useMemo(() => {
+    return storiesData.slice((page - 1) * 10, page * 10);
+  }, [page, storiesData]);
+
 
   useEffect(() => {
     setMyStories(storiesData ?? []);
@@ -74,7 +82,8 @@ const MyStoryPage = () => {
     }
   };
 
-  const handleUnpublish = async (id) => {
+  const handleUnpublish = async ({ id }) => {
+    console.log(id)
     try {
       await new StoryService(requestHeader).unpublish(id).then((res) => {
         console.log(res);
@@ -83,16 +92,20 @@ const MyStoryPage = () => {
       });
     } catch (error) {
       console.log(error);
-      toastSuccess('Gỡ đăng tải không thành công truyện');
+      toastError('Gỡ đăng tải không thành công truyện');
+
     }
   };
   const StoryOverViewCard = ({ story }) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const handleClick = (event) => {
       event.stopPropagation();
+      event.preventDefault();
       setAnchorEl(event.currentTarget);
     };
-    const handleClose = () => {
+    const handleClose = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
       setAnchorEl(null);
     };
     const open = Boolean(anchorEl);
@@ -109,6 +122,10 @@ const MyStoryPage = () => {
         handleDelete({ id });
       }
     };
+
+    const handleNavigate = () => {
+      router.push(`my-works/${story.id}`);
+    }
     // const theme = useTheme();
     const DetailInfo = ({ icon, number, content, isHighlight = false }) => {
       return (
@@ -158,10 +175,15 @@ const MyStoryPage = () => {
             height: '12em',
             cursor: 'pointer',
           }}
-          onClick={() => {
-            router.push(`my-works/${story.id}`);
-          }}>
+          onClick={(e) => {
+            e.stopPropagation();
+            // e.preventDefault();
+            handleNavigate();
+
+          }}
+        >
           <CardMedia
+
             component="img"
             sx={{ width: '8em', objectFit: 'cover' }}
             src={
@@ -169,6 +191,12 @@ const MyStoryPage = () => {
                 ? story.cover_url
                 : 'https://imgv3.fotor.com/images/gallery/Fiction-Book-Covers.jpg'
             }
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              handleNavigate();
+
+            }}
             alt="Live from space album cover"
           />
           <CardContent
@@ -179,10 +207,12 @@ const MyStoryPage = () => {
               flexDirection: 'column',
               px: '16px',
               py: '16px',
-            }}>
+            }}
+
+          >
             <Stack
               direction="column"
-              justifyContent="space-between"
+              justiPyContent="space-between"
               gap="6px"
               height="100%">
               <Stack gap="4px">
@@ -191,9 +221,7 @@ const MyStoryPage = () => {
                   justifyContent="space-between"
                   alignItems="center">
                   <Typography
-                    onClick={() => {
-                      router.push(`my-works/${story.id}`);
-                    }}
+
                     component="div"
                     variant="h6"
                     sx={{
@@ -211,22 +239,29 @@ const MyStoryPage = () => {
                       aria-describedby={id}
                       variant="text"
                       sx={{ padding: '4px' }}
-                      onClick={handleClick}>
+                      onClick={(e) => {
+                        handleClick(e)
+                      }}>
                       <MoreVert />
                     </IconButton>
                     <Popover
                       id={id}
                       open={open}
                       anchorEl={anchorEl}
-                      onClose={handleClose}
+                      onClose={(e) => handleClose(e)}
                       anchorOrigin={{
                         vertical: 'bottom',
                         horizontal: 'left',
                       }}>
                       <Grid container direction="column">
                         {story.is_draft === false &&
-                        story.is_paywalled === false ? (
-                          <Button variant="text" color="primary">
+                          story.is_paywalled === false ? (
+                          <Button onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            handleUnpublish({ id: story.id });
+                          }} variant="text" color="primary">
                             {' '}
                             Gỡ đăng tải{' '}
                           </Button>
@@ -239,7 +274,11 @@ const MyStoryPage = () => {
                           <Button
                             variant="text"
                             color="secondary"
-                            onClick={handleDialogOpen}>
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleDialogOpen();
+                            }}>
                             Xóa truyện
                           </Button>
                         )}
@@ -354,7 +393,7 @@ const MyStoryPage = () => {
               </Box>
             </Stack>
           </CardContent>
-        </Card>
+        </Card >
       </>
     );
   };
@@ -399,10 +438,10 @@ const MyStoryPage = () => {
                     setMyStories(
                       e.target.value !== ''
                         ? storiesData.filter((person) =>
-                            person?.title
-                              .toLowerCase()
-                              .includes(e.target.value.toLowerCase()),
-                          )
+                          person?.title
+                            .toLowerCase()
+                            .includes(e.target.value.toLowerCase()),
+                        )
                         : storiesData,
                     );
                   }}
@@ -431,18 +470,26 @@ const MyStoryPage = () => {
               </Stack>
 
               <Grid container spacing={3}>
-                {myStories.length === 0 && isSuccess ? (
+                {stories.length === 0 && isSuccess ? (
                   <Grid xs={6} spacing={0}>
                     <Typography>Không tìm thấy truyện nào</Typography>
                   </Grid>
                 ) : (
-                  myStories?.map((story, index) => (
+                  stories?.map((story, index) => (
                     <Grid item lg={6} xs={12} key={story.id}>
                       <StoryOverViewCard story={story}></StoryOverViewCard>
                     </Grid>
                   ))
                 )}
+
               </Grid>
+
+              <Stack alignItems="center" width="100%">
+                <Pagination
+                  page={page}
+                  onChange={(e, page) => setPage(page)}
+                  count={Math.ceil(myStories.length / 10)}></Pagination>
+              </Stack>
             </Stack>
           </Container>
         </Box>

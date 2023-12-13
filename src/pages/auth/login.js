@@ -54,7 +54,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>Đăng nhập | Pricible</title>
+        <title>Đăng nhập | Audiory</title>
       </Head>
       <Box
         sx={{

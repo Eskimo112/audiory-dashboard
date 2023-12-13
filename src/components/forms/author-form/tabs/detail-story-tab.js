@@ -22,8 +22,7 @@ import StoryService from '@/services/story';
 import { toastError, toastSuccess } from '@/utils/notification';
 
 const DetailStoryTab = ({ story, handleRefetch, file }) => {
-  console.log('file', file);
-  // console.log(story?.tags?.map(a => a.name))
+
   const requestHeader = useRequestHeader();
   const [selectedCategory, setSelectedCategory] = useState('');
   const [tag, setTag] = useState('');
