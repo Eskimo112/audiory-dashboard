@@ -176,7 +176,6 @@ const NewChapterPage = () => {
     });
 
     formik.setFieldValue('images', base64Result);
-    console.log(base64Result);
     formik.setFieldValue('content', editor.getText());
   };
 
@@ -188,7 +187,6 @@ const NewChapterPage = () => {
 
     try {
       await new ChapterService(requestHeader).create(body).then((res) => {
-        console.log(res);
         router.push(`/my-works/${storyData?.id}/write/${res?.id}`);
         toastSuccess('Tạo chương mới thành công');
       });
@@ -276,7 +274,7 @@ const NewChapterPage = () => {
 
   const onSaveDraftChapter = useCallback(
     async (isPreview, isPublish) => {
-      if (value.split(' ').length < MIN_WORDS && imageArr.length === 0) {
+      if (value.split(' ').length < MIN_WORDS) {
         toastError(`Quá ngắn để lưu bản thảo`);
       } else {
         // content size (text+image) handler
@@ -421,10 +419,11 @@ const NewChapterPage = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (!isChanged) return;
+      if (value.split(' ').length < MIN_WORDS) return;
       onSaveDraftChapter(false, false);
     }, 5000);
     return () => clearInterval(interval);
-  }, [isChanged, onSaveDraftChapter]);
+  }, [isChanged, onSaveDraftChapter, value]);
 
   const {
     confirmCbRef: continueRouterPushRef,

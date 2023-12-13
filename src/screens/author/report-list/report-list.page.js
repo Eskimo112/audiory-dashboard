@@ -27,10 +27,10 @@ import {
   CHIP_FONT_COLORS,
 } from '../../../constants/chip_colors';
 import { useAuth } from '../../../hooks/use-auth';
-import { formatDate } from '../../../utils/formatters';
-import LoadingPage from '../../loading';
 import ChapterVersionService from '../../../services/chapter-version';
+import { formatDate } from '../../../utils/formatters';
 import { toastError, toastSuccess } from '../../../utils/notification';
+import LoadingPage from '../../loading';
 
 const REPORT_TYPE_MAP = {
   USER: 'Người dùng',
