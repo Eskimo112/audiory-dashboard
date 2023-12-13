@@ -19,7 +19,7 @@ import { useRequestHeader } from '@/hooks/use-request-header';
 import UserService from '@/services/user';
 
 import { useAuth } from '../../../hooks/use-auth';
-import { formatDate, timeAgo } from '../../../utils/formatters';
+import { timeAgo } from '../../../utils/formatters';
 import LoadingPage from '../../loading';
 
 const NotificationListPage = () => {
@@ -27,7 +27,11 @@ const NotificationListPage = () => {
   const { user } = useAuth();
   const router = useRouter();
   const [page, setPage] = useState(1);
-  const { data: notis = [], isLoading } = useQuery(
+  const {
+    data: notis = [],
+    isLoading,
+    refetch,
+  } = useQuery(
     ['user', user.id, 'notification', page],
     async () =>
       await new UserService(requestHeader).getNotificationByUserId(
@@ -35,6 +39,14 @@ const NotificationListPage = () => {
       ),
     { refetchOnWindowFocus: false, enabled: Boolean(user.id) },
   );
+
+  const handleOnClickNoti = async (id) => {
+    await new UserService(requestHeader)
+      .updateNotificationById(id, { is_read: true })
+      .then(() => {
+        refetch();
+      });
+  };
 
   if (isLoading) return <LoadingPage />;
   return (
@@ -75,6 +87,7 @@ const NotificationListPage = () => {
                         key={index}
                         variant="text"
                         onClick={() => {
+                          handleOnClickNoti(noti.id);
                           if (noti.activity.action_type === 'RESPONDED') {
                             router.push(
                               `/report-list?report_id=${noti.activity.entity_id}`,
@@ -92,10 +105,12 @@ const NotificationListPage = () => {
                           textAlign: 'left',
                           justifyContent: 'start',
                           position: 'relative',
-                          border: '1px solid',
+                          overflow: 'visible',
+                          // border: '1px solid',
                           borderRadius: 1,
-                          borderColor: 'sky.lighter',
-                          overflow: 'hidden',
+                          // borderColor: 'sky.lighter',
+                          bgcolor: noti.is_read ? undefined : 'sky.lightest',
+                          padding: '12px',
                         }}>
                         <Stack
                           width="100%"
@@ -129,6 +144,18 @@ const NotificationListPage = () => {
                             </Typography>
                           </Stack>
                         </Stack>
+                        {!noti.is_read && (
+                          <Stack
+                            width="8px"
+                            height="8px"
+                            sx={{
+                              bgcolor: 'primary.main',
+                              borderRadius: 1,
+                              position: 'absolute',
+                              top: 0,
+                              right: 0,
+                            }}></Stack>
+                        )}
                       </Button>
                     );
                   })}

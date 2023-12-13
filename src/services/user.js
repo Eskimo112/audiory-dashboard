@@ -113,6 +113,19 @@ export default class UserService {
     return response.data;
   }
 
+  async updateNotificationById(id, body) {
+    const url = `notifications/${id}`;
+
+    const response = await request({
+      url,
+      method: 'put',
+      payload: body,
+      requestHeaders: this.requestHeader,
+    });
+    if (!response.data) return [];
+    return response.data;
+  }
+
   async getWallById(userId) {
     const url = `users/${userId}/wall`;
 
