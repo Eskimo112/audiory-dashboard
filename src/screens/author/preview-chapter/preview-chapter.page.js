@@ -105,6 +105,26 @@ const PreviewChapterPage = ({ chapterVersionId, isPreview }) => {
     router.back();
   };
 
+  const handlePublishChapter = async () => {
+    await new ChapterVersionService(requestHeader)
+      .publish(chapterVersionId)
+      .then(() => {
+        toastSuccess('Đăng tải chương thành công');
+        router.back();
+      })
+      .catch((error) => {
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.message
+        ) {
+          toastError(error.response.data.message);
+          return;
+        }
+        toastError('Đã xảy ra lỗi, thử lại sau');
+      });
+  };
+
   return (
     <>
       <Stack width={'100%'} direction="column" alignItems="center" gap="24px">
@@ -125,7 +145,19 @@ const PreviewChapterPage = ({ chapterVersionId, isPreview }) => {
               justifyContent="center"
               alignItems="center"
               gap="16px">
-              {!isPreview && (
+              {isPreview ? (
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  startIcon={
+                    <SvgIcon>
+                      <ArrowBack></ArrowBack>
+                    </SvgIcon>
+                  }
+                  onClick={handlePublishChapter}>
+                  Đăng tải
+                </Button>
+              ) : (
                 <Stack
                   width="100%"
                   direction="row"
