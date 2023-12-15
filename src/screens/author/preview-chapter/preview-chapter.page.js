@@ -149,11 +149,6 @@ const PreviewChapterPage = ({ chapterVersionId, isPreview }) => {
                 <Button
                   variant="outlined"
                   color="primary"
-                  startIcon={
-                    <SvgIcon>
-                      <ArrowBack></ArrowBack>
-                    </SvgIcon>
-                  }
                   onClick={handlePublishChapter}>
                   Đăng tải
                 </Button>
