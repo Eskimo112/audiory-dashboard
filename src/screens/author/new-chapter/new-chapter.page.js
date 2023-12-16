@@ -17,6 +17,7 @@ import {
   Popover,
   Skeleton,
   Stack,
+  SvgIcon,
   TextField,
   Typography,
 } from '@mui/material';
@@ -31,7 +32,14 @@ import { useQuery } from 'react-query';
 import { toastError, toastSuccess } from '@/utils/notification';
 import { AppImageUpload } from '@/components/app-image-upload';
 import AuthorBreadCrumbs from '@/components/author-bread-crumbs';
-import { CheckCircle } from '@mui/icons-material';
+import {
+  CheckCircle,
+  PublishRounded,
+  SaveRounded,
+  Visibility,
+  VisibilityOffRounded,
+  VisibilityOutlined,
+} from '@mui/icons-material';
 import { formatDateTime } from '@/utils/formatters';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import {
@@ -629,13 +637,23 @@ const NewChapterPage = () => {
                 color="inherit"
                 onClick={() => {
                   onSaveDraftChapter(false, false);
-                }}>
+                }}
+                startIcon={
+                  <SvgIcon>
+                    <SaveRounded></SaveRounded>
+                  </SvgIcon>
+                }>
                 Lưu bản thảo
               </Button>
               <Button
                 disabled={!formik.isValid || isSubmitting}
                 variant="outlined"
                 color="primary"
+                startIcon={
+                  <SvgIcon>
+                    <VisibilityOutlined></VisibilityOutlined>
+                  </SvgIcon>
+                }
                 onClick={() => {
                   onSaveDraftChapter(true, false);
                 }}>
@@ -647,6 +665,11 @@ const NewChapterPage = () => {
                 }
                 variant="contained"
                 color="primary"
+                startIcon={
+                  <SvgIcon>
+                    <PublishRounded></PublishRounded>
+                  </SvgIcon>
+                }
                 onClick={() => {
                   onSaveDraftChapter(false, true);
                 }}>

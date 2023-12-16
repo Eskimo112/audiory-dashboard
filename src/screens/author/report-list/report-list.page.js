@@ -51,12 +51,15 @@ const ReportListPage = ({ reportId }) => {
   const { user } = useAuth();
   const [currentReport, setCurrentReport] = useState(reportId);
   const [page, setPage] = useState(1);
-  const { data: reports = [], isLoading } = useQuery(
+  const { data: response = {}, isLoading } = useQuery(
     ['user', user.id, 'reports', page],
+
     async () =>
       await new UserService(requestHeader).getReportsByUserId(user.id, page),
     { refetchOnWindowFocus: false, enabled: Boolean(user.id) },
   );
+  const reports = response.data ?? [];
+  const totalPage = response.total_page ?? 0;
 
   // const { data: chapterVersionData = {} } = useQuery(
   //   ['chapterVersion', currentReport.reported_id],
@@ -188,7 +191,7 @@ const ReportListPage = ({ reportId }) => {
                 </Stack>
 
                 <Pagination
-                  count={2}
+                  count={totalPage}
                   page={page}
                   color="primary"
                   onChange={(_, page) => setPage(page)}

@@ -23,6 +23,9 @@ export const StatCard = (props) => {
   if (value !== 0) {
     percent = (difference / value) * 100;
   }
+
+  console.log(difference === 0);
+
   const positive = difference >= 0;
   return (
     <Card
@@ -47,7 +50,7 @@ export const StatCard = (props) => {
               sx={{ fontWeight: 600, fontSize: '16px' }}>
               {title}
             </Typography>
-            {difference && (
+            {difference !== 0 ? (
               <Typography
                 color="ink.main"
                 sx={{ fontWeight: 600, fontSize: '16px' }}>
@@ -62,8 +65,10 @@ export const StatCard = (props) => {
                     <ChevronDoubleDownIcon width="16px" />
                   )}
                 </SvgIcon>
-                {formatNumber(percent) + '%'}
+                {formatNumber(percent)}
               </Typography>
+            ) : (
+              <Stack height="25px"> </Stack>
             )}
             <Typography variant="h4" sx={{ fontWeight: 700 }}>
               {formatNumber(value) + (suffix || '')}

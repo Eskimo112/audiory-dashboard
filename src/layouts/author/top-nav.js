@@ -110,7 +110,7 @@ export const TopNav = (props) => {
             justifyContent="end"
             columnGap={1}>
             <Grid item xs="auto">
-              <Tooltip title="Danh sách báo cáo">
+              <Tooltip title="Thông báo">
                 <IconButton
                   aria-label="delete"
                   size="medium"

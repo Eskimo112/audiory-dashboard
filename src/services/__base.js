@@ -24,6 +24,7 @@ export const request = async ({
   payload,
   params,
   requestHeaders,
+  returnOriginalResponse,
 }) => {
   const axiosHeaders = convertHeaderToAxiosHeaders({
     ...requestHeaders,
@@ -41,5 +42,5 @@ export const request = async ({
   if (res.status !== 200) {
     throw res.data.message;
   }
-  return res.data ?? null;
+  return returnOriginalResponse ? res : res.data ?? null;
 };

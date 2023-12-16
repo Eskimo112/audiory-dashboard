@@ -4,7 +4,12 @@ import dynamic from 'next/dynamic';
 
 import 'react-quill/dist/quill.snow.css';
 
-import { ArrowBack, CheckCircle, RefreshRounded } from '@mui/icons-material';
+import {
+  ArrowBack,
+  CheckCircle,
+  PublishRounded,
+  RefreshRounded,
+} from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -106,8 +111,8 @@ const PreviewChapterPage = ({ chapterVersionId, isPreview }) => {
   };
 
   const handlePublishChapter = async () => {
-    await new ChapterVersionService(requestHeader)
-      .publish(chapterVersionId)
+    await new ChapterService(requestHeader)
+      .publish(chapterVersionData.chapter_id)
       .then(() => {
         toastSuccess('Đăng tải chương thành công');
         router.back();
@@ -146,12 +151,34 @@ const PreviewChapterPage = ({ chapterVersionId, isPreview }) => {
               alignItems="center"
               gap="16px">
               {isPreview ? (
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={handlePublishChapter}>
-                  Đăng tải
-                </Button>
+                <Stack
+                  width="100%"
+                  direction="row"
+                  justifyContent="space-around"
+                  gap="12px">
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={
+                      <SvgIcon>
+                        <ArrowBack></ArrowBack>
+                      </SvgIcon>
+                    }
+                    onClick={navigateToWrite}>
+                    Quay trở lại viết
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={
+                      <SvgIcon>
+                        <PublishRounded></PublishRounded>
+                      </SvgIcon>
+                    }
+                    onClick={handlePublishChapter}>
+                    Đăng tải
+                  </Button>
+                </Stack>
               ) : (
                 <Stack
                   width="100%"

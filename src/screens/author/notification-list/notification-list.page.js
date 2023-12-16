@@ -28,7 +28,7 @@ const NotificationListPage = () => {
   const router = useRouter();
   const [page, setPage] = useState(1);
   const {
-    data: notis = [],
+    data: response = {},
     isLoading,
     refetch,
   } = useQuery(
@@ -49,6 +49,9 @@ const NotificationListPage = () => {
   };
 
   if (isLoading) return <LoadingPage />;
+
+  const notis = response.data ?? [];
+  const totalPage = response.total_page ?? 0;
   return (
     <>
       <Head>
@@ -162,7 +165,7 @@ const NotificationListPage = () => {
                 </Stack>
 
                 <Pagination
-                  count={2}
+                  count={totalPage}
                   page={page}
                   color="primary"
                   onChange={(_, page) => setPage(page)}

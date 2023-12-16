@@ -93,8 +93,8 @@ export default class UserService {
       },
       requestHeaders: this.requestHeader,
     });
-    if (!response.data) return [];
-    return response.data;
+    if (!response) return [];
+    return response;
   }
 
   async getNotificationByUserId(offset) {
@@ -109,8 +109,8 @@ export default class UserService {
       },
       requestHeaders: this.requestHeader,
     });
-    if (!response.data) return [];
-    return response.data;
+    if (!response) return null;
+    return response;
   }
 
   async updateNotificationById(id, body) {
