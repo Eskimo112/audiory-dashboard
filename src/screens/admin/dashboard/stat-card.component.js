@@ -30,11 +30,8 @@ export const StatCard = (props) => {
       sx={{
         ...sx,
         padding: 0,
-        backgroundColor: difference
-          ? positive
-            ? 'primary.alpha20'
-            : 'secondary.alpha20'
-          : '',
+        opacity: 1,
+        backgroundColor: difference ? (positive ? '#dbebea' : '#f9e0da') : '',
       }}>
       <CardContent sx={{ padding: '24px', paddingBottom: '24px!important' }}>
         <Stack
@@ -63,7 +60,7 @@ export const StatCard = (props) => {
                     <ChevronDoubleDownIcon width="16px" />
                   )}
                 </SvgIcon>
-                {formatNumber(percent)}
+                {formatNumber(percent) + '%'}
               </Typography>
             ) : (
               <Stack height="25px"> </Stack>

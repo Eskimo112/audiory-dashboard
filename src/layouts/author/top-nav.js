@@ -11,14 +11,25 @@ import {
   Person,
 } from '@mui/icons-material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { Avatar, Box, Button, Grid, IconButton, Tooltip } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Stack,
+  Tooltip,
+} from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import PropTypes from 'prop-types';
+import { useQuery } from 'react-query';
 import { usePopover } from 'src/hooks/use-popover';
 
 import AppIcon from '@/components/app-icon';
 import { useAuth } from '@/hooks/use-auth';
 
+import { useRequestHeader } from '../../hooks/use-request-header';
+import UserService from '../../services/user';
 import { AccountPopover } from '../dashboard/account-popover';
 
 const TOP_NAV_HEIGHT = 60;
@@ -28,8 +39,21 @@ export const TopNav = (props) => {
   // const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   const router = useRouter();
   const accountPopover = usePopover();
-  const auth = useAuth();
-  const [user, setUser] = useState(auth?.user);
+  const { user } = useAuth();
+  const requestHeader = useRequestHeader();
+  const {
+    data: notis = [],
+    isLoading,
+    refetch,
+  } = useQuery(
+    ['user', user.id, 'notification', 1],
+    async () => await new UserService(requestHeader).getNotificationByUserId(0),
+    {
+      refetchOnWindowFocus: false,
+      enabled: Boolean(user.id),
+      select: (res) => res.data,
+    },
+  );
   return (
     <>
       <Box
@@ -74,7 +98,8 @@ export const TopNav = (props) => {
               }
               color="primary"
               onClick={() => {
-                router.push('/author-dashboard');
+                if (!router.pathname.startsWith('/author-dashboard'))
+                  router.push('/author-dashboard');
               }}>
               Thống kê
             </Button>
@@ -85,7 +110,8 @@ export const TopNav = (props) => {
               }
               color="primary"
               onClick={() => {
-                router.push('/my-works');
+                if (!router.pathname.startsWith('/my-works'))
+                  router.push('/my-works');
               }}>
               Sáng tác
             </Button>
@@ -96,7 +122,8 @@ export const TopNav = (props) => {
               }
               color="primary"
               onClick={() => {
-                router.push('/profile/me');
+                if (!router.pathname.startsWith('/profile'))
+                  router.push('/profile/me');
               }}>
               Hồ sơ
             </Button>
@@ -114,10 +141,23 @@ export const TopNav = (props) => {
                   aria-label="delete"
                   size="medium"
                   color="inherit"
+                  sx={{ position: 'relative' }}
                   onClick={() => {
                     router.push('/notification-list');
                   }}>
                   <NotificationsOutlined color="primary" />
+                  {(notis ?? []).find((noti) => noti.is_read !== true) && (
+                    <Stack
+                      sx={{
+                        width: '6px',
+                        height: '6px',
+                        bgcolor: 'secondary.main',
+                        position: 'absolute',
+                        borderRadius: '8px',
+                        right: 6,
+                        top: 6,
+                      }}></Stack>
+                  )}
                 </IconButton>
               </Tooltip>
             </Grid>
@@ -150,7 +190,7 @@ export const TopNav = (props) => {
                     height: 30,
                     width: 30,
                   }}
-                  src={auth?.user?.avatar_url ?? ''}
+                  src={user?.avatar_url ?? ''}
                 />
                 <ArrowDropDownIcon fontSize="inherit" color="primary" />
               </Grid>

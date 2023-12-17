@@ -91,7 +91,7 @@ const NewChapterPage = () => {
   } = useQuery(
     ['chapter', chapterId],
     async () => await new ChapterService(requestHeader).getById(chapterId),
-    { refetchOnWindowFocus: false, refetchOnMount: false },
+    { refetchOnWindowFocus: false },
   );
 
   const {
@@ -102,7 +102,7 @@ const NewChapterPage = () => {
     ['chapterVersionList', chapterId],
     async () =>
       await new ChapterVersionService(requestHeader).getAll({ chapterId }),
-    { refetchOnWindowFocus: false, refetchOnMount: false },
+    { refetchOnWindowFocus: false },
   );
 
   const {

@@ -274,7 +274,7 @@ const MyPostsPage = () => {
                             <Typography
                               fontSize="14px"
                               fontWeight={600}
-                              sx={{ color: 'ink.main' }}>
+                              sx={{ color: 'sky.dark' }}>
                               {post.children.length ?? 0} bình luận
                             </Typography>
                           </Stack>

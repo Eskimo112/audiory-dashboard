@@ -115,7 +115,7 @@ const PreviewChapterPage = ({ chapterVersionId, isPreview }) => {
       .publish(chapterVersionData.chapter_id)
       .then(() => {
         toastSuccess('Đăng tải chương thành công');
-        router.back();
+        router.push(`/my-works/${storyId}`);
       })
       .catch((error) => {
         if (

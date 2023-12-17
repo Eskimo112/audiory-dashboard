@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import Head from 'next/head';
 
-import { Close } from '@mui/icons-material';
+import { Close, PublishRounded } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -14,6 +14,7 @@ import {
   IconButton,
   Pagination,
   Stack,
+  SvgIcon,
   Typography,
   Unstable_Grid2 as Grid,
 } from '@mui/material';
@@ -284,7 +285,7 @@ const ReportListPage = ({ reportId }) => {
               </Stack>
             </DialogContent>
             <DialogContent dividers>
-              <Stack gap="12px">
+              <Stack gap="12px" alignItems="center">
                 <Stack
                   direction="row"
                   width="100%"
@@ -329,6 +330,12 @@ const ReportListPage = ({ reportId }) => {
                   currentReport.report_status === 'APPROVED' && (
                     <Button
                       variant="contained"
+                      startIcon={
+                        <SvgIcon>
+                          <PublishRounded></PublishRounded>
+                        </SvgIcon>
+                      }
+                      sx={{ width: 'fit-content' }}
                       onClick={async () => {
                         await new ChapterVersionService(requestHeader)
                           .publish(currentReport.reported_id)

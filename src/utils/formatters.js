@@ -18,33 +18,6 @@ export const formatStatistic = (value) => {
   }
 };
 
-export const countDiffenceFromNow = (dateString) => {
-  console.log(dateString);
-  const date = new Date(dateString).getTime();
-  const now = new Date().getTime();
-  const diffTime = Math.abs(now - date);
-  const diffInMinutes = Math.ceil(diffTime / (1000 * 60));
-  const diffInHours = Math.ceil(diffTime / (1000 * 60 * 60));
-
-  console.log('---------------------');
-  console.log('diffTime ', diffTime);
-  console.log('diffTime ', diffInMinutes);
-  console.log('diffTime ', diffInHours);
-  // if (diffInMinutes < 1) {
-  //   console.log('sec')
-  //   return diffInMinutes + ' giây trước';
-  // } else if (diffInHours < 1) {
-  //   console.log('min')
-
-  //   return diffInHours + ' phút trước';
-  // } else if (diffInHours <= 23) {
-  //   console.log('hour')
-  //   return diffInHours + ' giờ trước'
-  // };
-  console.log(formatDate(dateString));
-  return 'Cập nhật' + formatDateTime(dateString).split(',')[1];
-};
-
 export function timeAgo(dateString) {
   const currentDate = new Date();
   const inputDate = new Date(dateString);
@@ -88,4 +61,19 @@ export function formatDateTime(dateString) {
 
 export function formatDate(dateString) {
   return dayjs(dateString).format('DD/MM/YYYY');
+}
+
+export function formatNumberToFixed(number, decimalPlaces) {
+  if (typeof number !== 'number') {
+    throw new Error('Please provide a valid number');
+  }
+
+  if (typeof decimalPlaces !== 'number' || decimalPlaces < 0) {
+    throw new Error('Decimal places should be a non-negative number');
+  }
+
+  return number.toLocaleString(undefined, {
+    minimumFractionDigits: decimalPlaces,
+    maximumFractionDigits: decimalPlaces,
+  });
 }

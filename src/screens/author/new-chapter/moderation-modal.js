@@ -19,6 +19,7 @@ import { useQuery } from 'react-query';
 
 import { useRequestHeader } from '../../../hooks/use-request-header';
 import ChapterVersionService from '../../../services/chapter-version';
+import { formatNumberToFixed } from '../../../utils/formatters';
 
 const MODERATION_MAP = {
   Profanity: 'Thô tục',
@@ -70,14 +71,16 @@ const ModerationModal = ({ chapterVersionId, handleClose }) => {
                 tiết)
               </Typography>
               {paras.map((p, index) => {
-                const isMatured = p.content_moderation.is_mature;
-                const isReactionary = p.content_moderation.is_reactionary;
+                const isMatured = p.content_moderation[0].is_mature;
+                const isReactionary = p.content_moderation[0].is_reactionary;
 
                 return (
                   <Button
                     key={index}
                     variant="text"
-                    onClick={() => setCurrentModeration(p.content_moderation)}
+                    onClick={() =>
+                      setCurrentModeration(p.content_moderation[0])
+                    }
                     sx={{
                       cursor: 'pointer',
                       textAlign: 'left',
@@ -182,13 +185,8 @@ const ModerationModal = ({ chapterVersionId, handleClose }) => {
                       <Typography variant="body2">
                         {MODERATION_MAP[item.criteria_id]}
                       </Typography>
-                      <Typography
-                        variant="body2"
-                        fontWeight={600}
-                        color={
-                          item.confidence >= 0.8 ? 'error.main' : 'success.main'
-                        }>
-                        {item.confidence}
+                      <Typography variant="body2" fontWeight={600}>
+                        {formatNumberToFixed(item.confidence, 4)}
                       </Typography>
                     </Stack>
                   ))}

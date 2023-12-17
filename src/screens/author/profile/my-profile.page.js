@@ -133,11 +133,11 @@ const MyProfilePage = () => {
                   <Typography variant="h6">Giới thiệu</Typography>
                   <Button
                     onClick={() => {
-                      console.log('haha');
                       router.push('/profile/posts');
                     }}
                     variant="contained"
                     size="small"
+                    color="info"
                     sx={{ position: 'absolute', right: 0 }}
                     endIcon={
                       <SvgIcon>
