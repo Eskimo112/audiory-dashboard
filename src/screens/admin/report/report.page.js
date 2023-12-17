@@ -85,8 +85,7 @@ const ReportPage = () => {
                 lineClamp: 2,
                 WebkitBoxOrient: 'vertical',
               }}>
-              {cell.getValue() +
-                'aiweuyqoiwhen,amsndaksudyqouweqweiakjsdnaw qiweqwoiehn qwuoeyoq'}
+              {cell.getValue()}
             </Typography>
           );
         },

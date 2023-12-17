@@ -54,7 +54,6 @@ import { useAuth } from '../../../hooks/use-auth';
 import StoryService from '../../../services/story';
 import ModerationModal from './moderation-modal';
 import dynamic from 'next/dynamic';
-import useNextNavigateAway from '../../../hooks/use-navigate-away';
 import { useConfirmDialog } from '../../../hooks/use-confirm-dialog';
 
 const ReactQuill = dynamic(
