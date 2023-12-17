@@ -168,22 +168,21 @@ const NewChapterPage = () => {
   const onEditorChange = (content, delta, source, editor) => {
     // content
 
-    var imagesArr = editor
-      .getContents()
-      .ops?.filter((ele) => ele.insert.image !== undefined)
-      ?.map((image) => image?.insert?.image);
-    console.log(imageArr);
-    setImageArr(imagesArr);
+    // var imagesArr = editor
+    //   .getContents()
+    //   .ops?.filter((ele) => ele.insert.image !== undefined)
+    //   ?.map((image) => image?.insert?.image);
+    // setImageArr(imagesArr);
 
     setValue(editor.getText().trim());
     formik.setFieldValue('rich_text', JSON.stringify(editor.getContents()));
 
-    const base64Result = [];
-    imagesArr.forEach((image) => {
-      base64Result.push(convertImageLinkToBase64(image));
-    });
+    // const base64Result = [];
+    // imagesArr.forEach((image) => {
+    //   base64Result.push(convertImageLinkToBase64(image));
+    // });
 
-    formik.setFieldValue('images', base64Result);
+    // formik.setFieldValue('images', base64Result);
     formik.setFieldValue('content', editor.getText());
   };
 

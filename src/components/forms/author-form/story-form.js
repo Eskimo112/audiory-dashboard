@@ -276,7 +276,7 @@ const StoryForm = () => {
                           sx={{
                             bgcolor: 'primary.main',
                             borderRadius: '16px',
-                            padding: '4px 8px',
+                            padding: '2px 8px',
                             color: 'white',
                             alignItems: 'center',
                           }}>

@@ -55,5 +55,7 @@ export const convertImageLinkToBase64 = (url, callback) => {
     })
     .catch((error) => {
       console.error('Error:', error);
+
+      return url;
     });
 };

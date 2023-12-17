@@ -24,8 +24,6 @@ export const StatCard = (props) => {
     percent = (difference / value) * 100;
   }
 
-  console.log(difference === 0);
-
   const positive = difference >= 0;
   return (
     <Card
@@ -50,7 +48,7 @@ export const StatCard = (props) => {
               sx={{ fontWeight: 600, fontSize: '16px' }}>
               {title}
             </Typography>
-            {difference !== 0 ? (
+            {Boolean(difference) ? (
               <Typography
                 color="ink.main"
                 sx={{ fontWeight: 600, fontSize: '16px' }}>

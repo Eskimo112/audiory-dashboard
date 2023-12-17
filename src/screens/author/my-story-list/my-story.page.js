@@ -8,11 +8,14 @@ import {
   Add,
   CleaningServices,
   Comment,
+  DeleteForeverOutlined,
   EditNote,
   Favorite,
   Menu,
   MenuBook,
   MoreVert,
+  UnpublishedOutlined,
+  UnpublishedRounded,
 } from '@mui/icons-material';
 import {
   Box,
@@ -25,7 +28,7 @@ import {
   SvgIcon,
   TextField,
   Typography,
-  Unstable_Grid2 as Grid
+  Unstable_Grid2 as Grid,
 } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -63,7 +66,6 @@ const MyStoryPage = () => {
     return storiesData.slice((page - 1) * 10, page * 10);
   }, [page, storiesData]);
 
-
   useEffect(() => {
     setMyStories(storiesData ?? []);
   }, [storiesData]);
@@ -83,7 +85,7 @@ const MyStoryPage = () => {
   };
 
   const handleUnpublish = async ({ id }) => {
-    console.log(id)
+    console.log(id);
     try {
       await new StoryService(requestHeader).unpublish(id).then((res) => {
         console.log(res);
@@ -93,7 +95,6 @@ const MyStoryPage = () => {
     } catch (error) {
       console.log(error);
       toastError('Gỡ đăng tải không thành công truyện');
-
     }
   };
   const StoryOverViewCard = ({ story }) => {
@@ -125,7 +126,7 @@ const MyStoryPage = () => {
 
     const handleNavigate = () => {
       router.push(`my-works/${story.id}`);
-    }
+    };
     // const theme = useTheme();
     const DetailInfo = ({ icon, number, content, isHighlight = false }) => {
       return (
@@ -179,11 +180,8 @@ const MyStoryPage = () => {
             e.stopPropagation();
             // e.preventDefault();
             handleNavigate();
-
-          }}
-        >
+          }}>
           <CardMedia
-
             component="img"
             sx={{ width: '8em', objectFit: 'cover' }}
             src={
@@ -195,7 +193,6 @@ const MyStoryPage = () => {
               e.stopPropagation();
               e.preventDefault();
               handleNavigate();
-
             }}
             alt="Live from space album cover"
           />
@@ -207,9 +204,7 @@ const MyStoryPage = () => {
               flexDirection: 'column',
               px: '16px',
               py: '16px',
-            }}
-
-          >
+            }}>
             <Stack
               direction="column"
               justiPyContent="space-between"
@@ -221,7 +216,6 @@ const MyStoryPage = () => {
                   justifyContent="space-between"
                   alignItems="center">
                   <Typography
-
                     component="div"
                     variant="h6"
                     sx={{
@@ -240,7 +234,9 @@ const MyStoryPage = () => {
                       variant="text"
                       sx={{ padding: '4px' }}
                       onClick={(e) => {
-                        handleClick(e)
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleClick(e);
                       }}>
                       <MoreVert />
                     </IconButton>
@@ -255,14 +251,21 @@ const MyStoryPage = () => {
                       }}>
                       <Grid container direction="column">
                         {story.is_draft === false &&
-                          story.is_paywalled === false ? (
-                          <Button onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
+                        story.is_paywalled === false ? (
+                          <Button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
 
-                            handleUnpublish({ id: story.id });
-                          }} variant="text" color="primary">
-                            {' '}
+                              handleUnpublish({ id: story.id });
+                            }}
+                            startIcon={
+                              <SvgIcon sx={{ width: '18px' }}>
+                                <UnpublishedOutlined></UnpublishedOutlined>
+                              </SvgIcon>
+                            }
+                            variant="text"
+                            color="primary">
                             Gỡ đăng tải{' '}
                           </Button>
                         ) : (
@@ -278,7 +281,12 @@ const MyStoryPage = () => {
                               e.preventDefault();
                               e.stopPropagation();
                               handleDialogOpen();
-                            }}>
+                            }}
+                            startIcon={
+                              <SvgIcon sx={{ width: '18px' }}>
+                                <DeleteForeverOutlined></DeleteForeverOutlined>
+                              </SvgIcon>
+                            }>
                             Xóa truyện
                           </Button>
                         )}
@@ -393,7 +401,7 @@ const MyStoryPage = () => {
               </Box>
             </Stack>
           </CardContent>
-        </Card >
+        </Card>
       </>
     );
   };
@@ -438,10 +446,10 @@ const MyStoryPage = () => {
                     setMyStories(
                       e.target.value !== ''
                         ? storiesData.filter((person) =>
-                          person?.title
-                            .toLowerCase()
-                            .includes(e.target.value.toLowerCase()),
-                        )
+                            person?.title
+                              .toLowerCase()
+                              .includes(e.target.value.toLowerCase()),
+                          )
                         : storiesData,
                     );
                   }}
@@ -481,7 +489,6 @@ const MyStoryPage = () => {
                     </Grid>
                   ))
                 )}
-
               </Grid>
 
               <Stack alignItems="center" width="100%">

@@ -5,8 +5,8 @@ export const STATUS_MAP = {
 
 export const TRANSACTION_TYPE_MAP = {
   GIFT_SENT: 'Tặng quà',
-  REWARD_FROM_GIFT: 'Phần thưởng từ quà',
-  REWARD_FROM_STORY: 'Phần thưởng từ truyện',
+  REWARD_FROM_GIFT: 'Quà thưởng',
+  REWARD_FROM_STORY: 'Doanh thu',
   CHAPTER_BOUGHT: 'Mua chương',
   REFUND: 'Hoàn tiền',
   PURCHASE: 'Mua xu',

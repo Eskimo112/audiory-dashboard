@@ -40,12 +40,12 @@ const Page = () => (
             />
           </Box>
           <Typography align="center" sx={{ mb: 3 }} variant="h3">
-            404: The page you are looking for isn’t here
+            404: Trang mà bạn tìm kiếm không tồn tại
           </Typography>
-          <Typography align="center" color="text.secondary" variant="body1">
+          {/* <Typography align="center" color="text.secondary" variant="body1">
             You either tried some shady route or you came here by mistake.
             Whichever it is, try using the navigation
-          </Typography>
+          </Typography> */}
           <Button
             component={NextLink}
             href="/admin"
@@ -56,7 +56,7 @@ const Page = () => (
             }
             sx={{ mt: 3 }}
             variant="contained">
-            Go back to dashboard
+            Quay lại trang chủ
           </Button>
         </Box>
       </Container>

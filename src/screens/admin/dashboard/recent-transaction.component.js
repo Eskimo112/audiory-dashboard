@@ -26,7 +26,7 @@ import { CHIP_BG_COLORS, CHIP_FONT_COLORS } from '@/constants/chip_colors';
 import { TRANSACTION_TYPE_MAP } from '@/constants/status_map';
 import { SHARED_TABLE_PROPS } from '@/constants/table';
 import { useRequestHeader } from '@/hooks/use-request-header';
-import { formatDateTime } from '@/utils/formatters';
+import { formatDateTime, timeAgo } from '@/utils/formatters';
 
 import TransactionService from '../../../services/transaction';
 
@@ -64,7 +64,13 @@ const RecentTransactionsTable = () => {
                 src={row.original.user.avatar_url}
                 sx={{ width: '40px', height: '40px' }}></Avatar>
               <Stack alignItems="start">
-                <Typography variant="subtitle2">
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                  }}>
                   {row.original.user.full_name ?? 'Không có tên'}
                 </Typography>
                 <Typography
@@ -103,7 +109,7 @@ const RecentTransactionsTable = () => {
             <Chip
               label={cell.getValue()}
               sx={{
-                backgroundColor: CHIP_BG_COLORS[idx],
+                bgcolor: CHIP_BG_COLORS[idx],
                 color: CHIP_FONT_COLORS[idx],
               }}
             />
@@ -131,7 +137,7 @@ const RecentTransactionsTable = () => {
         accessorKey: 'created_date',
         header: 'Thời gian',
         accessorFn: (row) => {
-          return formatDateTime(row.created_date);
+          return timeAgo(row.created_date);
         },
       },
     ],
@@ -170,51 +176,49 @@ const RecentTransactionsTable = () => {
 
   return (
     <>
-      <Card sx={{ p: 2 }}>
-        <CardHeader
-          action={
-            <Stack direction="row" gap="8px">
-              <Button
-                color="inherit"
-                size="small"
-                onClick={() => refetch()}
-                startIcon={
-                  <SvgIcon fontSize="small">
-                    <ArrowPathIcon />
-                  </SvgIcon>
-                }>
-                Làm mới
-              </Button>
-            </Stack>
-          }
-          title="Giao dịch gần đây"
+      <CardHeader
+        action={
+          <Stack direction="row" gap="8px">
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => refetch()}
+              startIcon={
+                <SvgIcon fontSize="small">
+                  <ArrowPathIcon />
+                </SvgIcon>
+              }>
+              Làm mới
+            </Button>
+          </Stack>
+        }
+        title="Giao dịch gần đây"
+      />
+      <CardContent sx={{ paddingTop: 0, paddingBottom: 0 }}>
+        <MaterialReactTable
+          columns={columns}
+          data={transactions}
+          initialState={initialState}
+          muiPaginationProps={{
+            rowsPerPageOptions: [],
+            showFirstButton: false,
+            showLastButton: false,
+          }}
+          {...SHARED_TABLE_PROPS}
+          muiTableHeadCellProps={{
+            sx: {
+              height: '48px!important',
+              fontSize: '14px!important',
+            },
+          }}
+          muiTopToolbarProps={{
+            sx: {
+              display: 'none',
+            },
+          }}
+          enableRowActions={false}
         />
-        <CardContent sx={{ paddingTop: 0, paddingBottom: 0 }}>
-          <MaterialReactTable
-            columns={columns}
-            data={transactions}
-            initialState={initialState}
-            muiPaginationProps={{
-              rowsPerPageOptions: [],
-              showFirstButton: false,
-              showLastButton: false,
-            }}
-            {...SHARED_TABLE_PROPS}
-            muiTableHeadCellProps={{
-              sx: {
-                height: '48px!important',
-                fontSize: '14px!important',
-              },
-            }}
-            muiTopToolbarProps={{
-              sx: {
-                display: 'none',
-              },
-            }}
-            enableRowActions={false}
-          />
-        </CardContent>
-      </Card>
+      </CardContent>
     </>
   );
 };

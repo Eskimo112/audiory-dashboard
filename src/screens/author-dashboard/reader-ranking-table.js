@@ -89,7 +89,7 @@ const ReaderRankingTable = () => {
   };
 
   return (
-    <Card sx={{ p: 2 }}>
+    <>
       <CardHeader
         action={
           <Stack direction="row" gap="8px">
@@ -108,7 +108,7 @@ const ReaderRankingTable = () => {
         }
         title="Xếp hạng độc giả"
       />
-      <CardContent sx={{ paddingTop: 0, paddingBottom: 0 }}>
+      <CardContent sx={{ paddingTop: 0, paddingBottom: 0, padding: 0 }}>
         {isLoading ? (
           <CircularProgress />
         ) : (
@@ -144,7 +144,7 @@ const ReaderRankingTable = () => {
           />
         )}
       </CardContent>
-    </Card>
+    </>
   );
 };
 
