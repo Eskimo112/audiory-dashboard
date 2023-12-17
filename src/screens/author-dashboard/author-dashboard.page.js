@@ -21,7 +21,7 @@ const AuthorDashboardPage = () => {
   return (
     <>
       <Head>
-        <title>Tác giả | Audiory</title>
+        <title>Thống kê | Audiory</title>
       </Head>
       <Box
         component="main"

@@ -28,6 +28,7 @@ import { useRequestHeader } from '@/hooks/use-request-header';
 import ChapterService from '@/services/chapter';
 import StoryService from '@/services/story';
 import { toastError, toastSuccess } from '@/utils/notification';
+import Head from 'next/head';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -159,6 +160,9 @@ const EditStoryPage = () => {
 
   return (
     <>
+      <Head>
+        <title>{story?.title} | Audiory</title>
+      </Head>
       <div>
         <Grid container sx={{ padding: '0em 1em' }}>
           <AuthorBreadCrumbs storyTitle={story.title} />

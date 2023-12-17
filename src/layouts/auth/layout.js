@@ -20,13 +20,20 @@ export const Layout = (props) => {
       }}>
       <Grid container sx={{ flex: '1 1 auto' }}>
         <Grid xs={12} lg={6}>
-          <Box sx={{ p: 12 }}>
+          <Box
+            sx={{
+              margin: 'auto',
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
             <Image
               src={'/assets/images/login_cover.png'}
               alt={'girl reading book under a tree'}
               width={0}
               height={0}
-              style={{ width: '100%', height: 'auto' }}
+              style={{ width: '80%', height: 'auto' }}
               unoptimized
             />
           </Box>

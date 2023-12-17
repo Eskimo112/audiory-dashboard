@@ -135,9 +135,9 @@ const MyProfilePage = () => {
                     onClick={() => {
                       router.push('/profile/posts');
                     }}
-                    variant="contained"
+                    variant="text"
                     size="small"
-                    color="info"
+                    color="primary"
                     sx={{ position: 'absolute', right: 0 }}
                     endIcon={
                       <SvgIcon>

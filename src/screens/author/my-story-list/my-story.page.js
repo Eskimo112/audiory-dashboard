@@ -446,7 +446,8 @@ const MyStoryPage = () => {
               gap="12px"
               justifyContent="center"
               alignItems="center">
-              <Stack sx={{ marginY: 1, fontStyle: 'italic' }}>
+              <Stack
+                sx={{ marginY: 1, fontStyle: 'italic', paddingBottom: '32px' }}>
                 <Typography variant="h4">Sáng tác của tôi</Typography>
               </Stack>
 
@@ -454,11 +455,12 @@ const MyStoryPage = () => {
                 width="100%"
                 direction="row"
                 justifyContent="space-between"
-                alignItems="center">
+                alignItems="center"
+                px="12px">
                 <Stack
                   width="35%"
                   direction="row"
-                  gap="16px"
+                  gap="8px"
                   justifyContent="center"
                   alignItems="center">
                   <TextField

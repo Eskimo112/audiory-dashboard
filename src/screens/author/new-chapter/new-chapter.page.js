@@ -55,6 +55,7 @@ import StoryService from '../../../services/story';
 import ModerationModal from './moderation-modal';
 import dynamic from 'next/dynamic';
 import { useConfirmDialog } from '../../../hooks/use-confirm-dialog';
+import Head from 'next/head';
 
 const ReactQuill = dynamic(
   () => import('react-quill').then((mod) => mod.default),
@@ -466,6 +467,9 @@ const NewChapterPage = () => {
     );
   return (
     <>
+      <Head>
+        <title>{chapterData?.title} | Audiory</title>
+      </Head>
       <Stack direction="column" justifyContent="center" alignItems="center">
         <Grid width={1 / 2}>
           {listLoading ? (
