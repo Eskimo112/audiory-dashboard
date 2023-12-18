@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -6,26 +6,28 @@ import { useRouter } from 'next/router';
 import EyeIcon from '@heroicons/react/24/solid/EyeIcon';
 import {
   Add,
-  CleaningServices,
   Comment,
+  DeleteForeverOutlined,
   EditNote,
   Favorite,
   Menu,
   MenuBook,
   MoreVert,
+  UnpublishedOutlined,
 } from '@mui/icons-material';
 import {
   Box,
   Button,
   CircularProgress,
   Container,
+  inputBaseClasses,
   Pagination,
   Popover,
   Stack,
   SvgIcon,
   TextField,
   Typography,
-  Unstable_Grid2 as Grid
+  Unstable_Grid2 as Grid,
 } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -40,11 +42,15 @@ import StoryService from '@/services/story';
 import { formatStatistic, timeAgo } from '@/utils/formatters';
 import { toastError, toastSuccess } from '@/utils/notification';
 
+import useDebounce from '../../../hooks/use-debounce';
+import { SHARED_PAGE_SX } from '../../../constants/page_sx';
+
+const STORY_PER_PAGE = 6;
+
 const MyStoryPage = () => {
   const router = useRouter();
   const requestHeader = useRequestHeader();
 
-  const [myStories, setMyStories] = useState([]);
   const {
     data: storiesData = [],
     isLoading,
@@ -57,19 +63,23 @@ const MyStoryPage = () => {
   );
 
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 500);
   const [page, setPage] = useState(1);
 
+  const filteredStories = useMemo(() => {
+    return storiesData.filter((story) =>
+      story?.title.toLowerCase().includes(debouncedQuery.toLowerCase()),
+    );
+  }, [debouncedQuery, storiesData]);
+
   const stories = useMemo(() => {
-    return storiesData.slice((page - 1) * 10, page * 10);
-  }, [page, storiesData]);
-
-
-  useEffect(() => {
-    setMyStories(storiesData ?? []);
-  }, [storiesData]);
+    return filteredStories.slice(
+      (page - 1) * STORY_PER_PAGE,
+      page * STORY_PER_PAGE,
+    );
+  }, [filteredStories, page]);
 
   const handleDelete = async ({ id }, title) => {
-    console.log('handle delete');
     try {
       await new StoryService(requestHeader).delete(id).then((res) => {
         console.log(res);
@@ -83,7 +93,7 @@ const MyStoryPage = () => {
   };
 
   const handleUnpublish = async ({ id }) => {
-    console.log(id)
+    console.log(id);
     try {
       await new StoryService(requestHeader).unpublish(id).then((res) => {
         console.log(res);
@@ -93,7 +103,6 @@ const MyStoryPage = () => {
     } catch (error) {
       console.log(error);
       toastError('Gỡ đăng tải không thành công truyện');
-
     }
   };
   const StoryOverViewCard = ({ story }) => {
@@ -125,7 +134,7 @@ const MyStoryPage = () => {
 
     const handleNavigate = () => {
       router.push(`my-works/${story.id}`);
-    }
+    };
     // const theme = useTheme();
     const DetailInfo = ({ icon, number, content, isHighlight = false }) => {
       return (
@@ -143,8 +152,8 @@ const MyStoryPage = () => {
               }}>
               {icon ?? <MenuBook></MenuBook>}
             </SvgIcon>
-            <Typography component="div" variant="body2" fontSize="16px">
-              <b>{number}</b> {content ?? 'Mặc định'}
+            <Typography component="div" variant="body2" fontSize="15px">
+              <b>{number}</b> <i>{content ?? 'Mặc định'}</i>
             </Typography>
           </Stack>
         </>
@@ -179,11 +188,8 @@ const MyStoryPage = () => {
             e.stopPropagation();
             // e.preventDefault();
             handleNavigate();
-
-          }}
-        >
+          }}>
           <CardMedia
-
             component="img"
             sx={{ width: '8em', objectFit: 'cover' }}
             src={
@@ -195,7 +201,6 @@ const MyStoryPage = () => {
               e.stopPropagation();
               e.preventDefault();
               handleNavigate();
-
             }}
             alt="Live from space album cover"
           />
@@ -207,9 +212,7 @@ const MyStoryPage = () => {
               flexDirection: 'column',
               px: '16px',
               py: '16px',
-            }}
-
-          >
+            }}>
             <Stack
               direction="column"
               justiPyContent="space-between"
@@ -221,14 +224,13 @@ const MyStoryPage = () => {
                   justifyContent="space-between"
                   alignItems="center">
                   <Typography
-
                     component="div"
                     variant="h6"
                     sx={{
                       whiteSpace: 'wrap',
                       textOverflow: 'ellipsis',
                       overflow: 'hidden',
-                      fontSize: '18px',
+                      fontSize: '19px',
                       lineHeight: '24px',
                     }}>
                     {story.title}
@@ -238,9 +240,11 @@ const MyStoryPage = () => {
                       color="inherit"
                       aria-describedby={id}
                       variant="text"
-                      sx={{ padding: '4px' }}
+                      sx={{ padding: '4px', color: 'ink.lighter' }}
                       onClick={(e) => {
-                        handleClick(e)
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleClick(e);
                       }}>
                       <MoreVert />
                     </IconButton>
@@ -255,14 +259,21 @@ const MyStoryPage = () => {
                       }}>
                       <Grid container direction="column">
                         {story.is_draft === false &&
-                          story.is_paywalled === false ? (
-                          <Button onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
+                        story.is_paywalled === false ? (
+                          <Button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
 
-                            handleUnpublish({ id: story.id });
-                          }} variant="text" color="primary">
-                            {' '}
+                              handleUnpublish({ id: story.id });
+                            }}
+                            startIcon={
+                              <SvgIcon sx={{ width: '18px' }}>
+                                <UnpublishedOutlined></UnpublishedOutlined>
+                              </SvgIcon>
+                            }
+                            variant="text"
+                            color="primary">
                             Gỡ đăng tải{' '}
                           </Button>
                         ) : (
@@ -278,7 +289,12 @@ const MyStoryPage = () => {
                               e.preventDefault();
                               e.stopPropagation();
                               handleDialogOpen();
-                            }}>
+                            }}
+                            startIcon={
+                              <SvgIcon sx={{ width: '18px' }}>
+                                <DeleteForeverOutlined></DeleteForeverOutlined>
+                              </SvgIcon>
+                            }>
                             Xóa truyện
                           </Button>
                         )}
@@ -393,7 +409,7 @@ const MyStoryPage = () => {
               </Box>
             </Stack>
           </CardContent>
-        </Card >
+        </Card>
       </>
     );
   };
@@ -403,7 +419,13 @@ const MyStoryPage = () => {
       <Head>
         <title>Trang viết | Audiory</title>
       </Head>
-      <div style={{ width: '100%' }}>
+      <Box
+        component="main"
+        sx={{
+          ...SHARED_PAGE_SX,
+          // background: '#93DBD8',
+          // background: 'radial-gradient(at center, #DEF6FA, #FFFFFF)',
+        }}>
         <Box
           sx={{
             width: '100%',
@@ -418,38 +440,71 @@ const MyStoryPage = () => {
               justifyContent: 'center',
               marginY: 4,
             }}>
-            <Stack container spacing={1} width="100%" gap="20px">
-              <Stack direction="row" justifyContent="center">
-                <Stack sx={{ marginY: 1, fontStyle: 'italic' }}>
-                  <Typography variant="h4">Sáng tác của tôi</Typography>
-                </Stack>
+            <Stack
+              spacing={1}
+              width="100%"
+              gap="12px"
+              justifyContent="center"
+              alignItems="center">
+              <Stack
+                sx={{ marginY: 1, fontStyle: 'italic', paddingBottom: '32px' }}>
+                <Typography variant="h4">Sáng tác của tôi</Typography>
               </Stack>
 
-              <Stack width="100%" direction="row" gap="16px">
-                <TextField
-                  fullWidth
-                  id="outlined-controlled"
-                  variant="outlined"
-                  type="text"
-                  placeholder="Tìm kiếm"
-                  value={query}
-                  onChange={(e) => {
-                    setQuery(e.target.value);
-                    setMyStories(
-                      e.target.value !== ''
-                        ? storiesData.filter((person) =>
-                          person?.title
-                            .toLowerCase()
-                            .includes(e.target.value.toLowerCase()),
-                        )
-                        : storiesData,
-                    );
-                  }}
-                  sx={{ flexGrow: 1 }}
-                />
+              <Stack
+                width="100%"
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                px="12px">
+                <Stack
+                  width="35%"
+                  direction="row"
+                  gap="8px"
+                  justifyContent="center"
+                  alignItems="center">
+                  <TextField
+                    id="outlined-controlled"
+                    variant="outlined"
+                    placeholder="Nhập để tìm truyện"
+                    value={query}
+                    sx={{
+                      flexGrow: 1,
+                      [`& .${inputBaseClasses.root}`]: {
+                        borderRadius: '100px',
+                        input: {
+                          padding: '12px 16px',
+                        },
+                      },
+                    }}
+                    // onKeyDown={(event) => {
+                    //   const value = event.target.value.trim();
+                    //   if (
+                    //     (event.keyCode === 32 || event.keyCode === 13) &&
+                    //     value !== ''
+                    //   ) {
+                    //     setQuery(value);
+                    //   }
+                    // }}
+                    onChange={(e) => {
+                      setQuery(e.target.value);
+                    }}
+                  />
+                  <Button
+                    sx={{
+                      fontSize: '14px',
+                      borderRadius: '30px',
+                      minWidth: 0,
+                      display: 'flex',
+                    }}
+                    variant="contained"
+                    color="info"
+                    onClick={() => {}}>
+                    Tìm kiếm
+                  </Button>
+                </Stack>
                 <Button
                   style={{
-                    backgroundColor: (theme) => theme.palette.ink.main,
                     fontSize: '16px',
                     padding: '8px 16px',
                     flexGrow: 0,
@@ -469,10 +524,12 @@ const MyStoryPage = () => {
                 </Button>
               </Stack>
 
-              <Grid container spacing={3}>
+              <Grid container spacing={3} sx={{ width: '100%' }}>
                 {stories.length === 0 && isSuccess ? (
-                  <Grid xs={6} spacing={0}>
-                    <Typography>Không tìm thấy truyện nào</Typography>
+                  <Grid xs={12} spacing={0}>
+                    <Typography variant="body1" whiteSpace="nowrap">
+                      Không tìm thấy truyện nào
+                    </Typography>
                   </Grid>
                 ) : (
                   stories?.map((story, index) => (
@@ -481,19 +538,20 @@ const MyStoryPage = () => {
                     </Grid>
                   ))
                 )}
-
               </Grid>
 
               <Stack alignItems="center" width="100%">
                 <Pagination
                   page={page}
                   onChange={(e, page) => setPage(page)}
-                  count={Math.ceil(myStories.length / 10)}></Pagination>
+                  count={Math.ceil(
+                    filteredStories.length / STORY_PER_PAGE,
+                  )}></Pagination>
               </Stack>
             </Stack>
           </Container>
         </Box>
-      </div>
+      </Box>
     </>
   );
 };

@@ -3,6 +3,10 @@ export const CHIP_BG_COLORS = [
   'info.alpha20',
   'error.alpha20',
   'warning.alpha20',
+  'success.alpha20',
+  'info.alpha20',
+  'error.alpha20',
+  'warning.alpha20',
 ];
 export const CHIP_FONT_COLORS = [
   'ink.main',

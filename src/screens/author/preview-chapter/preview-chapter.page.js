@@ -4,7 +4,12 @@ import dynamic from 'next/dynamic';
 
 import 'react-quill/dist/quill.snow.css';
 
-import { ArrowBack, CheckCircle, RefreshRounded } from '@mui/icons-material';
+import {
+  ArrowBack,
+  CheckCircle,
+  PublishRounded,
+  RefreshRounded,
+} from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -105,6 +110,26 @@ const PreviewChapterPage = ({ chapterVersionId, isPreview }) => {
     router.back();
   };
 
+  const handlePublishChapter = async () => {
+    await new ChapterService(requestHeader)
+      .publish(chapterVersionData.chapter_id)
+      .then(() => {
+        toastSuccess('Đăng tải chương thành công');
+        router.push(`/my-works/${storyId}`);
+      })
+      .catch((error) => {
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.message
+        ) {
+          toastError(error.response.data.message);
+          return;
+        }
+        toastError('Đã xảy ra lỗi, thử lại sau');
+      });
+  };
+
   return (
     <>
       <Stack width={'100%'} direction="column" alignItems="center" gap="24px">
@@ -125,7 +150,36 @@ const PreviewChapterPage = ({ chapterVersionId, isPreview }) => {
               justifyContent="center"
               alignItems="center"
               gap="16px">
-              {!isPreview && (
+              {isPreview ? (
+                <Stack
+                  width="100%"
+                  direction="row"
+                  justifyContent="space-around"
+                  gap="12px">
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={
+                      <SvgIcon>
+                        <ArrowBack></ArrowBack>
+                      </SvgIcon>
+                    }
+                    onClick={navigateToWrite}>
+                    Quay trở lại viết
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={
+                      <SvgIcon>
+                        <PublishRounded></PublishRounded>
+                      </SvgIcon>
+                    }
+                    onClick={handlePublishChapter}>
+                    Đăng tải
+                  </Button>
+                </Stack>
+              ) : (
                 <Stack
                   width="100%"
                   direction="row"

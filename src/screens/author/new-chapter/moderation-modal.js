@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-import { useRouter } from 'next/router';
-
 import { Close } from '@mui/icons-material';
 import {
   Box,
@@ -19,6 +17,7 @@ import { useQuery } from 'react-query';
 
 import { useRequestHeader } from '../../../hooks/use-request-header';
 import ChapterVersionService from '../../../services/chapter-version';
+import { formatNumberToFixed } from '../../../utils/formatters';
 
 const MODERATION_MAP = {
   Profanity: 'Thô tục',
@@ -70,35 +69,57 @@ const ModerationModal = ({ chapterVersionId, handleClose }) => {
                 tiết)
               </Typography>
               {paras.map((p, index) => {
-                const isMatured = p.content_moderation.is_mature;
-                const isReactionary = p.content_moderation.is_reactionary;
-
-                return (
-                  <Button
-                    key={index}
-                    variant="text"
-                    onClick={() => setCurrentModeration(p.content_moderation)}
-                    sx={{
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      justifyContent: 'start',
-                      position: 'relative',
-                      ':hover': {
+                return p.content_moderation.map((moderation) => {
+                  const isMatured = moderation.is_mature;
+                  const isReactionary = moderation.is_reactionary;
+                  return moderation.type === 'IMAGE' && moderation.image ? (
+                    <Box
+                      sx={{
+                        width: '50%',
+                        padding: '8px',
                         bgcolor:
-                          isMatured || isReactionary ? 'error.alpha30' : '',
-                      },
-                      ':active': {
+                          isMatured || isReactionary ? 'error.alpha20' : '',
+                        borderRadius: '8px',
+                      }}>
+                      <Typography
+                        variant="body2"
+                        textAlign="center"
+                        color="error">
+                        Ảnh có nội dung trưởng thành
+                      </Typography>
+                      <Box
+                        width="100%"
+                        component="img"
+                        sx={{ filter: 'blur(8px)' }}
+                        src={moderation.image}></Box>
+                    </Box>
+                  ) : (
+                    <Button
+                      key={moderation.id}
+                      variant="text"
+                      onClick={() => setCurrentModeration(moderation)}
+                      sx={{
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        justifyContent: 'start',
+                        position: 'relative',
+                        ':hover': {
+                          bgcolor:
+                            isMatured || isReactionary ? 'error.alpha30' : '',
+                        },
+                        ':active': {
+                          bgcolor:
+                            isMatured || isReactionary ? 'error.alpha50' : '',
+                        },
                         bgcolor:
-                          isMatured || isReactionary ? 'error.alpha50' : '',
-                      },
-                      bgcolor:
-                        isMatured || isReactionary ? 'error.alpha20' : '',
-                    }}>
-                    <Typography variant="reading1" color="ink.main">
-                      {p.content}
-                    </Typography>
-                  </Button>
-                );
+                          isMatured || isReactionary ? 'error.alpha20' : '',
+                      }}>
+                      <Typography variant="reading1" color="ink.main">
+                        {p.content}
+                      </Typography>
+                    </Button>
+                  );
+                });
               })}
             </Stack>
           ) : (
@@ -182,13 +203,8 @@ const ModerationModal = ({ chapterVersionId, handleClose }) => {
                       <Typography variant="body2">
                         {MODERATION_MAP[item.criteria_id]}
                       </Typography>
-                      <Typography
-                        variant="body2"
-                        fontWeight={600}
-                        color={
-                          item.confidence >= 0.8 ? 'error.main' : 'success.main'
-                        }>
-                        {item.confidence}
+                      <Typography variant="body2" fontWeight={600}>
+                        {formatNumberToFixed(item.confidence, 4)}
                       </Typography>
                     </Stack>
                   ))}

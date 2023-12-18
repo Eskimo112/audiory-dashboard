@@ -21,9 +21,15 @@ const AuthorDashboardPage = () => {
   return (
     <>
       <Head>
-        <title>Tác giả | Audiory</title>
+        <title>Thống kê | Audiory</title>
       </Head>
-      <Box component="main" sx={SHARED_PAGE_SX}>
+      <Box
+        component="main"
+        sx={{
+          ...SHARED_PAGE_SX,
+          // background: '#93DBD8',
+          // background: 'radial-gradient(at center, #C6E9EE, #FFFFFF)',
+        }}>
         <Container
           sx={{
             width: '80%',
@@ -31,9 +37,15 @@ const AuthorDashboardPage = () => {
             flexDirection: 'column',
             gap: '24px',
           }}>
-          <Stack py={2}>
+          <Stack
+            sx={{
+              marginY: 4,
+              fontStyle: 'italic',
+              width: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
             <Typography variant="h4">Tổng quan số liệu</Typography>
-            <AppBreadCrumbs />
           </Stack>
           <Grid container spacing={3}>
             <Grid xs={12} lg={6}>

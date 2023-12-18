@@ -80,7 +80,7 @@ const MyPostsPage = () => {
       .finally(() => setIsSubmiting(false));
   };
 
-  if (postsLoading) return <LoadingPage />;
+  if (postsLoading || isLoading) return <LoadingPage />;
   if (!user) throw PageNotFoundError;
 
   return (
@@ -213,7 +213,7 @@ const MyPostsPage = () => {
                           handleSubmitPost();
                         }}
                         variant="contained"
-                        color="primary"
+                        color="info"
                         fullWidth
                         sx={{
                           borderRadius: 1,
@@ -265,16 +265,16 @@ const MyPostsPage = () => {
                             {post.text}
                           </Typography>
                           <Stack direction="row" gap="12px">
-                            <Typography
+                            {/* <Typography
                               fontSize="14px"
                               fontWeight={600}
                               sx={{ color: 'primary.main' }}>
                               {post.like_count ?? 0} lượt thích
-                            </Typography>
+                            </Typography> */}
                             <Typography
                               fontSize="14px"
                               fontWeight={600}
-                              sx={{ color: 'secondary.main' }}>
+                              sx={{ color: 'sky.dark' }}>
                               {post.children.length ?? 0} bình luận
                             </Typography>
                           </Stack>
@@ -306,7 +306,7 @@ const MyPostsPage = () => {
                                 sx={{
                                   padding: '12px',
                                   bgcolor: 'sky.lightest',
-                                  borderRadius: '4px',
+                                  borderRadius: '8px',
                                   gap: '8px',
                                 }}>
                                 <Stack direction="row" gap="12px">
@@ -329,7 +329,7 @@ const MyPostsPage = () => {
                                 <Typography variant="body2">
                                   {comment.text}
                                 </Typography>
-                                <Stack direction="row" gap="8px">
+                                {/* <Stack direction="row" gap="8px">
                                   <Button
                                     variant="text"
                                     sx={{
@@ -363,7 +363,7 @@ const MyPostsPage = () => {
                                     }}>
                                     Báo cáo
                                   </Button>
-                                </Stack>
+                                </Stack> */}
                               </Stack>
                             ))}
                           </Stack>

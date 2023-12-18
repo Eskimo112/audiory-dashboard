@@ -19,7 +19,7 @@ import { useRequestHeader } from '@/hooks/use-request-header';
 import UserService from '@/services/user';
 
 import { useAuth } from '../../../hooks/use-auth';
-import { formatDate } from '../../../utils/formatters';
+import { timeAgo } from '../../../utils/formatters';
 import LoadingPage from '../../loading';
 
 const NotificationListPage = () => {
@@ -27,7 +27,11 @@ const NotificationListPage = () => {
   const { user } = useAuth();
   const router = useRouter();
   const [page, setPage] = useState(1);
-  const { data: notis = [], isLoading } = useQuery(
+  const {
+    data: response = {},
+    isLoading,
+    refetch,
+  } = useQuery(
     ['user', user.id, 'notification', page],
     async () =>
       await new UserService(requestHeader).getNotificationByUserId(
@@ -36,8 +40,18 @@ const NotificationListPage = () => {
     { refetchOnWindowFocus: false, enabled: Boolean(user.id) },
   );
 
+  const handleOnClickNoti = async (id) => {
+    await new UserService(requestHeader)
+      .updateNotificationById(id, { is_read: true })
+      .then(() => {
+        refetch();
+      });
+  };
+
   if (isLoading) return <LoadingPage />;
 
+  const notis = response.data ?? [];
+  const totalPage = response.total_page ?? 0;
   return (
     <>
       <Head>
@@ -76,19 +90,30 @@ const NotificationListPage = () => {
                         key={index}
                         variant="text"
                         onClick={() => {
+                          handleOnClickNoti(noti.id);
                           if (noti.activity.action_type === 'RESPONDED') {
-                            router.push('/report-list');
+                            router.push(
+                              `/report-list?report_id=${noti.activity.entity_id}`,
+                            );
+                            return;
                           }
+                          if (noti.activity.entity_type === 'STORY') {
+                            router.push(`/my-works/${noti.activity.entity_id}`);
+                            return;
+                          }
+                          // show no support dialog
                         }}
                         sx={{
                           cursor: 'pointer',
                           textAlign: 'left',
                           justifyContent: 'start',
                           position: 'relative',
-                          border: '1px solid',
+                          overflow: 'visible',
+                          // border: '1px solid',
                           borderRadius: 1,
-                          borderColor: 'sky.lighter',
-                          overflow: 'hidden',
+                          // borderColor: 'sky.lighter',
+                          bgcolor: noti.is_read ? undefined : 'sky.lightest',
+                          padding: '12px',
                         }}>
                         <Stack
                           width="100%"
@@ -96,27 +121,21 @@ const NotificationListPage = () => {
                           justifyContent="space-between"
                           gap="12px">
                           <Stack
+                            direction="row"
                             sx={{
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
+                              gap: '8px',
+                              flexGrow: 1,
                             }}>
                             <Avatar
-                              src={noti.user.avatar_url}
+                              src={noti.activity.user.avatar_url}
                               sx={{ width: '40px', height: '40px' }}
                             />
                             <Typography
-                              variant="body1"
+                              variant="body2"
                               color="ink.main"
                               fontWeight={400}>
                               {noti.content}
                             </Typography>
-                            {/* <Typography
-                              variant="body2"
-                              color="ink.lighter"
-                              fontStyle="italic">
-                              {noti.description}
-                            </Typography> */}
                           </Stack>
                           <Stack gap="8px">
                             <Typography
@@ -124,17 +143,29 @@ const NotificationListPage = () => {
                               color="ink.lighter"
                               fontWeight={600}
                               fontStyle="italic">
-                              {formatDate(noti.created_date)}
+                              {timeAgo(noti.activity.created_date)}
                             </Typography>
                           </Stack>
                         </Stack>
+                        {!noti.is_read && (
+                          <Stack
+                            width="8px"
+                            height="8px"
+                            sx={{
+                              bgcolor: 'primary.main',
+                              borderRadius: 1,
+                              position: 'absolute',
+                              top: 0,
+                              right: 0,
+                            }}></Stack>
+                        )}
                       </Button>
                     );
                   })}
                 </Stack>
 
                 <Pagination
-                  count={2}
+                  count={totalPage}
                   page={page}
                   color="primary"
                   onChange={(_, page) => setPage(page)}

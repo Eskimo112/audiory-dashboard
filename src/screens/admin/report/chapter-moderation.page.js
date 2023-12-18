@@ -24,10 +24,11 @@ import AppBreadCrumbs from '../../../components/app-bread-crumbs';
 import { useRequestHeader } from '../../../hooks/use-request-header';
 import ChapterVersionService from '../../../services/chapter-version';
 import LoadingPage from '../../loading';
+import { formatNumberToFixed } from '../../../utils/formatters';
 
 const MODERATION_MAP = {
   Profanity: 'Thô tục',
-  Sexual: 'Tình dục',
+  Sexual: 'Khiêu dâm',
   Politics: 'Chính trị',
   Violent: 'Bạo lực',
 };
@@ -89,15 +90,16 @@ const ChapterModerationPage = ({ chapterVersionId }) => {
                     chi tiết)
                   </Typography>
                   {paras.map((p, index) => {
-                    const isMatured = p.content_moderation.is_mature;
-                    const isReactionary = p.content_moderation.is_reactionary;
+                    const isMatured = p.content_moderation[0].is_mature;
+                    const isReactionary =
+                      p.content_moderation[0].is_reactionary;
 
                     return (
                       <Button
                         key={index}
                         variant="text"
                         onClick={() =>
-                          setCurrentModeration(p.content_moderation)
+                          setCurrentModeration(p.content_moderation[0])
                         }
                         sx={{
                           cursor: 'pointer',
@@ -203,13 +205,8 @@ const ChapterModerationPage = ({ chapterVersionId }) => {
                       <Typography variant="body2">
                         {MODERATION_MAP[item.criteria_id]}
                       </Typography>
-                      <Typography
-                        variant="body2"
-                        fontWeight={600}
-                        color={
-                          item.confidence >= 0.8 ? 'error.main' : 'success.main'
-                        }>
-                        {item.confidence}
+                      <Typography variant="body2" fontWeight={600}>
+                        {formatNumberToFixed(item.confidence, 4)}
                       </Typography>
                     </Stack>
                   ))}

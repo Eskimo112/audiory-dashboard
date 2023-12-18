@@ -1,5 +1,5 @@
 // eslint-disable-next-line simple-import-sort/imports
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import 'react-quill/dist/quill.snow.css';
 
@@ -17,6 +17,7 @@ import {
   Popover,
   Skeleton,
   Stack,
+  SvgIcon,
   TextField,
   Typography,
 } from '@mui/material';
@@ -31,7 +32,14 @@ import { useQuery } from 'react-query';
 import { toastError, toastSuccess } from '@/utils/notification';
 import { AppImageUpload } from '@/components/app-image-upload';
 import AuthorBreadCrumbs from '@/components/author-bread-crumbs';
-import { CheckCircle } from '@mui/icons-material';
+import {
+  CheckCircle,
+  PublishRounded,
+  SaveRounded,
+  Visibility,
+  VisibilityOffRounded,
+  VisibilityOutlined,
+} from '@mui/icons-material';
 import { formatDateTime } from '@/utils/formatters';
 import { useRequestHeader } from '@/hooks/use-request-header';
 import {
@@ -46,8 +54,8 @@ import { useAuth } from '../../../hooks/use-auth';
 import StoryService from '../../../services/story';
 import ModerationModal from './moderation-modal';
 import dynamic from 'next/dynamic';
-import useNextNavigateAway from '../../../hooks/use-navigate-away';
 import { useConfirmDialog } from '../../../hooks/use-confirm-dialog';
+import Head from 'next/head';
 
 const ReactQuill = dynamic(
   () => import('react-quill').then((mod) => mod.default),
@@ -84,7 +92,7 @@ const NewChapterPage = () => {
   } = useQuery(
     ['chapter', chapterId],
     async () => await new ChapterService(requestHeader).getById(chapterId),
-    { refetchOnWindowFocus: false, refetchOnMount: false },
+    { refetchOnWindowFocus: false },
   );
 
   const {
@@ -95,7 +103,7 @@ const NewChapterPage = () => {
     ['chapterVersionList', chapterId],
     async () =>
       await new ChapterVersionService(requestHeader).getAll({ chapterId }),
-    { refetchOnWindowFocus: false, refetchOnMount: false },
+    { refetchOnWindowFocus: false },
   );
 
   const {
@@ -131,7 +139,7 @@ const NewChapterPage = () => {
       content: chapterData?.current_chapter_version?.content ?? '',
       rich_text:
         chapterData?.current_chapter_version?.rich_text === '' ||
-          chapterData?.current_chapter_version?.rich_text === undefined
+        chapterData?.current_chapter_version?.rich_text === undefined
           ? '{}'
           : chapterData?.current_chapter_version?.rich_text,
       title: chapterData?.current_chapter_version?.title ?? '',
@@ -160,23 +168,21 @@ const NewChapterPage = () => {
   const onEditorChange = (content, delta, source, editor) => {
     // content
 
-    var imagesArr = editor
-      .getContents()
-      .ops?.filter((ele) => ele.insert.image !== undefined)
-      ?.map((image) => image?.insert?.image);
-    console.log(imageArr);
-    setImageArr(imagesArr);
+    // var imagesArr = editor
+    //   .getContents()
+    //   .ops?.filter((ele) => ele.insert.image !== undefined)
+    //   ?.map((image) => image?.insert?.image);
+    // setImageArr(imagesArr);
 
     setValue(editor.getText().trim());
     formik.setFieldValue('rich_text', JSON.stringify(editor.getContents()));
 
-    const base64Result = [];
-    imagesArr.forEach((image) => {
-      base64Result.push(convertImageLinkToBase64(image));
-    });
+    // const base64Result = [];
+    // imagesArr.forEach((image) => {
+    //   base64Result.push(convertImageLinkToBase64(image));
+    // });
 
-    formik.setFieldValue('images', base64Result);
-    console.log(base64Result);
+    // formik.setFieldValue('images', base64Result);
     formik.setFieldValue('content', editor.getText());
   };
 
@@ -188,15 +194,12 @@ const NewChapterPage = () => {
 
     try {
       await new ChapterService(requestHeader).create(body).then((res) => {
-        console.log(res);
-        router.push(
-          `/my-works/${storyData?.id}/write/${res?.id}`,
-        );
+        router.push(`/my-works/${storyData?.id}/write/${res?.id}`);
         toastSuccess('Tạo chương mới thành công');
       });
       refetch();
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toastError('Tạo chương không thành công');
     }
   };
@@ -276,41 +279,40 @@ const NewChapterPage = () => {
     setOpenDialog(false);
   };
 
-
-  const onSaveDraftChapter = async (isPreview, isPublish) => {
-    if (value.split(' ').length < MIN_WORDS && imageArr.length === 0) {
-      toastError(`Quá ngắn để lưu bản thảo`);
-    } else {
-      // content size (text+image) handler
-      // calculate link images and file images size
-      var imagesInBytes = 0;
-      imageArr.forEach((image) => {
-        if (image.includes('http')) {
-          console.log('link');
-          console.log(image);
-          convertImageLinkToBase64(image, function (base64String) {
-            imagesInBytes += fileSizeFromBase64({ base64String });
-          });
-        } else {
-          imagesInBytes += fileSizeFromBase64({ base64String: image });
-        }
-      });
-      console.log(imageArr);
-      setContentSize(byteSizeFromString(value) + imagesInBytes);
-
-      const values = formik.values;
-      const formData = new FormData();
-      Object.keys(values).forEach((key) => formData.append(key, values[key]));
-
-      if (chapterData.current_chapter_version)
-        formData.append(
-          'banner_url',
-          chapterData.current_chapter_version.banner_url,
-        );
-
-      if (contentSize > MAX_CONTENT_SIZE) {
-        toastError('Nội dung chương vượt quá 2MB');
+  const onSaveDraftChapter = useCallback(
+    async (isPreview, isPublish) => {
+      if (value.split(' ').length < MIN_WORDS) {
+        toastError(`Quá ngắn để lưu bản thảo`);
       } else {
+        // content size (text+image) handler
+        // calculate link images and file images size
+        let imagesInBytes = 0;
+        imageArr.forEach((image) => {
+          if (image.includes('http')) {
+            convertImageLinkToBase64(image, function (base64String) {
+              imagesInBytes += fileSizeFromBase64({ base64String });
+            });
+          } else {
+            imagesInBytes += fileSizeFromBase64({ base64String: image });
+          }
+        });
+        setContentSize(byteSizeFromString(value) + imagesInBytes);
+
+        const values = formik.values;
+        const formData = new FormData();
+        Object.keys(values).forEach((key) => formData.append(key, values[key]));
+
+        if (chapterData.current_chapter_version)
+          formData.append(
+            'banner_url',
+            chapterData.current_chapter_version.banner_url,
+          );
+
+        if (contentSize > MAX_CONTENT_SIZE) {
+          toastError('Nội dung chương vượt quá 2MB');
+          return;
+        }
+
         setIsSubmitting(true);
         if (!isChanged) {
           if (isPreview) {
@@ -357,61 +359,78 @@ const NewChapterPage = () => {
           return;
         }
 
-        try {
-          await new ChapterVersionService(requestHeader)
-            .create({ body: formData })
-            .then((res) => {
-              if (res.code === 200) {
-                if (isPreview) {
-                  router.push(
-                    `/my-works/${router.query?.id}/preview/${res.data?.id}?is_preview=true`,
-                  );
-                }
-                if (isPublish) {
-                  new ChapterService(requestHeader)
-                    .publish(chapterId)
-                    .then((res) => {
-                      if (res.code === 200) {
-                        router.push(`/my-works/${router.query?.id}`);
-                        toastSuccess('Đăng tải thành công');
-                      } else {
-                        toastError(res.message);
-                      }
-                    })
-                    .catch((e) => {
-                      if (
-                        e.response.data.message ===
-                        'Hãy gắn nhãn trưởng thành để đi tiếp'
-                      ) {
-                        setBlockedVersionId(
-                          e.response.data.data.current_chapter_version.id,
-                        );
-                        setOpenDialog(true);
-                      } else {
-                        toastError('Không thể đăng tải chương');
-                      }
-                    });
-                } else {
-                  toastSuccess('Lưu bản thảo thành công');
-                  refetch();
-                  refetch2();
-                }
-              } else {
-                toastError(res.message);
+        await new ChapterVersionService(requestHeader)
+          .create({ body: formData })
+          .then((res) => {
+            if (res.code === 200) {
+              if (isPreview) {
+                router.push(
+                  `/my-works/${router.query?.id}/preview/${res.data?.id}?is_preview=true`,
+                );
               }
-            })
-            .finally(() => {
-              setIsSubmitting(false);
-            });
-        } catch (error) {
-          formik.setFieldValue('form_file', undefined);
-          setIsSubmitting(false);
-          console.log(error);
-        }
+              if (isPublish) {
+                new ChapterService(requestHeader)
+                  .publish(chapterId)
+                  .then((res) => {
+                    if (res.code === 200) {
+                      router.push(`/my-works/${router.query?.id}`);
+                      toastSuccess('Đăng tải thành công');
+                    } else {
+                      toastError(res.message);
+                    }
+                  })
+                  .catch((e) => {
+                    if (
+                      e.response.data.message ===
+                      'Hãy gắn nhãn trưởng thành để đi tiếp'
+                    ) {
+                      setBlockedVersionId(
+                        e.response.data.data.current_chapter_version.id,
+                      );
+                      setOpenDialog(true);
+                    } else {
+                      toastError('Không thể đăng tải chương');
+                    }
+                  });
+              } else {
+                toastSuccess('Lưu bản thảo thành công');
+                refetch();
+                refetch2();
+              }
+            } else {
+              toastError(res.message);
+            }
+          })
+          .finally(() => {
+            formik.setFieldValue('form_file', undefined);
+            setIsSubmitting(false);
+          });
       }
-    }
-  };
+    },
+    [
+      chapterData.current_chapter_version,
+      chapterId,
+      contentSize,
+      formik,
+      imageArr,
+      isChanged,
+      refetch,
+      refetch2,
+      requestHeader,
+      router,
+      value,
+    ],
+  );
   const [userConfirmToLeave, setUserConfirmToLeave] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isChanged) return;
+      if (value.split(' ').length < MIN_WORDS) return;
+      onSaveDraftChapter(false, false);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isChanged, onSaveDraftChapter, value]);
 
   const {
     confirmCbRef: continueRouterPushRef,
@@ -448,9 +467,12 @@ const NewChapterPage = () => {
     );
   return (
     <>
+      <Head>
+        <title>{chapterData?.title} | Audiory</title>
+      </Head>
       <Stack direction="column" justifyContent="center" alignItems="center">
         <Grid width={1 / 2}>
-          {isRefetching ? (
+          {listLoading ? (
             <Skeleton />
           ) : (
             <AuthorBreadCrumbs
@@ -526,10 +548,11 @@ const NewChapterPage = () => {
                           variant="body1">
                           ({chapter?.is_draft ? 'Bản thảo' : 'Đã đăng tải'}){' '}
                         </Typography>
-                        <Typography variant="body1" color="sky.dark">{`${formatDateTime(
-                          chapter?.updated_date ?? chapter?.created_date,
-                        ).split(' ')[0]
-                          }`}</Typography>
+                        <Typography variant="body1" color="sky.dark">{`${
+                          formatDateTime(
+                            chapter?.updated_date ?? chapter?.created_date,
+                          ).split(' ')[0]
+                        }`}</Typography>
                       </Grid>
                     </Grid>
                     <Grid
@@ -616,13 +639,23 @@ const NewChapterPage = () => {
                 color="inherit"
                 onClick={() => {
                   onSaveDraftChapter(false, false);
-                }}>
+                }}
+                startIcon={
+                  <SvgIcon>
+                    <SaveRounded></SaveRounded>
+                  </SvgIcon>
+                }>
                 Lưu bản thảo
               </Button>
               <Button
                 disabled={!formik.isValid || isSubmitting}
                 variant="outlined"
                 color="primary"
+                startIcon={
+                  <SvgIcon>
+                    <VisibilityOutlined></VisibilityOutlined>
+                  </SvgIcon>
+                }
                 onClick={() => {
                   onSaveDraftChapter(true, false);
                 }}>
@@ -634,6 +667,11 @@ const NewChapterPage = () => {
                 }
                 variant="contained"
                 color="primary"
+                startIcon={
+                  <SvgIcon>
+                    <PublishRounded></PublishRounded>
+                  </SvgIcon>
+                }
                 onClick={() => {
                   onSaveDraftChapter(false, true);
                 }}>
@@ -644,8 +682,8 @@ const NewChapterPage = () => {
 
           <Grid maxWidth="lg">
             <form noValidate onSubmit={formik.handleSubmit}>
-              {isRefetching ? (
-                <Skeleton />
+              {isLoading ? (
+                <Skeleton height="250px" />
               ) : (
                 <Box height="250px">
                   <AppImageUpload

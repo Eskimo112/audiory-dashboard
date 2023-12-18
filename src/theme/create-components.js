@@ -7,6 +7,7 @@ import {
   outlinedInputClasses,
   paperClasses,
   tableCellClasses,
+  tableRowClasses,
   textFieldClasses,
 } from '@mui/material';
 
@@ -283,12 +284,11 @@ export function createComponents(config) {
       styleOverrides: {
         root: {
           borderBottom: 'none',
-          background: 'yellow',
 
-          // height: '56px',
           [`& .${tableCellClasses.root}`]: {
             borderBottom: 'none',
             backgroundColor: palette.primary.lightest,
+
             color: palette.ink.main,
             fontSize: 16,
             fontWeight: 600,
@@ -306,6 +306,7 @@ export function createComponents(config) {
         },
       },
     },
+
     MuiTextField: {
       defaultProps: {
         variant: 'filled',

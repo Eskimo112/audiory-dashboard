@@ -361,10 +361,13 @@ const ReportDetailPage = ({ reportId }) => {
                         <Typography fontSize="16px">{report.title}</Typography>
                       </Stack>
                       <Stack>
-                        <Typography variant="body1" fontWeight={600}>
+                        <Typography
+                          variant="body1"
+                          fontWeight={600}
+                          fontSize="16px">
                           Mô tả:
                         </Typography>
-                        <Typography variant="body1">
+                        <Typography variant="body1" fontSize="16px">
                           {report.description}
                         </Typography>
                       </Stack>

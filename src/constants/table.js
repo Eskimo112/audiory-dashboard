@@ -17,6 +17,7 @@ export const SHARED_TABLE_PROPS = {
       display: 'flex',
       flexDirection: 'column',
       gap: '24px',
+      background: 'transparent',
     },
   },
   muiTableContainerProps: {
@@ -32,6 +33,11 @@ export const SHARED_TABLE_PROPS = {
       borderRadius: 1,
       boxShadow:
         '0px 5px 22px rgba(0, 0, 0, 0.04), 0px 0px 0px 0.5px rgba(0, 0, 0, 0.03)',
+    },
+  },
+  muiBottomToolbarProps: {
+    sx: {
+      background: 'transparent',
     },
   },
   muiSearchTextFieldProps: {

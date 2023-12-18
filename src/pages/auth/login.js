@@ -8,6 +8,7 @@ import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 import * as Yup from 'yup';
 
 import { toastError } from '@/utils/notification';
+import AppIcon from '../../components/app-icon';
 
 const Page = () => {
   const router = useRouter();
@@ -25,17 +26,20 @@ const Page = () => {
     }),
 
     onSubmit: async (values, helpers) => {
-      try {
-        await auth.signInWithPassword(values.email, values.password);
-        router.push('/my-works');
-      } catch (err) {
-        helpers.setStatus({ success: false });
-        helpers.setErrors({
-          submit: err.response.data.message ?? 'Tài khoản hoặc mật khẩu sai',
+      await auth
+        .signInWithPassword(values.email, values.password)
+        .then(() => {
+          router.push('/my-works');
+        })
+        .catch((error) => {
+          helpers.setStatus({ success: false });
+          helpers.setErrors({
+            submit:
+              error.response.data.message ?? 'Tài khoản hoặc mật khẩu sai',
+          });
+          helpers.setSubmitting(false);
+          toastError('Đăng nhập không thành công');
         });
-        helpers.setSubmitting(false);
-        toastError('Đăng nhập không thành công');
-      }
     },
   });
 
@@ -51,7 +55,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>Đăng nhập | Pricible</title>
+        <title>Đăng nhập | Audiory</title>
       </Head>
       <Box
         sx={{
@@ -70,6 +74,8 @@ const Page = () => {
           <Stack
             spacing={1}
             sx={{ mb: 3, justifyContent: 'center', alignItems: 'center' }}>
+            <AppIcon size={30} />
+
             <Typography variant="h4">Đăng nhập</Typography>
             <Typography variant="body1" color="ink.lighter" textAlign="center">
               Nơi bạn thỏa sức khám phá và tưởng tượng, đọc, viết và nghe hàng
@@ -108,12 +114,31 @@ const Page = () => {
                 {formik.errors.submit}
               </Typography>
             )}
+            <Stack
+              width="100%"
+              justifyContent="flex-end"
+              direction="row"
+              sx={{ mt: '6px' }}>
+              <Typography
+                fontSize="14px"
+                color="ink.lighter"
+                onClick={() => {}}
+                sx={{
+                  ':hover': {
+                    textDecoration: 'underline',
+                  },
+                  cursor: 'pointer',
+                }}>
+                Quên mật khẩu?
+              </Typography>
+            </Stack>
 
             <Button
               fullWidth
               size="large"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 3, mb: 2, fontSize: '16px' }}
               type="submit"
+              color="primary"
               variant="contained"
               disabled={!formik.isValid || formik.isSubmitting}
               spin>
@@ -121,14 +146,18 @@ const Page = () => {
             </Button>
           </form>
 
-          <Typography variant="body1" color="ink.lighter" textAlign="center">
+          <Typography
+            variant="body1"
+            color="ink.lighter"
+            textAlign="center"
+            fontSize="16px">
             Hoặc
           </Typography>
           <Button
             fullWidth
             size="large"
-            sx={{ mt: 2 }}
-            variant="outlined"
+            sx={{ mt: 2, bgcolor: 'sky.lightest', color: 'ink.main' }}
+            variant="text"
             onClick={handleSignInGoogle}>
             Đăng nhập với google
           </Button>

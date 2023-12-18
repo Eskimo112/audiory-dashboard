@@ -4,14 +4,14 @@ export const STATUS_MAP = {
 };
 
 export const TRANSACTION_TYPE_MAP = {
-  REWARD_FROM_GIFT: 'Phần thưởng từ quà',
-  REWARD_FROM_STORY: 'Phần thưởng từ truyện',
+  GIFT_SENT: 'Tặng quà',
+  REWARD_FROM_GIFT: 'Quà thưởng',
+  REWARD_FROM_STORY: 'Doanh thu',
   CHAPTER_BOUGHT: 'Mua chương',
   REFUND: 'Hoàn tiền',
   PURCHASE: 'Mua xu',
   DAILY_REWARD: 'Nhận xu hàng ngày',
   WITHDRAW: 'Rút tiền',
-  GIFT_SENT: 'Tặng quà',
 };
 export const TRANSACTION_STATUS_MAP = {
   SUCCEEDED: 'Thành công',

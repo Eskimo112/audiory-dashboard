@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Head from 'next/head';
 
-import { Close } from '@mui/icons-material';
+import { Close, PublishRounded } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -14,6 +14,7 @@ import {
   IconButton,
   Pagination,
   Stack,
+  SvgIcon,
   Typography,
   Unstable_Grid2 as Grid,
 } from '@mui/material';
@@ -29,6 +30,7 @@ import {
 import { useAuth } from '../../../hooks/use-auth';
 import ChapterVersionService from '../../../services/chapter-version';
 import { formatDate } from '../../../utils/formatters';
+import { toastError, toastSuccess } from '../../../utils/notification';
 import LoadingPage from '../../loading';
 
 const REPORT_TYPE_MAP = {
@@ -45,17 +47,20 @@ const REPORT_STATUS_MAP = {
   REJECTED: 'Bị từ chối',
 };
 
-const ReportListPage = () => {
+const ReportListPage = ({ reportId }) => {
   const requestHeader = useRequestHeader();
   const { user } = useAuth();
-  const [currentReport, setCurrentReport] = useState(null);
+  const [currentReport, setCurrentReport] = useState(reportId);
   const [page, setPage] = useState(1);
-  const { data: reports = [], isLoading } = useQuery(
+  const { data: response = {}, isLoading } = useQuery(
     ['user', user.id, 'reports', page],
+
     async () =>
       await new UserService(requestHeader).getReportsByUserId(user.id, page),
     { refetchOnWindowFocus: false, enabled: Boolean(user.id) },
   );
+  const reports = response.data ?? [];
+  const totalPage = response.total_page ?? 0;
 
   // const { data: chapterVersionData = {} } = useQuery(
   //   ['chapterVersion', currentReport.reported_id],
@@ -70,6 +75,12 @@ const ReportListPage = () => {
   //     refetchOnWindowFocus: false,
   //   },
   // );
+
+  useEffect(() => {
+    if (!reports) return;
+    const matchedReport = reports.find((report) => report.id === reportId);
+    if (matchedReport) setCurrentReport(matchedReport);
+  }, [reportId, reports]);
 
   if (isLoading) return <LoadingPage />;
 
@@ -181,7 +192,7 @@ const ReportListPage = () => {
                 </Stack>
 
                 <Pagination
-                  count={2}
+                  count={totalPage}
                   page={page}
                   color="primary"
                   onChange={(_, page) => setPage(page)}
@@ -274,7 +285,7 @@ const ReportListPage = () => {
               </Stack>
             </DialogContent>
             <DialogContent dividers>
-              <Stack gap="12px">
+              <Stack gap="12px" alignItems="center">
                 <Stack
                   direction="row"
                   width="100%"
@@ -315,16 +326,38 @@ const ReportListPage = () => {
                     </Typography>
                   </Stack>
                 )}
-                {/* {currentReport.report_type === 'CONTENT_VIOLATION_COMPLAINT' &&
+                {currentReport.report_type === 'CONTENT_VIOLATION_COMPLAINT' &&
                   currentReport.report_status === 'APPROVED' && (
                     <Button
                       variant="contained"
-                      onClick={() => {
-                        chapterVersionData;
+                      startIcon={
+                        <SvgIcon>
+                          <PublishRounded></PublishRounded>
+                        </SvgIcon>
+                      }
+                      sx={{ width: 'fit-content' }}
+                      onClick={async () => {
+                        await new ChapterVersionService(requestHeader)
+                          .publish(currentReport.reported_id)
+                          .then(() => {
+                            toastSuccess('Đăng tải chương thành công');
+                          })
+                          .catch((error) => {
+                            if (
+                              error.response &&
+                              error.response.data &&
+                              error.response.data.message
+                            ) {
+                              toastError(error.response.data.message);
+                              return;
+                            }
+                            toastError('Đã xảy ra lỗi, thử lại sau');
+                          })
+                          .finally(() => setCurrentReport(null));
                       }}>
-                      Chi tiết chương
+                      Đăng tải chương
                     </Button>
-                  )} */}
+                  )}
               </Stack>
             </DialogContent>
           </Dialog>

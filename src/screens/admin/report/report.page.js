@@ -73,6 +73,22 @@ const ReportPage = () => {
       {
         accessorKey: 'title',
         header: 'Tiêu đề',
+        Cell: ({ cell }) => {
+          return (
+            <Typography
+              variant="body1"
+              fontSize="14px"
+              sx={{
+                overflow: 'hidden',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                lineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+              }}>
+              {cell.getValue()}
+            </Typography>
+          );
+        },
       },
       {
         accessorKey: 'report_type',
@@ -216,12 +232,13 @@ const ReportPage = () => {
         },
       },
     ],
-    [],
+    [theme.palette.primary.main],
   );
 
   const initialState = {
     columnVisibility: {
       id: false,
+      reported_id: false,
     },
     showGlobalFilter: true,
   };
@@ -279,7 +296,11 @@ const ReportPage = () => {
                       borderRadius: 4,
                       padding: '5px 12px',
                     }}
-                    variant="outlined"
+                    variant={
+                      row.original.report_status === 'PROCESSING'
+                        ? 'contained'
+                        : 'outlined'
+                    }
                     onClick={() => {
                       router.push(`/admin/reports/${row.original.id}`);
                     }}>

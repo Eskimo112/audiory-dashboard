@@ -93,8 +93,8 @@ export default class UserService {
       },
       requestHeaders: this.requestHeader,
     });
-    if (!response.data) return [];
-    return response.data;
+    if (!response) return [];
+    return response;
   }
 
   async getNotificationByUserId(offset) {
@@ -107,6 +107,19 @@ export default class UserService {
         offset,
         limit: 10,
       },
+      requestHeaders: this.requestHeader,
+    });
+    if (!response) return null;
+    return response;
+  }
+
+  async updateNotificationById(id, body) {
+    const url = `notifications/${id}`;
+
+    const response = await request({
+      url,
+      method: 'put',
+      payload: body,
       requestHeaders: this.requestHeader,
     });
     if (!response.data) return [];

@@ -23,17 +23,15 @@ export const StatCard = (props) => {
   if (value !== 0) {
     percent = (difference / value) * 100;
   }
+
   const positive = difference >= 0;
   return (
     <Card
       sx={{
         ...sx,
         padding: 0,
-        backgroundColor: difference
-          ? positive
-            ? 'primary.alpha20'
-            : 'secondary.alpha20'
-          : '',
+        opacity: 1,
+        backgroundColor: difference ? (positive ? '#dbebea' : '#f9e0da') : '',
       }}>
       <CardContent sx={{ padding: '24px', paddingBottom: '24px!important' }}>
         <Stack
@@ -47,7 +45,7 @@ export const StatCard = (props) => {
               sx={{ fontWeight: 600, fontSize: '16px' }}>
               {title}
             </Typography>
-            {difference && (
+            {Boolean(difference) ? (
               <Typography
                 color="ink.main"
                 sx={{ fontWeight: 600, fontSize: '16px' }}>
@@ -64,6 +62,8 @@ export const StatCard = (props) => {
                 </SvgIcon>
                 {formatNumber(percent) + '%'}
               </Typography>
+            ) : (
+              <Stack height="25px"> </Stack>
             )}
             <Typography variant="h4" sx={{ fontWeight: 700 }}>
               {formatNumber(value) + (suffix || '')}

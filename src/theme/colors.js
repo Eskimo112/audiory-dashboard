@@ -43,8 +43,10 @@ export const primary = withAlphas({
 
 export const chart = {
   main: '#439A97',
-  light: '#A2E4E2',
-  darkest: '#0F4F4D',
+  light: '#abfaa9',
+  darkest: '#3b3561',
+  yellow: '#ead94c',
+  coral: '#dd7373',
 };
 
 export const secondary = withAlphas({
@@ -65,11 +67,11 @@ export const success = withAlphas({
 });
 
 export const info = withAlphas({
-  lightest: '#ECFDFF',
-  light: '#CFF9FE',
-  main: '#06AED4',
-  dark: '#0E7090',
-  darkest: '#164C63',
+  lightest: '#E4E4E4',
+  light: '#969696',
+  main: '#232323',
+  dark: '#121212',
+  darkest: '#000000',
   contrastText: '#FFFFFF',
 });
 

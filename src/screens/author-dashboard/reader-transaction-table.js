@@ -79,7 +79,7 @@ const ReaderTransactionsTable = () => {
 
       {
         accessorKey: 'total_price',
-        header: 'Giá trị',
+        header: 'Tổng xu',
         size: 80,
         Cell: ({ cell, row }) => {
           return (
@@ -112,7 +112,7 @@ const ReaderTransactionsTable = () => {
   };
 
   return (
-    <Card sx={{ p: 2 }}>
+    <>
       <CardHeader title="Giao dịch độc giả" />
       <CardContent sx={{ paddingTop: 0, paddingBottom: 0 }}>
         {isLoading ? (
@@ -143,7 +143,7 @@ const ReaderTransactionsTable = () => {
           />
         )}
       </CardContent>
-    </Card>
+    </>
   );
 };
 

@@ -22,7 +22,6 @@ import StoryService from '@/services/story';
 import { toastError, toastSuccess } from '@/utils/notification';
 
 const DetailStoryTab = ({ story, handleRefetch, file }) => {
-
   const requestHeader = useRequestHeader();
   const [selectedCategory, setSelectedCategory] = useState('');
   const [tag, setTag] = useState('');
@@ -275,15 +274,17 @@ const DetailStoryTab = ({ story, handleRefetch, file }) => {
                     sx={{
                       minWidth: 0,
                       borderRadius: '24px',
-                      padding: '6px 12px',
+                      padding: '3px 12px',
+                      gap: '4px',
                     }}
                     type="button">
-                    {tag}{' '}
+                    {tag}
+
                     <Clear
                       onClick={() => {
                         setTagList(tagList.filter((ele) => ele !== tag));
                       }}
-                      fontSize="1em"
+                      fontSize="14px"
                       sx={{}}
                     />
                   </Button>
