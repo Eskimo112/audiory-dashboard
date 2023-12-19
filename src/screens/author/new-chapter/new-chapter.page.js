@@ -139,7 +139,7 @@ const NewChapterPage = () => {
       content: chapterData?.current_chapter_version?.content ?? '',
       rich_text:
         chapterData?.current_chapter_version?.rich_text === '' ||
-        chapterData?.current_chapter_version?.rich_text === undefined
+          chapterData?.current_chapter_version?.rich_text === undefined
           ? '{}'
           : chapterData?.current_chapter_version?.rich_text,
       title: chapterData?.current_chapter_version?.title ?? '',
@@ -230,7 +230,7 @@ const NewChapterPage = () => {
           title: values.title,
           description: values.description,
           user_id: userId,
-          reported_id: currentChapterVersion.id,
+          reported_id: blockedVersionId || currentChapterVersion.id,
           report_type: 'CONTENT_VIOLATION_COMPLAINT',
           form_file: reportFormFile,
         });
@@ -339,6 +339,8 @@ const NewChapterPage = () => {
                   setBlockedVersionId(
                     e.response.data.data.current_chapter_version.id,
                   );
+                  refetch();
+                  refetch2();
                   setOpenDialog(true);
                 } else {
                   toastError('Không thể đăng tải chương');
@@ -384,6 +386,8 @@ const NewChapterPage = () => {
                       e.response.data.message ===
                       'Hãy gắn nhãn trưởng thành để đi tiếp'
                     ) {
+                      refetch();
+                      refetch2();
                       setBlockedVersionId(
                         e.response.data.data.current_chapter_version.id,
                       );
@@ -428,7 +432,7 @@ const NewChapterPage = () => {
       if (!isChanged) return;
       if (value.split(' ').length < MIN_WORDS) return;
       onSaveDraftChapter(false, false);
-    }, 5000);
+    }, 15000);
     return () => clearInterval(interval);
   }, [isChanged, onSaveDraftChapter, value]);
 
@@ -548,11 +552,10 @@ const NewChapterPage = () => {
                           variant="body1">
                           ({chapter?.is_draft ? 'Bản thảo' : 'Đã đăng tải'}){' '}
                         </Typography>
-                        <Typography variant="body1" color="sky.dark">{`${
-                          formatDateTime(
-                            chapter?.updated_date ?? chapter?.created_date,
-                          ).split(' ')[0]
-                        }`}</Typography>
+                        <Typography variant="body1" color="sky.dark">{`${formatDateTime(
+                          chapter?.updated_date ?? chapter?.created_date,
+                        ).split(' ')[0]
+                          }`}</Typography>
                       </Grid>
                     </Grid>
                     <Grid
