@@ -191,6 +191,9 @@ export const getBarChartCommonOptions = (theme, category, series) => ({
       fontSize: 14,
       fontWeight: 600,
     },
+    valueFormatter: (value) => {
+      return formatNumber(value) + ' VNĐ';
+    },
     dataZoom: [
       {
         yAxisIndex: 0,

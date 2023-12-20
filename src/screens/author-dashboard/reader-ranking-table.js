@@ -71,6 +71,9 @@ const ReaderRankingTable = () => {
         accessorKey: 'total_donation',
         header: 'Quà tặng',
         size: 40,
+        accessorFn: (row) => {
+          return row.total_donation + ' xu';
+        },
       },
     ],
     [],

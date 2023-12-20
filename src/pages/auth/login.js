@@ -74,7 +74,7 @@ const Page = () => {
           <Stack
             spacing={1}
             sx={{ mb: 3, justifyContent: 'center', alignItems: 'center' }}>
-            <AppIcon size={30} />
+            {/* <AppIcon size={30} /> */}
 
             <Typography variant="h4">Đăng nhập</Typography>
             <Typography variant="body1" color="ink.lighter" textAlign="center">

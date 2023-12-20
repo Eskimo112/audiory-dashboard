@@ -23,8 +23,8 @@ import { SHARED_PAGE_SX } from '@/constants/page_sx';
 import AppBreadCrumbs from '../../../components/app-bread-crumbs';
 import { useRequestHeader } from '../../../hooks/use-request-header';
 import ChapterVersionService from '../../../services/chapter-version';
-import LoadingPage from '../../loading';
 import { formatNumberToFixed } from '../../../utils/formatters';
+import LoadingPage from '../../loading';
 
 const MODERATION_MAP = {
   Profanity: 'Thô tục',
@@ -35,7 +35,6 @@ const MODERATION_MAP = {
 
 const ChapterModerationPage = ({ chapterVersionId }) => {
   const requestHeader = useRequestHeader();
-  const router = useRouter();
   // for comment dialog
   const [currentModeration, setCurrentModeration] = useState(null);
   const { data: paras = [], isLoading } = useQuery(
@@ -90,38 +89,61 @@ const ChapterModerationPage = ({ chapterVersionId }) => {
                     chi tiết)
                   </Typography>
                   {paras.map((p, index) => {
-                    const isMatured = p.content_moderation[0].is_mature;
-                    const isReactionary =
-                      p.content_moderation[0].is_reactionary;
-
-                    return (
-                      <Button
-                        key={index}
-                        variant="text"
-                        onClick={() =>
-                          setCurrentModeration(p.content_moderation[0])
-                        }
-                        sx={{
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                          justifyContent: 'start',
-                          position: 'relative',
-                          ':hover': {
+                    return p.content_moderation.map((moderation) => {
+                      const isMatured = moderation.is_mature;
+                      const isReactionary = moderation.is_reactionary;
+                      return moderation.type === 'IMAGE' && moderation.image ? (
+                        <Box
+                          sx={{
+                            width: '50%',
+                            padding: '8px',
                             bgcolor:
-                              isMatured || isReactionary ? 'error.alpha30' : '',
-                          },
-                          ':active': {
+                              isMatured || isReactionary ? 'error.alpha20' : '',
+                            borderRadius: '8px',
+                          }}>
+                          <Typography
+                            variant="body2"
+                            textAlign="center"
+                            color="error">
+                            Ảnh có nội dung trưởng thành
+                          </Typography>
+                          <Box
+                            width="100%"
+                            component="img"
+                            sx={{ filter: 'blur(8px)' }}
+                            src={moderation.image}></Box>
+                        </Box>
+                      ) : (
+                        <Button
+                          key={moderation.id}
+                          variant="text"
+                          onClick={() => setCurrentModeration(moderation)}
+                          sx={{
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            justifyContent: 'start',
+                            position: 'relative',
+                            ':hover': {
+                              bgcolor:
+                                isMatured || isReactionary
+                                  ? 'error.alpha30'
+                                  : '',
+                            },
+                            ':active': {
+                              bgcolor:
+                                isMatured || isReactionary
+                                  ? 'error.alpha50'
+                                  : '',
+                            },
                             bgcolor:
-                              isMatured || isReactionary ? 'error.alpha50' : '',
-                          },
-                          bgcolor:
-                            isMatured || isReactionary ? 'error.alpha20' : '',
-                        }}>
-                        <Typography variant="reading1" color="ink.main">
-                          {p.content}
-                        </Typography>
-                      </Button>
-                    );
+                              isMatured || isReactionary ? 'error.alpha20' : '',
+                          }}>
+                          <Typography variant="reading1" color="ink.main">
+                            {p.content}
+                          </Typography>
+                        </Button>
+                      );
+                    });
                   })}
                 </Stack>
               </Grid>

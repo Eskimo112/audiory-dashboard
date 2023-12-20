@@ -51,6 +51,7 @@ export const AuthorRevenueChart = (props) => {
     const analytics = data.analytics;
     if (!analytics) return null;
     const categories = Object.keys(analytics[0].values).reverse();
+
     const formattedSeries = analytics.map((series) => ({
       name: REVENUE_MAP[series.metric],
       data: Object.values(series.values).reverse(),
