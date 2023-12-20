@@ -54,6 +54,9 @@ const AuthorBreadCrumbs = ({
 
     paths.forEach((path, index) => {
       if (index !== 0) {
+        if (path === 'write') return;
+        if (path === 'preview') return;
+
         result.push(
           <Link
             key={index}
@@ -81,7 +84,11 @@ const AuthorBreadCrumbs = ({
           break;
         case 2:
           accumulativeRoute =
-            paths.length === 3 ? cTitle ?? '' : paths[2] === 'write' ? 'Viết' : 'Xem trước';
+            paths.length === 3
+              ? cTitle ?? ''
+              : paths[2] === 'write'
+              ? 'Viết'
+              : 'Xem trước';
           break;
         case 3:
           accumulativeRoute = cTitle;

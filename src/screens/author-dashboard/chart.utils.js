@@ -79,7 +79,6 @@ export const getAuthorChartCommonOptions = (theme, category, series) => ({
     },
   },
   color: Object.values(theme.palette.chart),
-
   series: series.map((sr) => ({
     ...sr,
     type: 'line',

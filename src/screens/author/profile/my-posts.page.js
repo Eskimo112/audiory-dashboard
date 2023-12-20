@@ -4,7 +4,12 @@ import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
-import { ArrowBack, MoreVert } from '@mui/icons-material';
+import {
+  ArrowBack,
+  DeleteOutlineOutlined,
+  MoreVert,
+  UnpublishedOutlined,
+} from '@mui/icons-material';
 import {
   Avatar,
   Box,
@@ -13,6 +18,7 @@ import {
   Divider,
   IconButton,
   inputBaseClasses,
+  Popover,
   Stack,
   SvgIcon,
   TextField,
@@ -63,6 +69,7 @@ const MyPostsPage = () => {
   );
 
   const [value, setValue] = useState('');
+  const [anchorEl, setAnchorEl] = useState(null);
   const [isSubmitting, setIsSubmiting] = useState(false);
 
   const handleSubmitPost = async () => {
@@ -78,6 +85,22 @@ const MyPostsPage = () => {
         toastError('Đã có lỗi xảy ra. Vui lòng thử lại sau');
       })
       .finally(() => setIsSubmiting(false));
+  };
+
+  const handleDeletePost = async (id) => {
+    setIsSubmiting(true);
+    await new CommentService(requestHeader)
+      .deleteById(id)
+      .then(() => {
+        toastSuccess('Xóa bài đăng thành công');
+        refetch();
+        setValue('');
+      })
+      .catch(() => {
+        toastError('Đã có lỗi xảy ra. Vui lòng thử lại sau');
+      })
+      .finally(() => setIsSubmiting(false));
+    setAnchorEl(null);
   };
 
   if (postsLoading || isLoading) return <LoadingPage />;
@@ -256,9 +279,41 @@ const MyPostsPage = () => {
                               </Typography>
                             </Stack>
                             <IconButton
-                              sx={{ color: 'ink.lighter', fontSize: '14px' }}>
+                              sx={{ color: 'ink.lighter', fontSize: '14px' }}
+                              onClick={(e) => {
+                                console.log(e.target);
+                                setAnchorEl(e.currentTarget);
+                              }}>
                               <MoreVert />
                             </IconButton>
+                            <Popover
+                              id={post.id}
+                              open={!!anchorEl}
+                              anchorEl={anchorEl}
+                              onClose={(e) => setAnchorEl(null)}
+                              anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                              }}>
+                              <Stack container direction="column" gap="4px">
+                                <Button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+
+                                    handleDeletePost(post.id);
+                                  }}
+                                  startIcon={
+                                    <SvgIcon sx={{ width: '18px' }}>
+                                      <DeleteOutlineOutlined></DeleteOutlineOutlined>
+                                    </SvgIcon>
+                                  }
+                                  variant="text"
+                                  color="error">
+                                  Xóa bài đăng
+                                </Button>
+                              </Stack>
+                            </Popover>
                           </Stack>
                           <Divider />
                           <Typography variant="body2" fontSize="16px">

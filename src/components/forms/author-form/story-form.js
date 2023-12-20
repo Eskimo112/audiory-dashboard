@@ -174,6 +174,8 @@ const StoryForm = () => {
     }
   };
 
+  console.log(formik.values.tags);
+
   return (
     <>
       <div>

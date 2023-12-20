@@ -8,6 +8,7 @@ import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 import * as Yup from 'yup';
 
 import { toastError } from '@/utils/notification';
+
 import AppIcon from '../../components/app-icon';
 
 const Page = () => {
@@ -114,7 +115,7 @@ const Page = () => {
                 {formik.errors.submit}
               </Typography>
             )}
-            <Stack
+            {/* <Stack
               width="100%"
               justifyContent="flex-end"
               direction="row"
@@ -131,7 +132,7 @@ const Page = () => {
                 }}>
                 Quên mật khẩu?
               </Typography>
-            </Stack>
+            </Stack> */}
 
             <Button
               fullWidth
